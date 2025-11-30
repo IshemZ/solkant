@@ -317,11 +317,70 @@ Use the following prefixes for branch names:
 - Database access through Prisma Client
 - Server Components for data fetching where possible
 
+**Existing API Routes**:
+
+All API routes are in `app/api/`:
+
+1. **`/api/auth/[...nextauth]`** (NextAuth handler)
+   - File: `app/api/auth/[...nextauth]/route.ts`
+   - Methods: `GET`, `POST`
+   - Purpose: Handles all NextAuth authentication requests
+   - Endpoints provided:
+     - `/api/auth/signin` - Sign in page
+     - `/api/auth/signout` - Sign out
+     - `/api/auth/callback/[provider]` - OAuth callbacks (Google)
+     - `/api/auth/session` - Get current session
+     - `/api/auth/csrf` - CSRF token
+     - `/api/auth/providers` - List available providers
+   - Configuration imported from `lib/auth.ts`
+
+2. **`/api/auth/register`** (User registration)
+   - File: `app/api/auth/register/route.ts`
+   - Method: `POST`
+   - Purpose: Creates new user account with email/password
+   - Request body: `{ name, email, password }`
+   - Validation: Email uniqueness, password length (8+ chars)
+   - Security: Hashes password with bcryptjs (12 rounds)
+   - Returns: User object (without password) or error
+   - **Note**: Error messages currently in English (TODO: translate to French)
+
+**Existing Pages & Routes**:
+
+All pages are in `app/`:
+
+1. **`/`** (Homepage)
+   - File: `app/page.tsx`
+   - Public landing page in French
+   - Features: Hero, features grid, CTA sections, footer
+   - Links to `/login` and `/register`
+
+2. **`/login`** (Login page)
+   - File: `app/(auth)/login/page.tsx`
+   - Component: `LoginForm.tsx`
+   - Features: Email/password login, Google OAuth, all text in French
+   - Redirects to `/dashboard` on success
+
+3. **`/register`** (Registration page)
+   - File: `app/(auth)/register/page.tsx`
+   - Component: `RegisterForm.tsx`
+   - Features: Name, email, password, confirm password, Google OAuth
+   - All text in French, auto-login after registration
+   - Redirects to `/dashboard` on success
+
+4. **`/dashboard`** (Main dashboard - Protected)
+   - File: `app/(dashboard)/dashboard/page.tsx`
+   - Layout: `app/(dashboard)/layout.tsx` (auth protection)
+   - Features: Welcome message, stats cards, quick actions, getting started guide
+   - Shows user name/email from session
+   - All text in French
+   - Redirects to `/login` if not authenticated
+
 ### Styling Conventions
 
 - Using Tailwind CSS v4 utility classes
 - Custom theme tokens defined in `app/globals.css`
-- [TODO: Add component styling patterns, shared components location]
+- Color scheme: Beige/brown tones for beauty industry (`#D4B5A0`, `#8B7355`)
+- All UI text in French for consistency
 
 ### File Organization
 
@@ -332,14 +391,22 @@ devisio/
 ├── app/                      # Next.js App Router
 │   ├── (auth)/              # ✅ Route group for authentication
 │   │   ├── login/           # ✅ Login page with email/password + Google OAuth
+│   │   │   └── page.tsx     # French language login form
 │   │   └── register/        # ✅ Registration page with form validation
+│   │       └── page.tsx     # French language registration form
+│   ├── (dashboard)/         # ✅ Protected route group for authenticated users
+│   │   ├── layout.tsx       # ✅ Dashboard layout with auth protection
+│   │   └── dashboard/       # ✅ Main dashboard page
+│   │       └── page.tsx     # Welcome page, stats, quick actions
 │   ├── api/                 # API Routes
 │   │   └── auth/            # ✅ NextAuth endpoints
-│   │       ├── [...nextauth]/ # NextAuth route handler
-│   │       └── register/    # User registration API
+│   │       ├── [...nextauth]/ # ✅ NextAuth route handler (signin, signout, callback, session)
+│   │       │   └── route.ts   # Imports authOptions from lib/auth.ts
+│   │       └── register/    # ✅ User registration API
+│   │           └── route.ts   # POST - creates new user with hashed password
 │   ├── actions/             # Server Actions (CRUD operations)
 │   ├── layout.tsx           # Root layout with fonts and metadata
-│   ├── page.tsx             # ✅ Homepage (professional landing page)
+│   ├── page.tsx             # ✅ Homepage (professional landing page in French)
 │   └── globals.css          # Global styles + Tailwind
 │
 ├── components/              # React components
