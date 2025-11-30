@@ -6,6 +6,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Devisio is a Next.js 16 application using the App Router architecture with TypeScript, React 19, and Tailwind CSS v4.
 
+**Purpose**: [TODO: Describe what this application does and its main goals]
+
+**Target Users**: [TODO: Who will use this application]
+
 ## Development Commands
 
 - `npm run dev` - Start development server at http://localhost:3000
@@ -84,3 +88,66 @@ Use the following prefixes for branch names:
 3. Run `npm run lint` to check for linting issues
 4. Push branch and create pull request to `main`
 5. Once merged, changes auto-deploy to production via Vercel
+
+## Key Patterns and Decisions
+
+### Data Fetching
+
+[TODO: Document your data fetching strategy when you implement it]
+- Server Components vs Client Components
+- API routes or Server Actions
+- Data caching strategy
+
+### State Management
+
+[TODO: Document state management approach]
+- Local state: useState/useReducer
+- Global state: Context API / Zustand / Redux / etc.
+- Server state: If using a library like React Query, SWR, etc.
+
+### Authentication & Authorization
+
+[TODO: Document authentication setup when implemented]
+- Auth provider: NextAuth, Clerk, Supabase Auth, custom, etc.
+- Protected routes pattern
+- Session management
+
+### Database & Backend
+
+[TODO: Document database and backend services]
+- Database: PostgreSQL, MongoDB, Supabase, Firebase, etc.
+- ORM/Client: Prisma, Drizzle, raw SQL, etc.
+- API structure
+
+### Styling Conventions
+
+- Using Tailwind CSS v4 utility classes
+- Custom theme tokens defined in `app/globals.css`
+- [TODO: Add component styling patterns, shared components location]
+
+### File Organization
+
+[TODO: Document file/folder organization patterns as they emerge]
+- Components: Where shared components live
+- Utilities: Helper functions location
+- Types: TypeScript type definitions
+- Constants: Application constants
+
+## Environment Variables
+
+[TODO: Document required environment variables]
+
+```bash
+# Example:
+# DATABASE_URL=
+# NEXT_PUBLIC_API_URL=
+# AUTH_SECRET=
+```
+
+## Known Issues & Gotchas
+
+[TODO: Document any known issues, workarounds, or things to watch out for]
+
+## Future Plans
+
+[TODO: Track planned features or refactoring]
