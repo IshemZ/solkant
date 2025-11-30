@@ -254,9 +254,10 @@ Use the following prefixes for branch names:
 
 [TODO: Document state management approach]
 
-- Local state: useState/useReducer
-- Global state: Context API / Zustand / Redux / etc.
-- Server state: If using a library like React Query, SWR, etc.
+- Local state: useState/useReducer for component-level state
+- Global state: Context API for small apps (minimize global state when possible)
+- Server state: Server Components + Server Actions (recommended for Devisio)
+- For larger apps: Consider Zustand or React Query if needed
 
 ### Authentication & Authorization
 
@@ -269,7 +270,8 @@ Use the following prefixes for branch names:
 
 **Implementation**:
 
-- NextAuth configuration in `/app/api/auth/[...nextauth]/route.ts`
+- NextAuth configuration defined in `lib/auth.ts` (providers, callbacks, session strategy)
+- NextAuth API routes in `/app/api/auth/[...nextauth]/route.ts` (imports config from `lib/auth.ts`)
 - Session management via NextAuth session strategy
 - Protected routes using middleware or server-side session checks
 - Single account per beauty institute (business owner)
@@ -299,7 +301,7 @@ Use the following prefixes for branch names:
 
 **API Structure**:
 
-- Prefer Server Actions for data mutations (Next.js 14+ pattern)
+- Prefer Server Actions for data mutations (modern App Router pattern)
 - API routes (`/app/api/*`) for external integrations or webhooks
 - Database access through Prisma Client
 - Server Components for data fetching where possible
@@ -351,6 +353,7 @@ devisio/
 - Utilities: camelCase (e.g., `utils.ts`, `formatters.ts`)
 - Types: `types.ts` or inline with components
 - Constants: `constants.ts` with UPPER_CASE exports
+- Tests: Co-located with components (e.g., `QuoteCard.test.tsx` next to `QuoteCard.tsx`)
 
 ## Environment Variables
 
@@ -393,11 +396,16 @@ Follow these modern SaaS development practices when working on Devisio:
   - Automatic revalidation and optimistic updates
   - Type-safe data mutations
 - **Colocation**: Keep related files close (component + styles + tests in same folder)
+  - Example: `components/quotes/QuoteCard.tsx` with `QuoteCard.test.tsx` in same folder
+  - Group domain-specific components together (`components/quotes/`, `components/clients/`)
 - **Composition over Inheritance**: Build small, reusable components
 
 ### Security Best Practices
 
-- **Environment Variables**: Never commit secrets (use `.env.local`, not `.env`)
+- **Environment Variables**:
+  - Use `.env.local` for actual secrets (ignored by git)
+  - `.env.example` is the template (safe to commit, no real values)
+  - Never commit `.env` files with real credentials
 - **Input Validation**: Always validate user input with Zod schemas
 - **SQL Injection**: Use Prisma parameterized queries (never raw SQL with user input)
 - **XSS Protection**: React escapes by default, but be careful with `dangerouslySetInnerHTML`
@@ -602,12 +610,13 @@ This checklist guides the initial project setup. Check off items as they are com
   - [ ] Create OAuth 2.0 Client ID
   - [ ] Add authorized redirect URIs
   - [ ] Note down Client ID and Secret
-- [ ] Create NextAuth API route
-  - [ ] `app/api/auth/[...nextauth]/route.ts`
+- [ ] Create NextAuth configuration in `lib/auth.ts`
   - [ ] Configure providers (Credentials, Google)
   - [ ] Configure session strategy
-  - [ ] Configure callbacks
-- [ ] Create auth utilities in `lib/auth.ts`
+  - [ ] Configure callbacks (jwt, session)
+- [ ] Create NextAuth API route `app/api/auth/[...nextauth]/route.ts`
+  - [ ] Import auth config from `lib/auth.ts`
+  - [ ] Export GET and POST handlers
 - [ ] Test authentication flow
 
 ### 6. Initial UI Setup
