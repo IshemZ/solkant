@@ -581,6 +581,200 @@ cat .env.local | grep -E "^(DATABASE_URL|DIRECT_URL)=" > .env
 
 **Note**: This is expected behavior, not a bug. The two tools have different env loading strategies.
 
+## UX Review & Recommendations
+
+**Last Review Date**: 2025-11-30
+**Overall UX Score**: 6.5/10
+
+This section documents UX issues identified during development and prioritized recommendations for improvement. It serves as a roadmap for UX enhancements.
+
+### UX Score Breakdown
+
+| Category | Score | Notes |
+|----------|-------|-------|
+| **Visual Design** | 7.5/10 | Clean, professional, good color palette |
+| **Navigation** | 5/10 | Missing dashboard route, no mobile menu |
+| **User Feedback** | 4/10 | Critical: No success messages or confirmations |
+| **Accessibility** | 5.5/10 | Missing focus states, ARIA labels |
+| **Language Consistency** | 3/10 | **Critical**: Mixed French/English |
+| **Forms & Authentication** | 6/10 | Missing password visibility toggle, forgot password |
+| **Responsiveness** | 7/10 | Good mobile design, needs mobile nav |
+| **Error Handling** | 5/10 | Basic errors present, needs improvement |
+
+### Critical Issues (Fix Immediately)
+
+These issues block core user flows or create confusion:
+
+1. **Language Inconsistency** ⚠️
+   - **Problem**: Homepage in French, auth pages in English
+   - **Impact**: Confusing, unprofessional
+   - **Fix**: Uniformize to French across all pages
+   - **Files affected**:
+     - [app/(auth)/login/page.tsx](app/(auth)/login/page.tsx)
+     - [app/(auth)/register/page.tsx](app/(auth)/register/page.tsx)
+     - [components/auth/LoginForm.tsx](components/auth/LoginForm.tsx)
+     - [components/auth/RegisterForm.tsx](components/auth/RegisterForm.tsx)
+
+2. **Missing Dashboard Route** ⚠️
+   - **Problem**: 404 error after successful login/registration
+   - **Impact**: Breaks core user flow, creates bad first impression
+   - **Fix**: Create `app/(dashboard)/dashboard/page.tsx` with basic layout
+   - **Temporary solution**: Add simple welcome page with user info
+
+3. **No User Feedback** ⚠️
+   - **Problem**: No success messages, loading states, or confirmations
+   - **Impact**: Users don't know if actions succeeded
+   - **Fix**:
+     - Add toast notifications library (react-hot-toast or sonner)
+     - Show "Registration successful!" message
+     - Add loading spinners during auth
+     - Add success feedback after form submissions
+
+4. **Generic Error Messages** ⚠️
+   - **Problem**: "Invalid email or password" doesn't help debug
+   - **Impact**: Poor user experience, support burden
+   - **Fix**:
+     - Distinguish between "User not found" and "Wrong password"
+     - Add field-specific validation errors
+     - Show helpful hints ("Email format incorrect")
+
+### Important Improvements (Phase 2)
+
+These significantly improve UX but aren't blocking:
+
+5. **Missing Forgot Password Flow**
+   - Add "Forgot password?" link
+   - Implement password reset via email
+   - Create reset token system in Prisma schema
+
+6. **No Password Visibility Toggle**
+   - Add eye icon to show/hide password
+   - Common UX pattern users expect
+   - Easy accessibility win
+
+7. **No Mobile Navigation Menu**
+   - Homepage nav doesn't adapt for mobile
+   - Add hamburger menu for small screens
+   - Ensure touch-friendly buttons
+
+8. **Theme Not Applied to Forms**
+   - Forms use generic styling
+   - Should match homepage color palette
+   - Apply primary/secondary colors from Prisma Business model
+
+9. **No Loading States**
+   - Forms submit without visual feedback
+   - Add spinners or skeleton screens
+   - Disable buttons during submission
+
+10. **Accessibility Gaps**
+    - Missing focus indicators on interactive elements
+    - No ARIA labels for screen readers
+    - Forms missing proper label associations
+
+### Nice-to-Have Enhancements (Phase 3)
+
+These polish the experience but can wait:
+
+11. **No Social Proof**
+    - Homepage lacks testimonials, reviews, or client logos
+    - Add social proof section for credibility
+
+12. **No Pricing Information**
+    - Users can't see pricing before signing up
+    - Consider adding pricing page or transparency
+
+13. **Missing Demo/Screenshots**
+    - Landing page doesn't show product
+    - Add dashboard preview screenshots
+
+14. **No Onboarding Flow**
+    - After registration, users dropped into empty dashboard
+    - Add guided tour or setup wizard
+
+15. **Animations Missing**
+    - Static experience, no micro-interactions
+    - Add subtle transitions for polish
+
+### Prioritized Implementation Roadmap
+
+#### **Phase 1: Critical Fixes (URGENT)**
+Complete before any user testing or launch:
+
+1. Uniformize language to French (all auth pages)
+2. Create `/dashboard` route with basic layout
+3. Add toast notification system
+4. Implement proper success/error feedback
+5. Improve error messages with specific guidance
+6. Add loading states to all forms
+
+**Estimated effort**: 1-2 days
+**Impact**: Fixes broken user flows, makes app usable
+
+#### **Phase 2: Important UX (Before Beta)**
+Complete before inviting real users:
+
+1. Implement forgot password flow
+2. Add password visibility toggle
+3. Create responsive mobile navigation
+4. Apply theme colors to auth pages
+5. Add proper focus states and ARIA labels
+6. Improve form validation feedback
+
+**Estimated effort**: 2-3 days
+**Impact**: Professional, polished experience
+
+#### **Phase 3: Polish & Growth (Post-Launch)**
+Add after core product is stable:
+
+1. Add social proof section
+2. Create pricing/features comparison page
+3. Add product screenshots to homepage
+4. Build onboarding wizard for new users
+5. Add micro-animations and transitions
+6. Implement analytics and user feedback system
+
+**Estimated effort**: 3-5 days
+**Impact**: Increased conversions, better retention
+
+### UX Testing Recommendations
+
+Before launching to users:
+
+- [ ] Test complete auth flow (register → login → dashboard)
+- [ ] Verify all text is in French
+- [ ] Test on mobile devices (iOS Safari, Android Chrome)
+- [ ] Test keyboard navigation (tab through forms)
+- [ ] Test with screen reader (VoiceOver or NVDA)
+- [ ] Verify error states display correctly
+- [ ] Test Google OAuth flow end-to-end
+- [ ] Check all links work (no 404s)
+
+### Design System Consistency
+
+**Current Theme** (from Prisma Business model):
+- Primary: `#D4B5A0` (beige - beauty industry aesthetic)
+- Secondary: `#8B7355` (darker beige/brown)
+
+**To Apply**:
+- Use primary color for CTAs and highlights
+- Use secondary for hover states and accents
+- Ensure auth pages match homepage aesthetic
+- Create reusable button/input components with theme
+
+### Future UX Considerations
+
+As the product grows, consider:
+
+- **Multi-language support**: If expanding beyond French market
+- **Dark mode**: Optional, but increasingly expected
+- **Keyboard shortcuts**: Power user feature for quote creation
+- **Bulk actions**: For managing multiple clients/quotes
+- **Search functionality**: When data volume grows
+- **Export options**: PDF, CSV for quotes and reports
+- **Email templates**: Professional quote delivery
+- **Client portal**: Let clients view/accept quotes online
+
 ## Future Plans
 
 [TODO: Track planned features or refactoring]
