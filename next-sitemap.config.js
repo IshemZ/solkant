@@ -1,4 +1,4 @@
 module.exports = {
-  siteUrl: "https://www.solkant.com", // change ça avec ton vrai domaine
+  siteUrl: "https://solkant.com", // change ça avec ton vrai domaine
   generateRobotsTxt: true,
 };
