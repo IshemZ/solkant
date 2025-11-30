@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
-import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
+import SignOutButton from '@/components/SignOutButton'
 
 export const metadata: Metadata = {
   title: 'Tableau de bord | Devisio',
@@ -9,10 +9,12 @@ export const metadata: Metadata = {
 }
 
 export default async function DashboardPage() {
+  // Auth check handled by layout.tsx - session guaranteed to exist
   const session = await getServerSession(authOptions)
 
+  // TypeScript safety: layout.tsx redirects if no session
   if (!session) {
-    redirect('/login')
+    return null
   }
 
   return (
@@ -28,12 +30,7 @@ export default async function DashboardPage() {
               <span className="text-sm text-foreground/60">
                 {session.user?.name || session.user?.email}
               </span>
-              <a
-                href="/api/auth/signout"
-                className="rounded-md border border-foreground/20 px-4 py-2 text-sm font-medium text-foreground hover:bg-foreground/5"
-              >
-                Déconnexion
-              </a>
+              <SignOutButton />
             </div>
           </div>
         </div>
