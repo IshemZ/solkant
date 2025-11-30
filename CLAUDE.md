@@ -864,9 +864,397 @@ As the product grows, consider:
 - **Email templates**: Professional quote delivery
 - **Client portal**: Let clients view/accept quotes online
 
+## Development Roadmap & Todo List
+
+This section provides a prioritized list of tasks to complete before launch. Items are organized by priority and estimated effort.
+
+### 🔴 **Critical Priority - Do Immediately**
+
+These items are **blocking** for production launch and pose security/data integrity risks:
+
+#### **1. Multi-Tenancy Data Isolation** 🔴 CRITICAL
+**Priority**: Highest
+**Effort**: 2-3 hours
+**Risk**: Data leak between businesses
+
+- [ ] Create multi-tenancy helper functions in `lib/multi-tenancy.ts`:
+  ```typescript
+  export async function getUserBusinessId(userId: string): Promise<string>
+  export function withBusinessFilter<T>(businessId: string, query: T): T
+  ```
+- [ ] Add Prisma middleware to enforce businessId filtering on all queries
+- [ ] Audit all existing queries to ensure they filter by businessId
+- [ ] Add businessId to NextAuth session object
+- [ ] Update `types/next-auth.d.ts` to include businessId in session
+
+**Files to create/modify**:
+- Create: `lib/multi-tenancy.ts`
+- Modify: `lib/auth.ts` (add businessId to session callback)
+- Modify: `types/next-auth.d.ts`
+
+---
+
+#### **2. Automatic Business Creation on Registration** 🔴 CRITICAL
+**Priority**: Highest
+**Effort**: 1-2 hours
+**Risk**: Users can't use the app without a Business record
+
+- [ ] Modify registration flow to create Business + User in single transaction
+- [ ] Update `app/api/auth/register/route.ts`:
+  ```typescript
+  const result = await prisma.$transaction(async (tx) => {
+    const user = await tx.user.create({ data: { name, email, password }})
+    const business = await tx.business.create({
+      data: {
+        name: `Institut de ${name}`,
+        userId: user.id
+      }
+    })
+    return { user, business }
+  })
+  ```
+- [ ] Handle Google OAuth registration (add callback in `lib/auth.ts`)
+- [ ] Test registration flow creates both User and Business
+
+**Files to modify**:
+- `app/api/auth/register/route.ts`
+- `lib/auth.ts` (signIn callback for OAuth)
+
+---
+
+#### **3. Input Validation with Zod Schemas** 🔴 CRITICAL
+**Priority**: High
+**Effort**: 2-3 hours
+**Risk**: SQL injection, XSS, invalid data in database
+
+- [ ] Create validation schemas in `lib/validations/`:
+  - [ ] `auth.ts` - registration, login schemas
+  - [ ] `business.ts` - business profile schemas
+  - [ ] `client.ts` - client CRUD schemas
+  - [ ] `service.ts` - service CRUD schemas
+  - [ ] `quote.ts` - quote creation schemas
+- [ ] Apply validation in API routes and Server Actions
+- [ ] Add input sanitization (trim, lowercase email)
+- [ ] Validate on both client and server
+
+**Example schema**:
+```typescript
+// lib/validations/auth.ts
+import { z } from 'zod'
+
+export const registerSchema = z.object({
+  name: z.string().min(2, 'Le nom doit contenir au moins 2 caractères').trim(),
+  email: z.string().email('Email invalide').toLowerCase().trim(),
+  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: 'Les mots de passe ne correspondent pas',
+  path: ['confirmPassword'],
+})
+```
+
+**Files to create**:
+- `lib/validations/auth.ts`
+- `lib/validations/business.ts`
+- `lib/validations/client.ts`
+- `lib/validations/service.ts`
+- `lib/validations/quote.ts`
+
+---
+
+#### **4. Create .env.example File** 🔴 CRITICAL
+**Priority**: High
+**Effort**: 15 minutes
+**Risk**: Other developers/deployments missing required env vars
+
+- [ ] Create `.env.example` with all required variables (placeholder values)
+- [ ] Document each variable's purpose
+- [ ] Add instructions for obtaining values (Google OAuth, Supabase URLs)
+
+**File to create**:
+```bash
+# .env.example
+
+# Database (Supabase PostgreSQL)
+# Get from: Supabase Dashboard → Project Settings → Database → Connection String
+DATABASE_URL="postgresql://postgres:[YOUR-PASSWORD]@[PROJECT-REF].supabase.co:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres:[YOUR-PASSWORD]@[PROJECT-REF].supabase.co:5432/postgres"
+
+# NextAuth Configuration
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="generate-with-openssl-rand-base64-32"
+
+# Google OAuth (optional)
+# Get from: Google Cloud Console → APIs & Services → Credentials
+GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+GOOGLE_CLIENT_SECRET="your-client-secret"
+```
+
+---
+
+### 🟠 **High Priority - Before Beta Launch**
+
+These improve security, reliability, and production-readiness:
+
+#### **5. Rate Limiting on Auth Endpoints** 🟠
+**Priority**: High
+**Effort**: 2-3 hours
+**Risk**: Brute force attacks, DoS
+
+- [ ] Install rate limiting library: `npm install @upstash/ratelimit @upstash/redis`
+- [ ] Create Upstash Redis account (free tier)
+- [ ] Add rate limiter in `lib/rate-limit.ts`
+- [ ] Apply to login and registration endpoints (5 attempts per 15 minutes)
+- [ ] Return proper error messages in French
+
+**Files to create/modify**:
+- Create: `lib/rate-limit.ts`
+- Modify: `app/api/auth/register/route.ts`
+- Modify: `components/auth/LoginForm.tsx`
+
+---
+
+#### **6. Implement Server Actions for Data Mutations** 🟠
+**Priority**: High
+**Effort**: 4-5 hours
+**Benefits**: Better type safety, automatic revalidation, optimistic updates
+
+- [ ] Create Server Actions in `app/actions/`:
+  - [ ] `auth.ts` - registration action (replace API route)
+  - [ ] `business.ts` - update business profile
+  - [ ] `clients.ts` - CRUD operations
+  - [ ] `services.ts` - CRUD operations
+  - [ ] `quotes.ts` - CRUD operations
+- [ ] Use `revalidatePath()` for cache invalidation
+- [ ] Add proper error handling and return types
+- [ ] Replace API route usage in components with Server Actions
+
+**Example Server Action**:
+```typescript
+// app/actions/clients.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import prisma from '@/lib/prisma'
+import { createClientSchema } from '@/lib/validations/client'
+
+export async function createClient(formData: FormData) {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.businessId) {
+    return { error: 'Non autorisé' }
+  }
+
+  const validated = createClientSchema.safeParse({
+    firstName: formData.get('firstName'),
+    lastName: formData.get('lastName'),
+    email: formData.get('email'),
+    phone: formData.get('phone'),
+  })
+
+  if (!validated.success) {
+    return { error: validated.error.flatten().fieldErrors }
+  }
+
+  const client = await prisma.client.create({
+    data: {
+      ...validated.data,
+      businessId: session.user.businessId,
+    }
+  })
+
+  revalidatePath('/dashboard/clients')
+  return { success: true, client }
+}
+```
+
+---
+
+#### **7. Proper Error Handling & Logging** 🟠
+**Priority**: High
+**Effort**: 2-3 hours
+
+- [ ] Create logging utility in `lib/logger.ts`:
+  - Console logs in development
+  - Sentry/LogTail in production (install later)
+  - Structured error logging
+- [ ] Replace all `console.error()` with logger
+- [ ] Add error boundaries:
+  - [ ] `app/error.tsx` (global error boundary)
+  - [ ] `app/(dashboard)/error.tsx` (dashboard error boundary)
+- [ ] Add loading states:
+  - [ ] `app/(dashboard)/loading.tsx`
+  - [ ] `app/(dashboard)/clients/loading.tsx`
+  - [ ] `app/(dashboard)/quotes/loading.tsx`
+
+**Files to create**:
+- `lib/logger.ts`
+- `app/error.tsx`
+- `app/(dashboard)/error.tsx`
+- `app/(dashboard)/loading.tsx`
+
+---
+
+#### **8. Environment Variable Type Safety** 🟠
+**Priority**: Medium
+**Effort**: 1 hour
+
+- [ ] Create `lib/env.ts` with Zod validation:
+  ```typescript
+  import { z } from 'zod'
+
+  const envSchema = z.object({
+    DATABASE_URL: z.string().url(),
+    DIRECT_URL: z.string().url(),
+    NEXTAUTH_SECRET: z.string().min(32),
+    NEXTAUTH_URL: z.string().url(),
+    GOOGLE_CLIENT_ID: z.string().optional(),
+    GOOGLE_CLIENT_SECRET: z.string().optional(),
+  })
+
+  export const env = envSchema.parse(process.env)
+  ```
+- [ ] Replace `process.env.X` with `env.X` throughout codebase
+- [ ] Build will fail if env vars are missing/invalid
+
+**File to create**:
+- `lib/env.ts`
+
+---
+
+### 🟡 **Medium Priority - Post-Beta, Pre-Launch**
+
+Improves code quality and developer experience:
+
+#### **9. Component Barrel Exports** 🟡
+**Priority**: Medium
+**Effort**: 30 minutes
+
+- [ ] Create `components/auth/index.ts`:
+  ```typescript
+  export { default as LoginForm } from './LoginForm'
+  export { default as RegisterForm } from './RegisterForm'
+  ```
+- [ ] Update imports to use barrel exports
+- [ ] Create barrel exports for other component folders as they grow
+
+---
+
+#### **10. Database Query Optimization** 🟡
+**Priority**: Medium
+**Effort**: 1-2 hours
+
+- [ ] Add `select` to only fetch needed fields
+- [ ] Use `include` for relationships instead of separate queries
+- [ ] Add database indexes on frequently queried fields:
+  - [ ] `Client.email` (if searching by email)
+  - [ ] `Quote.quoteNumber`
+  - [ ] `Quote.status`
+- [ ] Use pagination for large datasets:
+  ```typescript
+  const clients = await prisma.client.findMany({
+    where: { businessId },
+    take: 20,
+    skip: page * 20,
+    orderBy: { createdAt: 'desc' },
+  })
+  ```
+
+---
+
+#### **11. Toast Notification System** 🟡
+**Priority**: Medium (UX improvement)
+**Effort**: 1-2 hours
+
+- [ ] Install: `npm install sonner` (recommended) or `react-hot-toast`
+- [ ] Add Toaster to root layout
+- [ ] Show success messages:
+  - "Inscription réussie!"
+  - "Client créé avec succès"
+  - "Devis envoyé"
+- [ ] Show error messages with helpful text
+
+**Files to modify**:
+- `app/layout.tsx` (add Toaster)
+- All forms (add toast.success/error)
+
+---
+
+### 🟢 **Low Priority - Nice to Have**
+
+Polish and quality of life improvements:
+
+#### **12. Improved Error Messages** 🟢
+**Priority**: Low (UX improvement)
+**Effort**: 2-3 hours
+
+- [ ] Distinguish "user not found" vs "wrong password"
+- [ ] Add field-specific validation errors
+- [ ] Show helpful hints for common mistakes
+
+---
+
+#### **13. Add Testing** 🟢
+**Priority**: Low (for now)
+**Effort**: Ongoing
+
+- [ ] Install testing libraries: `npm install -D vitest @testing-library/react`
+- [ ] Unit tests for utility functions
+- [ ] Integration tests for Server Actions
+- [ ] E2E tests for critical flows (Playwright)
+
+---
+
+#### **14. Performance Monitoring** 🟢
+**Priority**: Low
+**Effort**: 2-3 hours
+
+- [ ] Install Sentry for error tracking
+- [ ] Set up Vercel Analytics
+- [ ] Monitor Core Web Vitals
+- [ ] Add performance budgets
+
+---
+
+### 📊 **Progress Tracking**
+
+| Priority | Total Tasks | Completed | Remaining |
+|----------|-------------|-----------|-----------|
+| 🔴 Critical | 4 | 0 | 4 |
+| 🟠 High | 4 | 0 | 4 |
+| 🟡 Medium | 3 | 0 | 3 |
+| 🟢 Low | 4 | 0 | 4 |
+| **TOTAL** | **15** | **0** | **15** |
+
+**Estimated Time to Production-Ready**: 20-25 hours of development
+
+---
+
+### ✅ **Completion Criteria**
+
+Before deploying to production, ensure:
+
+- [x] All 🔴 Critical tasks completed
+- [x] All 🟠 High priority tasks completed
+- [ ] At least 50% of 🟡 Medium priority tasks completed
+- [ ] Full manual testing on staging environment
+- [ ] Security audit completed
+- [ ] Performance testing passed
+- [ ] Backup and rollback plan in place
+
+---
+
 ## Future Plans
 
-[TODO: Track planned features or refactoring]
+**Post-Launch Features** (not in current roadmap):
+
+- Email notifications for quote sent/accepted
+- PDF generation for quotes
+- Client portal for viewing/accepting quotes
+- Analytics dashboard
+- Mobile app (React Native)
+- Multi-language support (if expanding beyond France)
+- Dark mode
+- Advanced reporting and exports
 
 ## Initial Setup Checklist
 
