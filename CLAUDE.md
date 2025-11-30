@@ -153,17 +153,92 @@ Use the following prefixes for branch names:
 ### Deployment Process
 
 - **Platform**: Vercel
-- **Production**: `main` branch auto-deploys to production
-- **Process**: Push to `main` triggers automatic deployment
-- Changes are immediately visible on the live website after successful deployment
+- **Environments**:
+  - **Production**: `main` branch → Auto-deploys to production (live website)
+  - **Staging**: `develop` branch → Auto-deploys to staging environment for testing
+  - **Preview**: Feature branches → Unique preview URLs for each PR
+
+**Deployment Flow**:
+
+- Push to `develop` → Vercel creates staging deployment
+- Push to `main` → Vercel deploys to production
+- Push any feature branch → Vercel creates preview deployment with unique URL
 
 ### Development Workflow
 
-1. Create a feature/fix branch from `main`
-2. Make changes and test locally with `npm run dev`
-3. Run `npm run lint` to check for linting issues
-4. Push branch and create pull request to `main`
-5. Once merged, changes auto-deploy to production via Vercel
+**Important**: Never push directly to `main`. Always go through `develop` first.
+
+#### For New Features:
+
+1. **Start from develop branch**
+
+   ```bash
+   git checkout develop
+   git pull origin develop
+   ```
+
+2. **Create feature branch**
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+
+3. **Develop and test locally**
+
+   ```bash
+   npm run dev  # Test at http://localhost:3000
+   npm run lint # Check for linting issues
+   ```
+
+4. **Commit and push feature branch**
+
+   ```bash
+   git add .
+   git commit -m "Add your feature description"
+   git push origin feature/your-feature-name
+   ```
+
+5. **Test on Vercel Preview**
+   - Vercel automatically creates a preview deployment
+   - Test on the unique preview URL provided by Vercel
+   - Verify everything works as expected
+
+6. **Merge to develop for staging**
+
+   ```bash
+   git checkout develop
+   git merge feature/your-feature-name
+   git push origin develop
+   ```
+
+   - Vercel deploys to staging environment
+   - Perform full testing on staging
+
+7. **Deploy to production when ready**
+
+   ```bash
+   git checkout main
+   git pull origin main
+   git merge develop
+   git push origin main
+   ```
+
+   - Only merge to `main` when `develop` is stable and fully tested
+   - This triggers production deployment
+
+#### For Bug Fixes:
+
+- Use `fix/` prefix: `git checkout -b fix/bug-description`
+- Follow same workflow as features
+- For urgent production fixes, use `hotfix/` prefix
+
+#### Branch Management:
+
+- **`main`**: Production-ready code only
+- **`develop`**: Integration branch for features, deployed to staging
+- **`feature/*`**: Individual features (branch from `develop`)
+- **`fix/*`**: Bug fixes (branch from `develop`)
+- **`hotfix/*`**: Urgent production fixes (branch from `main`, merge to both `main` and `develop`)
 
 ## Key Patterns and Decisions
 
