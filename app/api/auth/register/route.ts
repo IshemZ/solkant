@@ -9,14 +9,14 @@ export async function POST(request: Request) {
     // Validation
     if (!email || !password) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Email et mot de passe requis' },
         { status: 400 }
       )
     }
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
+        { error: 'Le mot de passe doit contenir au moins 8 caractères' },
         { status: 400 }
       )
     }
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'User with this email already exists' },
+        { error: 'Un utilisateur avec cet email existe déjà' },
         { status: 400 }
       )
     }
@@ -52,13 +52,13 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json(
-      { user, message: 'User created successfully' },
+      { user, message: 'Utilisateur créé avec succès' },
       { status: 201 }
     )
   } catch (error) {
     console.error('Registration error:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Erreur interne du serveur' },
       { status: 500 }
     )
   }

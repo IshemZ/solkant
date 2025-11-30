@@ -321,6 +321,8 @@ Use the following prefixes for branch names:
 
 All API routes are in `app/api/`:
 
+**Status**: ✅ All required API routes exist for current pages
+
 1. **`/api/auth/[...nextauth]`** (NextAuth handler)
    - File: `app/api/auth/[...nextauth]/route.ts`
    - Methods: `GET`, `POST`
@@ -342,7 +344,7 @@ All API routes are in `app/api/`:
    - Validation: Email uniqueness, password length (8+ chars)
    - Security: Hashes password with bcryptjs (12 rounds)
    - Returns: User object (without password) or error
-   - **Note**: Error messages currently in English (TODO: translate to French)
+   - All error messages in French
 
 **Existing Pages & Routes**:
 
