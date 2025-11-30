@@ -24,7 +24,7 @@ export default function LoginForm() {
       })
 
       if (result?.error) {
-        setError('Invalid email or password')
+        setError('Email ou mot de passe invalide')
         setIsLoading(false)
         return
       }
@@ -32,7 +32,7 @@ export default function LoginForm() {
       router.push('/dashboard')
       router.refresh()
     } catch (error) {
-      setError('An error occurred. Please try again.')
+      setError('Une erreur est survenue. Veuillez réessayer.')
       setIsLoading(false)
     }
   }
@@ -65,7 +65,7 @@ export default function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
             required
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-            placeholder="you@example.com"
+            placeholder="vous@exemple.com"
             disabled={isLoading}
           />
         </div>
@@ -75,7 +75,7 @@ export default function LoginForm() {
             htmlFor="password"
             className="block text-sm font-medium text-foreground"
           >
-            Password
+            Mot de passe
           </label>
           <input
             id="password"
@@ -94,7 +94,7 @@ export default function LoginForm() {
           disabled={isLoading}
           className="w-full rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Signing in...' : 'Sign in'}
+          {isLoading ? 'Connexion...' : 'Se connecter'}
         </button>
       </form>
 
@@ -104,7 +104,7 @@ export default function LoginForm() {
         </div>
         <div className="relative flex justify-center text-sm">
           <span className="bg-background px-2 text-foreground/60">
-            Or continue with
+            Ou continuer avec
           </span>
         </div>
       </div>

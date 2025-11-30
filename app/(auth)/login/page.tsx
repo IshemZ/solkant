@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import LoginForm from '@/components/auth/LoginForm'
 
 export const metadata: Metadata = {
-  title: 'Login | Devisio',
-  description: 'Login to your Devisio account',
+  title: 'Connexion | Devisio',
+  description: 'Connectez-vous à votre compte Devisio',
 }
 
 export default function LoginPage() {
@@ -15,19 +15,19 @@ export default function LoginPage() {
             Devisio
           </h1>
           <p className="mt-2 text-sm text-foreground/60">
-            Sign in to your account
+            Connectez-vous à votre compte
           </p>
         </div>
 
         <LoginForm />
 
         <p className="text-center text-sm text-foreground/60">
-          Don&apos;t have an account?{' '}
+          Pas encore de compte ?{' '}
           <a
             href="/register"
             className="font-medium text-foreground hover:underline"
           >
-            Sign up
+            Créer un compte
           </a>
         </p>
       </div>

@@ -2,8 +2,8 @@ import { Metadata } from 'next'
 import RegisterForm from '@/components/auth/RegisterForm'
 
 export const metadata: Metadata = {
-  title: 'Register | Devisio',
-  description: 'Create your Devisio account',
+  title: 'Inscription | Devisio',
+  description: 'Créez votre compte Devisio',
 }
 
 export default function RegisterPage() {
@@ -15,19 +15,19 @@ export default function RegisterPage() {
             Devisio
           </h1>
           <p className="mt-2 text-sm text-foreground/60">
-            Create your account
+            Créez votre compte
           </p>
         </div>
 
         <RegisterForm />
 
         <p className="text-center text-sm text-foreground/60">
-          Already have an account?{' '}
+          Vous avez déjà un compte ?{' '}
           <a
             href="/login"
             className="font-medium text-foreground hover:underline"
           >
-            Sign in
+            Se connecter
           </a>
         </p>
       </div>
