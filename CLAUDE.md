@@ -330,12 +330,22 @@ Use the following prefixes for branch names:
 ```
 devisio/
 ├── app/                      # Next.js App Router
+│   ├── (auth)/              # ✅ Route group for authentication
+│   │   ├── login/           # ✅ Login page with email/password + Google OAuth
+│   │   └── register/        # ✅ Registration page with form validation
+│   ├── api/                 # API Routes
+│   │   └── auth/            # ✅ NextAuth endpoints
+│   │       ├── [...nextauth]/ # NextAuth route handler
+│   │       └── register/    # User registration API
 │   ├── actions/             # Server Actions (CRUD operations)
-│   ├── layout.tsx           # Root layout with fonts
-│   ├── page.tsx             # Homepage
+│   ├── layout.tsx           # Root layout with fonts and metadata
+│   ├── page.tsx             # ✅ Homepage (professional landing page)
 │   └── globals.css          # Global styles + Tailwind
 │
 ├── components/              # React components
+│   ├── auth/                # ✅ Authentication components
+│   │   ├── LoginForm.tsx    # Client component for login
+│   │   └── RegisterForm.tsx # Client component for registration
 │   ├── ui/                  # Base UI components (buttons, inputs, etc.)
 │   ├── quotes/              # Quote-specific components
 │   ├── clients/             # Client management components
@@ -343,19 +353,28 @@ devisio/
 │   └── layout/              # Layout components (header, sidebar, footer)
 │
 ├── lib/                     # Shared utilities and configurations
-│   ├── utils.ts            # Utility functions (cn for Tailwind classes)
-│   ├── prisma.ts           # ✅ Prisma client singleton
-│   └── auth.ts             # ✅ NextAuth configuration
+│   ├── utils.ts            # ✅ Utility functions (cn for Tailwind classes)
+│   ├── prisma.ts           # ✅ Prisma client singleton (Prisma 6)
+│   └── auth.ts             # ✅ NextAuth configuration (Credentials + Google)
 │
 ├── prisma/                  # Database
-│   ├── schema.prisma       # ✅ Database schema (Prisma 7 format)
-│   └── migrations/         # Migration files (created after first migrate)
+│   ├── schema.prisma       # ✅ Database schema (Prisma 6 format)
+│   └── migrations/         # ✅ Migration files (initial migration applied)
+│
+├── types/                   # TypeScript type definitions
+│   └── next-auth.d.ts      # ✅ Extended NextAuth session types
 │
 ├── public/                  # Static assets
 │
+├── .env.local              # ✅ Local environment variables (git-ignored)
+├── .env                    # ✅ For Prisma CLI (DATABASE_URL, DIRECT_URL)
 ├── .env.example            # Environment variables template
 └── CLAUDE.md              # This file - project documentation
 ```
+
+**Status Legend:**
+- ✅ = Completed and functional
+- (no icon) = Placeholder directory or planned feature
 
 **File Naming Conventions:**
 
