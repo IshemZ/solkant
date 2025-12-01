@@ -126,6 +126,14 @@ export const authOptions: NextAuthOptions = {
       // Initial sign in
       if (user) {
         token.id = user.id
+
+        // Fetch businessId for the user
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { business: { select: { id: true } } }
+        })
+
+        token.businessId = dbUser?.business?.id || null
       }
 
       // OAuth sign in
@@ -139,6 +147,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string
+        session.user.businessId = token.businessId as string | null
       }
       return session
     },

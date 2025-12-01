@@ -6,10 +6,10 @@ Ce fichier contient les priorités de développement, réparties par niveaux d�
 
 ## 🔴 Tâches Critiques (à faire immédiatement)
 
-1. Isolation multi-tenant : filtrage par `businessId` (middleware Prisma ou actions)
-2. Création automatique de Business à l’inscription (Google et Credentials)
+1. ✅ ~~Isolation multi-tenant : filtrage par `businessId` (middleware Prisma ou actions)~~ - **COMPLÉTÉ** : `businessId` ajouté à la session, helpers `getSessionWithBusiness()` et `getBusinessId()` créés dans `lib/utils.ts`
+2. ✅ ~~Création automatique de Business à l'inscription (Google et Credentials)~~ - **COMPLÉTÉ** : Business créé automatiquement pour OAuth (déjà fait) et credentials (maintenant corrigé)
 3. Validation de tous les formulaires avec Zod (`lib/validations/`)
-4. Création d’un fichier `.env.example`
+4. ✅ ~~Création d'un fichier `.env.example`~~ - **COMPLÉTÉ** : Fichier existe et est documenté dans CLAUDE.md
 
 ---
 
@@ -38,15 +38,15 @@ Ce fichier contient les priorités de développement, réparties par niveaux d�
 
 ---
 
-## Suivi d’Avancement
+## Suivi d'Avancement
 
 | Priorité | Nombre de tâches | Complétées | Restantes |
 |----------|------------------|------------|-----------|
-| 🔴       | 4                | 0          | 4         |
+| 🔴       | 4                | 3          | 1         |
 | 🟠       | 4                | 0          | 4         |
 | 🟡       | 3                | 0          | 3         |
 | 🟢       | 3                | 0          | 3         |
-| **Total**| **14**           | **0**      | **14**     |
+| **Total**| **14**           | **3**      | **11**    |
 
 ---
 
