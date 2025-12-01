@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { createService, deleteService } from '@/app/actions/services'
 import type { Service } from '@prisma/client'
+import ConfirmDialog from './ConfirmDialog'
 
 interface ServicesListProps {
   initialServices: Service[]
@@ -13,6 +15,8 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [serviceToDelete, setServiceToDelete] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -33,22 +37,33 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
 
     if (result.error) {
       setError(result.error)
+      toast.error('Erreur lors de la création du service')
     } else if (result.data) {
       setServices([result.data, ...services])
       setShowForm(false)
       e.currentTarget.reset()
+      toast.success(`Service "${result.data.name}" créé avec succès`)
     }
 
     setIsLoading(false)
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce service ?')) return
+  function openDeleteDialog(id: string) {
+    setServiceToDelete(id)
+    setDeleteDialogOpen(true)
+  }
 
-    const result = await deleteService(id)
+  async function confirmDelete() {
+    if (!serviceToDelete) return
+
+    const result = await deleteService(serviceToDelete)
     if (result.success) {
-      setServices(services.filter((s) => s.id !== id))
+      setServices(services.filter((s) => s.id !== serviceToDelete))
+      toast.success('Service supprimé avec succès')
+    } else {
+      toast.error('Erreur lors de la suppression du service')
     }
+    setServiceToDelete(null)
   }
 
   return (
@@ -188,7 +203,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
                   )}
                 </div>
                 <button
-                  onClick={() => handleDelete(service.id)}
+                  onClick={() => openDeleteDialog(service.id)}
                   className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                 >
                   <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -213,6 +228,17 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Supprimer le service"
+        description="Êtes-vous sûr de vouloir supprimer ce service ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   )
 }

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { updateBusiness } from '@/app/actions/business'
 import type { Business } from '@prisma/client'
 
@@ -11,13 +12,11 @@ interface BusinessSettingsFormProps {
 export default function BusinessSettingsForm({ business }: BusinessSettingsFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
-    setSuccess(false)
 
     const formData = new FormData(e.currentTarget)
     const data = {
@@ -32,9 +31,9 @@ export default function BusinessSettingsForm({ business }: BusinessSettingsFormP
 
     if (result.error) {
       setError(result.error)
+      toast.error('Erreur lors de la mise à jour')
     } else {
-      setSuccess(true)
-      setTimeout(() => setSuccess(false), 3000)
+      toast.success('Informations mises à jour avec succès')
     }
 
     setIsLoading(false)
@@ -45,12 +44,6 @@ export default function BusinessSettingsForm({ business }: BusinessSettingsFormP
       {error && (
         <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
           {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="rounded-md bg-green-50 p-4 text-sm text-green-800 dark:bg-green-900/20 dark:text-green-200">
-          Informations mises à jour avec succès
         </div>
       )}
 

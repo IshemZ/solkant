@@ -2,8 +2,10 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import { toast } from 'sonner'
 import { deleteQuote } from '@/app/actions/quotes'
 import type { Quote, Client, QuoteItem, Service } from '@prisma/client'
+import ConfirmDialog from './ConfirmDialog'
 
 interface QuoteWithRelations extends Quote {
   client: Client
@@ -32,14 +34,25 @@ const statusColors: Record<string, string> = {
 
 export default function QuotesList({ initialQuotes }: QuotesListProps) {
   const [quotes, setQuotes] = useState(initialQuotes)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [quoteToDelete, setQuoteToDelete] = useState<string | null>(null)
 
-  async function handleDelete(id: string) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce devis ?')) return
+  function openDeleteDialog(id: string) {
+    setQuoteToDelete(id)
+    setDeleteDialogOpen(true)
+  }
 
-    const result = await deleteQuote(id)
+  async function confirmDelete() {
+    if (!quoteToDelete) return
+
+    const result = await deleteQuote(quoteToDelete)
     if (result.success) {
-      setQuotes(quotes.filter((q) => q.id !== id))
+      setQuotes(quotes.filter((q) => q.id !== quoteToDelete))
+      toast.success('Devis supprimé avec succès')
+    } else {
+      toast.error('Erreur lors de la suppression du devis')
     }
+    setQuoteToDelete(null)
   }
 
   return (
@@ -128,7 +141,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <button
-                        onClick={() => handleDelete(quote.id)}
+                        onClick={() => openDeleteDialog(quote.id)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       >
                         Supprimer
@@ -141,6 +154,17 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Supprimer le devis"
+        description="Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   )
 }

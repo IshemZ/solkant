@@ -2,6 +2,7 @@ import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import DashboardNav from '@/components/DashboardNav'
+import Link from 'next/link'
 
 export const metadata: Metadata = {
   title: 'Tableau de bord | Devisio',
@@ -142,7 +143,10 @@ export default async function DashboardPage() {
             Actions rapides
           </h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <button className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5">
+            <Link
+              href="/dashboard/devis/nouveau"
+              className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5"
+            >
               <div className="rounded-md bg-foreground p-2 text-background">
                 <svg
                   className="h-5 w-5"
@@ -162,9 +166,12 @@ export default async function DashboardPage() {
                 <p className="font-medium text-foreground">Nouveau devis</p>
                 <p className="text-sm text-foreground/60">Créer un nouveau devis</p>
               </div>
-            </button>
+            </Link>
 
-            <button className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5">
+            <Link
+              href="/dashboard/clients"
+              className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5"
+            >
               <div className="rounded-md bg-foreground p-2 text-background">
                 <svg
                   className="h-5 w-5"
@@ -184,9 +191,12 @@ export default async function DashboardPage() {
                 <p className="font-medium text-foreground">Nouveau client</p>
                 <p className="text-sm text-foreground/60">Ajouter un client</p>
               </div>
-            </button>
+            </Link>
 
-            <button className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5">
+            <Link
+              href="/dashboard/services"
+              className="flex items-center gap-3 rounded-md border border-foreground/20 bg-background p-4 text-left transition-colors hover:bg-foreground/5"
+            >
               <div className="rounded-md bg-foreground p-2 text-background">
                 <svg
                   className="h-5 w-5"
@@ -206,7 +216,7 @@ export default async function DashboardPage() {
                 <p className="font-medium text-foreground">Nouveau service</p>
                 <p className="text-sm text-foreground/60">Ajouter un service</p>
               </div>
-            </button>
+            </Link>
           </div>
         </div>
 

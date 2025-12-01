@@ -15,26 +15,42 @@ Ce fichier contient les priorités de développement, réparties par niveaux d�
 
 ## 🟠 Tâches Haute Priorité (avant mise en production)
 
-5. Rate limiting sur les endpoints sensibles (`@upstash/ratelimit`)
-6. Migration vers Server Actions pour mutations (CRUD quotes, clients, services)
-7. Logging structuré + gestion des erreurs (e.g. Error Boundaries React)
-8. Sécurisation des variables d’environnement avec `zodEnv`
+### Navigation & UX (Critique - Review UX 2025-12-01)
+
+- [x] **Navigation mobile responsive** - Menu hamburger avec overlay pour accès sections sur mobile - **COMPLÉTÉ** : Composant MobileNav créé avec Radix UI Dialog, intégré dans DashboardNav
+- [x] **Indicateur de page active** - Utiliser `usePathname()` pour highlighter la page courante dans DashboardNav - **COMPLÉTÉ** : Border-bottom sur la page active
+- [x] **Notifications toast** - Installer et configurer `sonner` pour feedback success/error sur toutes actions CRUD - **COMPLÉTÉ** : Sonner installé, Toaster configuré dans layout, toasts ajoutés dans tous les composants CRUD (ClientsList, ServicesList, QuotesList, QuoteForm, BusinessSettingsForm)
+- [x] **Fonctionnaliser actions rapides dashboard** - Ajouter hrefs/navigation sur les 3 boutons "Actions rapides" - **COMPLÉTÉ** : Boutons convertis en Links vers /dashboard/devis/nouveau, /dashboard/clients, /dashboard/services
+- [x] **Modal de confirmation personnalisée** - Remplacer `confirm()` natif par composant réutilisable - **COMPLÉTÉ** : ConfirmDialog créé avec Radix UI, intégré dans ClientsList, ServicesList et QuotesList
+- [ ] **Breadcrumbs** - Ajouter fil d'ariane sur pages imbriquées (ex: `/dashboard/devis/nouveau`)
+
+### Sécurité & Performance
+
+- [ ] Rate limiting sur les endpoints sensibles (`@upstash/ratelimit`)
+- [ ] Migration vers Server Actions pour mutations (CRUD quotes, clients, services)
+- [ ] Logging structuré + gestion des erreurs (e.g. Error Boundaries React)
+- [ ] Sécurisation des variables d'environnement avec `zodEnv`)
 
 ---
 
 ## 🟡 Moyenne Priorité
 
-9. Exports globaux (`index.ts`) dans `components/`
-10. Optimisation des requêtes Prisma (`select`, `include`, indexation BDD)
-11. Intégration de `sonner` pour feedback utilisateur (toasts)
+- [ ] Améliorer layout dashboard (considérer sidebar latérale persistante)
+- [ ] Tableau clients responsive (vue cards sur mobile au lieu de overflow-x-auto)
+- [ ] Loading states élégants (skeletons au lieu de texte "Création...")
+- [ ] Exports globaux (`index.ts`) dans `components/`
+- [ ] Optimisation des requêtes Prisma (`select`, `include`, indexation BDD)
 
 ---
 
 ## 🟢 Basse Priorité
 
-12. Messages d’erreurs plus précis et localisés
-13. Écriture de tests (unitaires, end-to-end avec Playwright)
-14. Monitoring performance (Sentry, Core Web Vitals)
+- [ ] Messages d'erreurs plus précis et localisés
+- [ ] Écriture de tests (unitaires, end-to-end avec Playwright)
+- [ ] Monitoring performance (Sentry, Core Web Vitals)
+- [ ] Accessibilité complète (attributs ARIA, navigation clavier, skip links)
+- [ ] Stepper visuel pour création de devis
+- [ ] Onboarding guidé pour nouveaux utilisateurs
 
 ---
 

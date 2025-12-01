@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 import { createQuote } from '@/app/actions/quotes'
 import type { Client, Service } from '@prisma/client'
 
@@ -93,8 +94,10 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
 
     if (result.error) {
       setError(result.error)
+      toast.error('Erreur lors de la création du devis')
       setIsLoading(false)
     } else if (result.data) {
+      toast.success(`Devis ${result.data.quoteNumber} créé avec succès`)
       router.push(`/dashboard/devis/${result.data.id}`)
     }
   }

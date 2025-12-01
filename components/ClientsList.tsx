@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { toast } from 'sonner'
 import { createClient, deleteClient } from '@/app/actions/clients'
 import type { Client } from '@prisma/client'
+import ConfirmDialog from './ConfirmDialog'
 
 interface ClientsListProps {
   initialClients: Client[]
@@ -13,6 +15,8 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
   const [showForm, setShowForm] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [clientToDelete, setClientToDelete] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -33,22 +37,33 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
 
     if (result.error) {
       setError(result.error)
+      toast.error('Erreur lors de la création du client')
     } else if (result.data) {
       setClients([result.data, ...clients])
       setShowForm(false)
       e.currentTarget.reset()
+      toast.success(`Client ${result.data.firstName} ${result.data.lastName} créé avec succès`)
     }
 
     setIsLoading(false)
   }
 
-  async function handleDelete(id: string) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer ce client ?')) return
+  function openDeleteDialog(id: string) {
+    setClientToDelete(id)
+    setDeleteDialogOpen(true)
+  }
 
-    const result = await deleteClient(id)
+  async function confirmDelete() {
+    if (!clientToDelete) return
+
+    const result = await deleteClient(clientToDelete)
     if (result.success) {
-      setClients(clients.filter((c) => c.id !== id))
+      setClients(clients.filter((c) => c.id !== clientToDelete))
+      toast.success('Client supprimé avec succès')
+    } else {
+      toast.error('Erreur lors de la suppression du client')
     }
+    setClientToDelete(null)
   }
 
   return (
@@ -216,7 +231,7 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <button
-                        onClick={() => handleDelete(client.id)}
+                        onClick={() => openDeleteDialog(client.id)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                       >
                         Supprimer
@@ -229,6 +244,17 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
           </div>
         </div>
       )}
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={confirmDelete}
+        title="Supprimer le client"
+        description="Êtes-vous sûr de vouloir supprimer ce client ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   )
 }

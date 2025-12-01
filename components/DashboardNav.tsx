@@ -1,5 +1,9 @@
+'use client'
+
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import SignOutButton from './SignOutButton'
+import MobileNav from './MobileNav'
 
 interface DashboardNavProps {
   userName?: string | null
@@ -7,6 +11,8 @@ interface DashboardNavProps {
 }
 
 export default function DashboardNav({ userName, userEmail }: DashboardNavProps) {
+  const pathname = usePathname()
+
   return (
     <header className="border-b border-foreground/10 bg-background">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -37,35 +43,54 @@ export default function DashboardNav({ userName, userEmail }: DashboardNavProps)
               </Link>
               <Link
                 href="/dashboard/clients"
-                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                className={
+                  pathname === '/dashboard/clients'
+                    ? 'text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1'
+                    : 'text-sm font-medium text-foreground/60 transition-colors hover:text-foreground'
+                }
               >
                 Clients
               </Link>
               <Link
                 href="/dashboard/services"
-                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                className={
+                  pathname === '/dashboard/services'
+                    ? 'text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1'
+                    : 'text-sm font-medium text-foreground/60 transition-colors hover:text-foreground'
+                }
               >
                 Services
               </Link>
               <Link
                 href="/dashboard/devis"
-                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                className={
+                  pathname === '/dashboard/devis' || pathname.startsWith('/dashboard/devis/')
+                    ? 'text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1'
+                    : 'text-sm font-medium text-foreground/60 transition-colors hover:text-foreground'
+                }
               >
                 Mes devis
               </Link>
               <Link
                 href="/dashboard/parametres"
-                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                className={
+                  pathname === '/dashboard/parametres'
+                    ? 'text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1'
+                    : 'text-sm font-medium text-foreground/60 transition-colors hover:text-foreground'
+                }
               >
                 Paramètres
               </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-foreground/60">
+            <span className="hidden sm:inline text-sm text-foreground/60">
               {userName || userEmail}
             </span>
-            <SignOutButton />
+            <div className="hidden md:block">
+              <SignOutButton />
+            </div>
+            <MobileNav userName={userName} userEmail={userEmail} />
           </div>
         </div>
       </div>
