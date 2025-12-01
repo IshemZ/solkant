@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import GoogleProvider from 'next-auth/providers/google'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
+// import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import prisma from './prisma'
 import bcrypt from 'bcryptjs'
 
@@ -15,7 +15,8 @@ import bcrypt from 'bcryptjs'
  */
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  // Adapter disabled for JWT strategy - accounts/sessions managed via JWT
+  // adapter: PrismaAdapter(prisma),
 
   providers: [
     // Email/Password authentication
@@ -77,20 +78,44 @@ export const authOptions: NextAuthOptions = {
   // Callbacks
   callbacks: {
     async signIn({ user, account }) {
-      // For Google OAuth, check if Business exists, create if not
-      if (account?.provider === 'google' && user.id) {
-        const existingBusiness = await prisma.business.findUnique({
-          where: { userId: user.id }
-        })
-
-        if (!existingBusiness) {
-          await prisma.business.create({
-            data: {
-              name: `Institut de ${user.name || 'beauté'}`,
-              userId: user.id,
-              email: user.email || undefined,
-            }
+      // For Google OAuth: create User and Business if they don't exist
+      if (account?.provider === 'google' && user.email) {
+        try {
+          // Check if user exists
+          let dbUser = await prisma.user.findUnique({
+            where: { email: user.email },
+            include: { business: true }
           })
+
+          // Create user if doesn't exist
+          if (!dbUser) {
+            dbUser = await prisma.user.create({
+              data: {
+                email: user.email,
+                name: user.name || undefined,
+                image: user.image || undefined,
+                emailVerified: new Date(),
+              },
+              include: { business: true }
+            })
+          }
+
+          // Create Business if doesn't exist
+          if (!dbUser.business) {
+            await prisma.business.create({
+              data: {
+                name: `Institut de ${user.name || 'beauté'}`,
+                userId: dbUser.id,
+                email: user.email || undefined,
+              }
+            })
+          }
+
+          // Update user.id with database ID for JWT token
+          user.id = dbUser.id
+        } catch (error) {
+          console.error('Error in signIn callback:', error)
+          return false
         }
       }
 
