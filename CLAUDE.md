@@ -81,12 +81,31 @@ npx prisma db push               # Push schema changes without migration (dev on
 npx tsx scripts/fix-missing-business.ts    # Fix users without Business records (one-time utility)
 ```
 
+### Validation
+
+```bash
+# Les schémas de validation Zod sont dans lib/validations/
+# Utilisation:
+import { createClientSchema, validateAction } from '@/lib/validations'
+
+# Documentation complète:
+# - lib/validations/README.md - Guide d'utilisation
+# - lib/validations/EXAMPLES.md - Exemples pratiques
+# - lib/validations/GOTCHAS.md - Problèmes Zod v4 spécifiques
+```
+
 ### Important Notes
 
 - Always run `npx prisma generate` after pulling schema changes from git
 - **DATABASE_URL** (port 6543 with pgbouncer) is used for app runtime (pooled connection)
 - **DIRECT_URL** (port 5432) is used for Prisma CLI migrations (direct connection)
 - See [.env.example](.env.example) for required environment variables
+- **ZOD VERSION 4.1.13** - Utiliser la syntaxe v4, pas v3 (voir lib/validations/GOTCHAS.md)
+
+### Ne pas faire
+
+- Ne pas créer de fichiers .md systématiquement - Cela consomme des ressources inutilement
+- Ne pas sur-documenter avec des fichiers séparés
 
 ---
 
@@ -168,8 +187,8 @@ See [prisma/schema.prisma](prisma/schema.prisma) for complete schema definition.
 **Session Structure:**
 
 ```typescript
-session.user.id         // User ID
-session.user.businessId // Business ID (for tenant isolation)
-session.user.email      // User email
-session.user.name       // User name
+session.user.id; // User ID
+session.user.businessId; // Business ID (for tenant isolation)
+session.user.email; // User email
+session.user.name; // User name
 ```

@@ -68,6 +68,24 @@ export const registerSchema = z.object({
 - Vérifier systématiquement la session NextAuth
 - Encodage systématique des entrées si rendu (`dangerouslySetInnerHTML`) évité
 
+### ⚠️ Variables d'environnement et commits
+
+**CRITIQUE : Ne jamais exposer ou committer les variables d'environnement sensibles**
+
+- Les fichiers `.env`, `.env.local`, `.env.production` sont dans `.gitignore` et NE DOIVENT JAMAIS être committés
+- Ne jamais hardcoder les clés API, secrets, URLs de base de données dans le code
+- Utiliser `.env.example` comme template (avec des valeurs factices uniquement)
+- Exemples de données sensibles à protéger :
+  - `DATABASE_URL` et `DIRECT_URL` (Supabase)
+  - `NEXTAUTH_SECRET`
+  - `GOOGLE_CLIENT_ID` et `GOOGLE_CLIENT_SECRET`
+  - Toute clé d'API tierce
+- En cas d'exposition accidentelle :
+  1. Régénérer immédiatement toutes les clés compromises
+  2. Révoquer les tokens exposés chez les providers (Google, Supabase, etc.)
+  3. Ne pas simplement supprimer le commit - l'historique Git conserve les données
+  4. Utiliser `git-filter-repo` ou contacter le support de l'hébergeur si nécessaire
+
 ---
 
 ## 🔁 Liens utiles

@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import SignOutButton from '@/components/SignOutButton'
+import DashboardNav from '@/components/DashboardNav'
 
 export const metadata: Metadata = {
   title: 'Tableau de bord | Devisio',
@@ -20,21 +20,10 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-foreground/10 bg-background">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-foreground">Devisio</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-foreground/60">
-                {session.user?.name || session.user?.email}
-              </span>
-              <SignOutButton />
-            </div>
-          </div>
-        </div>
-      </header>
+      <DashboardNav
+        userName={session.user?.name}
+        userEmail={session.user?.email}
+      />
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
