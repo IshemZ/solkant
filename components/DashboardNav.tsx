@@ -53,6 +53,12 @@ export default function DashboardNav({ userName, userEmail }: DashboardNavProps)
               >
                 Mes devis
               </Link>
+              <Link
+                href="/dashboard/parametres"
+                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+              >
+                Paramètres
+              </Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

@@ -41,6 +41,10 @@ export const quoteItemSchema = z.object({
     .min(1, 'La quantité doit être d\'au moins 1')
     .max(9999, 'La quantité ne peut pas dépasser 9999')
     .default(1),
+  total: z
+    .number('Le total doit être un nombre')
+    .min(0, 'Le total ne peut pas être négatif')
+    .max(9999999.99, 'Le total ne peut pas dépasser 9 999 999,99 €'),
 })
 
 /**
@@ -50,16 +54,7 @@ export const createQuoteSchema = z.object({
   clientId: z
     .string('Le client est requis')
     .cuid('ID de client invalide'),
-  quoteNumber: z
-    .string()
-    .min(1, 'Le numéro de devis est requis')
-    .max(50, 'Le numéro de devis ne peut pas dépasser 50 caractères')
-    .regex(
-      /^[A-Z0-9-]+$/,
-      'Le numéro de devis ne peut contenir que des lettres majuscules, des chiffres et des tirets'
-    )
-    .trim(),
-  status: quoteStatusEnum.default('DRAFT'),
+  status: quoteStatusEnum.default('DRAFT').optional(),
   validUntil: z
     .string()
     .datetime('Date de validité invalide')
