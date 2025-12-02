@@ -57,7 +57,7 @@ async function RevenueTotal() {
 
 // Skeleton fallbacks
 function StatSkeleton() {
-  return <div className="h-9 w-16 animate-pulse rounded bg-muted" />;
+  return <div className="h-9 w-16 animate-pulse rounded bg-foreground/10" />;
 }
 
 // Composant principal avec Suspense
