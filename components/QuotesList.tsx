@@ -8,6 +8,7 @@ import type { Quote, Client, QuoteItem, Service } from "@prisma/client";
 import ConfirmDialog from "./ConfirmDialog";
 import { EmptyState } from "./ui/empty-state";
 import { FileText } from "lucide-react";
+import { formatDate } from "@/lib/date-utils";
 
 interface QuoteWithRelations extends Quote {
   client: Client;
@@ -130,7 +131,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                       {quote.client.firstName} {quote.client.lastName}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
-                      {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
+                      {formatDate(quote.createdAt)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
                       <span

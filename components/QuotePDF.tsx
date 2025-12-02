@@ -7,6 +7,7 @@ import type {
   QuoteItem,
   Service,
 } from "@prisma/client";
+import { formatDate } from "@/lib/date-utils";
 
 interface QuoteWithRelations extends Quote {
   client: Client;
@@ -194,13 +195,10 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
         <View style={styles.header}>
           <Text style={styles.title}>DEVIS</Text>
           <Text style={styles.quoteNumber}>{quote.quoteNumber}</Text>
-          <Text style={styles.date}>
-            Date: {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
-          </Text>
+          <Text style={styles.date}>Date: {formatDate(quote.createdAt)}</Text>
           {quote.validUntil && (
             <Text style={styles.date}>
-              Valable jusqu&apos;au:{" "}
-              {new Date(quote.validUntil).toLocaleDateString("fr-FR")}
+              Valable jusqu&apos;au: {formatDate(quote.validUntil)}
             </Text>
           )}
         </View>
@@ -321,9 +319,7 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
           <Text style={styles.footerText}>
             Ce devis est valable{" "}
             {quote.validUntil
-              ? `jusqu'au ${new Date(quote.validUntil).toLocaleDateString(
-                  "fr-FR"
-                )}`
+              ? `jusqu'au ${formatDate(quote.validUntil)}`
               : "pendant 30 jours"}
           </Text>
         </View>

@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+// Année pour le copyright - évaluée une seule fois au build
+const CURRENT_YEAR = new Date().getFullYear();
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
@@ -258,7 +261,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
             <p className="text-sm text-foreground/60">
-              &copy; {new Date().getFullYear()} Solkant. Tous droits réservés.
+              &copy; {CURRENT_YEAR} Solkant. Tous droits réservés.
             </p>
           </div>
         </div>

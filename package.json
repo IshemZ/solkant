@@ -12,6 +12,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
+    "test:hydration": "vitest run tests/lib/date-utils.test.ts tests/components/hydration.test.tsx tests/components/loading-states.test.tsx",
     "a11y:audit": "echo 'Install pa11y-ci: npm install -D pa11y-ci' && echo 'Run: npm run dev & sleep 5 && npx pa11y-ci'"
   },
   "dependencies": {

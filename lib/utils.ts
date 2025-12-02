@@ -11,6 +11,9 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// Re-export date utilities for convenience
+export { formatDate, formatDateTime, formatDateISO } from "./date-utils";
+
 /**
  * Get the current session with businessId for multi-tenant filtering
  * Use this in Server Actions and API routes to ensure proper tenant isolation
@@ -27,7 +30,9 @@ export async function getSessionWithBusiness() {
 
   // Ensure businessId exists for authenticated users
   if (!session.user.businessId) {
-    throw new Error('User is authenticated but has no associated Business. This should not happen.');
+    throw new Error(
+      "User is authenticated but has no associated Business. This should not happen."
+    );
   }
 
   return session;
@@ -44,7 +49,7 @@ export async function getBusinessId(): Promise<string> {
   const session = await getSessionWithBusiness();
 
   if (!session) {
-    throw new Error('User must be authenticated to access this resource');
+    throw new Error("User must be authenticated to access this resource");
   }
 
   return session.user.businessId!;

@@ -9,6 +9,7 @@ import type {
   QuoteItem,
   Service,
 } from "@prisma/client";
+import { formatDate } from "@/lib/date-utils";
 
 interface QuoteWithRelations extends Quote {
   client: Client;
@@ -95,7 +96,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
             </h1>
           </div>
           <p className="mt-2 text-sm text-foreground/60">
-            Créé le {new Date(quote.createdAt).toLocaleDateString("fr-FR")}
+            Créé le {formatDate(quote.createdAt)}
           </p>
         </div>
 
@@ -272,8 +273,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
         <div className="mt-8 space-y-4 border-t border-gray-200 pt-6">
           {quote.validUntil && (
             <p className="text-sm text-gray-600">
-              Devis valable jusqu&apos;au{" "}
-              {new Date(quote.validUntil).toLocaleDateString("fr-FR")}
+              Devis valable jusqu&apos;au {formatDate(quote.validUntil)}
             </p>
           )}
           {quote.notes && (
