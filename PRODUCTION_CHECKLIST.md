@@ -193,7 +193,73 @@ Ajouter tests pour :
 
 ## 🚀 DÉPLOIEMENT VERCEL
 
-### Étape 1 : Configuration Vercel
+### ⚠️ IMPORTANT : Gestion des Variables d'Environnement
+
+**❌ NE PAS créer de fichier `.env.production`**
+
+- Risque de commit accidentel avec secrets
+- Next.js ne l'utilise pas avec Vercel
+- Les variables sont gérées dans le Dashboard Vercel
+
+**✅ Utiliser exclusivement Vercel Dashboard ou CLI**
+
+---
+
+### Étape 1 : Préparer les Credentials Production
+
+#### 1a. Créer une Base de Données PRODUCTION séparée
+
+**Supabase Dashboard** (recommandé) :
+
+- Nouveau projet : `devisio-production`
+- Région : EU West (Paris)
+- Copier `DATABASE_URL` et `DIRECT_URL`
+
+**Pourquoi séparer ?**
+
+- ✅ Isolation complète dev/prod
+- ✅ Migrations sécurisées
+- ✅ Performances indépendantes
+
+#### 1b. Créer des Credentials Google OAuth PRODUCTION
+
+**Google Cloud Console** :
+
+- Nouvelles credentials OAuth 2.0
+- Authorized origins : `https://solkant.vercel.app`
+- Redirect URI : `https://solkant.vercel.app/api/auth/callback/google`
+
+**Pourquoi séparer ?**
+
+- Les credentials dev (`localhost:3000`) ne fonctionnent PAS en prod
+
+#### 1c. Générer un Nouveau NEXTAUTH_SECRET
+
+```bash
+openssl rand -base64 32
+```
+
+**⚠️ JAMAIS réutiliser le secret de développement !**
+
+---
+
+### Étape 2 : Configuration Vercel
+
+#### Option A : Via Dashboard (Recommandé)
+
+Vercel Dashboard → Settings → Environment Variables :
+
+| Variable               | Value                                                          | Scope      |
+| ---------------------- | -------------------------------------------------------------- | ---------- |
+| `DATABASE_URL`         | `postgresql://postgres.[PROD]@...6543/postgres?pgbouncer=true` | Production |
+| `DIRECT_URL`           | `postgresql://postgres.[PROD]@...5432/postgres`                | Production |
+| `NEXTAUTH_URL`         | `https://solkant.vercel.app`                                   | Production |
+| `NEXTAUTH_SECRET`      | `[NOUVEAU secret openssl]`                                     | Production |
+| `GOOGLE_CLIENT_ID`     | `[PROD client ID]`                                             | Production |
+| `GOOGLE_CLIENT_SECRET` | `[PROD secret]`                                                | Production |
+| `NODE_ENV`             | `production`                                                   | Production |
+
+#### Option B : Via CLI
 
 ```bash
 # Installer Vercel CLI
@@ -202,28 +268,49 @@ npm i -g vercel
 # Login
 vercel login
 
-# Deploy preview
-vercel
+# Lier le projet
+vercel link
 
-# Deploy production
+# Ajouter les variables
+vercel env add DATABASE_URL production
+vercel env add DIRECT_URL production
+vercel env add NEXTAUTH_URL production
+vercel env add NEXTAUTH_SECRET production
+vercel env add GOOGLE_CLIENT_ID production
+vercel env add GOOGLE_CLIENT_SECRET production
+```
+
+---
+
+### Étape 3 : Appliquer les Migrations
+
+```bash
+# Configurer temporairement les URLs de prod
+export DATABASE_URL="[votre-prod-database-url]"
+export DIRECT_URL="[votre-prod-direct-url]"
+
+# Appliquer les migrations
+npx prisma migrate deploy
+
+# Vérifier avec Prisma Studio
+npx prisma studio
+```
+
+---
+
+### Étape 4 : Déployer
+
+```bash
+# Push vers main (auto-deploy)
+git checkout main
+git merge test
+git push origin main
+
+# OU déployer directement
 vercel --prod
 ```
 
-### Étape 2 : Variables d'environnement
-
-Dans Vercel Dashboard → Settings → Environment Variables :
-
-```
-DATABASE_URL          = postgres://... (Neon pooled)
-DIRECT_URL            = postgres://... (Neon direct)
-NEXTAUTH_URL          = https://solkant.vercel.app
-NEXTAUTH_SECRET       = [générer nouveau secret]
-GOOGLE_CLIENT_ID      = [optionnel]
-GOOGLE_CLIENT_SECRET  = [optionnel]
-NODE_ENV              = production
-```
-
-**⚠️ IMPORTANT** : Ne JAMAIS copier-coller `.env.local` dans Vercel. Regénérer les secrets.
+**📚 Guide complet** : Voir `docs/DEPLOYMENT_GUIDE.md`
 
 ### Étape 3 : Vérifications post-deploy
 
