@@ -20,21 +20,28 @@ const envSchema = z.object({
   DATABASE_URL: z
     .string()
     .url("DATABASE_URL doit être une URL valide")
-    .startsWith("postgres://", "DATABASE_URL doit être une connexion Postgres")
+    .refine(
+      (url) => url.startsWith("postgres://") || url.startsWith("postgresql://"),
+      "DATABASE_URL doit être une connexion Postgres"
+    )
     .describe("Neon pooled connection string (pour queries)"),
 
   DIRECT_URL: z
     .string()
     .url("DIRECT_URL doit être une URL valide")
-    .startsWith("postgres://", "DIRECT_URL doit être une connexion Postgres")
+    .refine(
+      (url) => url.startsWith("postgres://") || url.startsWith("postgresql://"),
+      "DIRECT_URL doit être une connexion Postgres"
+    )
     .describe("Neon direct connection string (pour migrations Prisma)"),
 
   // ===== AUTH (REQUIRED) =====
   NEXTAUTH_URL: z
     .string()
     .url("NEXTAUTH_URL doit être une URL valide")
+    .optional()
     .describe(
-      "URL de l'application (ex: http://localhost:3000 ou https://devisio.fr)"
+      "URL de l'application (auto-détecté en dev, requis en prod: https://devisio.fr)"
     ),
 
   NEXTAUTH_SECRET: z

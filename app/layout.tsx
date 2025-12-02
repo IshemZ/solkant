@@ -2,6 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
+import { getEnv, logEnvSummary } from "@/lib/env";
+
+// Validate environment variables at startup (server-side only)
+getEnv();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,8 +23,12 @@ export const metadata: Metadata = {
     "Devisio simplifie la création de devis professionnels pour les instituts de beauté. Gérez vos clients, services et générez des PDF personnalisés.",
 };
 
-// Audit A11y en développement uniquement
+// Audit A11y en développement uniquement - DÉSACTIVÉ temporairement
+// Cause "window is not defined" en mode Turbopack
+// TODO: Réactiver après migration stable
+/*
 if (process.env.NODE_ENV === "development") {
+  logEnvSummary();
   import("@axe-core/react").then((axe) => {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require("react");
@@ -29,6 +37,7 @@ if (process.env.NODE_ENV === "development") {
     axe.default(React, ReactDOM, 1000);
   });
 }
+*/
 
 export default function RootLayout({
   children,

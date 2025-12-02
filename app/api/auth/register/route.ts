@@ -2,9 +2,38 @@ import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import prisma from '@/lib/prisma'
 
+// Simple in-memory rate limiting (production: use Redis/Upstash)
+const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
+
+function rateLimit(identifier: string, limit = 5, windowMs = 15 * 60 * 1000): boolean {
+  const now = Date.now()
+  const record = rateLimitMap.get(identifier)
+
+  if (!record || now > record.resetTime) {
+    rateLimitMap.set(identifier, { count: 1, resetTime: now + windowMs })
+    return true
+  }
+
+  if (record.count >= limit) {
+    return false
+  }
+
+  record.count++
+  return true
+}
+
 export async function POST(request: Request) {
   try {
     const { name, email, password } = await request.json()
+
+    // Rate limiting by IP
+    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown'
+    if (!rateLimit(ip, 5, 15 * 60 * 1000)) {
+      return NextResponse.json(
+        { error: 'Trop de tentatives. Réessayez dans 15 minutes.' },
+        { status: 429 }
+      )
+    }
 
     // Validation
     if (!email || !password) {

@@ -4,6 +4,7 @@ import GoogleProvider from 'next-auth/providers/google'
 // import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import prisma from './prisma'
 import bcrypt from 'bcryptjs'
+import { getEnv, features } from './env'
 
 /**
  * NextAuth configuration
@@ -14,14 +15,13 @@ import bcrypt from 'bcryptjs'
  * - Callbacks for JWT and session handling
  */
 
-export const authOptions: NextAuthOptions = {
-  // Adapter disabled for JWT strategy - accounts/sessions managed via JWT
-  // adapter: PrismaAdapter(prisma),
+const env = getEnv()
 
-  providers: [
-    // Email/Password authentication
-    CredentialsProvider({
-      name: 'credentials',
+// Build providers array dynamically based on available credentials
+const providers = [
+  // Email/Password authentication
+  CredentialsProvider({
+    name: 'credentials',
       credentials: {
         email: { label: 'Email', type: 'email' },
         password: { label: 'Password', type: 'password' }
@@ -56,13 +56,23 @@ export const authOptions: NextAuthOptions = {
         }
       }
     }),
+]
 
-    // Google OAuth
+// Add Google OAuth only if credentials are available
+if (features.googleOAuth) {
+  providers.push(
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID as string,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
-    }),
-  ],
+      clientId: env.GOOGLE_CLIENT_ID!,
+      clientSecret: env.GOOGLE_CLIENT_SECRET!,
+    })
+  )
+}
+
+export const authOptions: NextAuthOptions = {
+  // Adapter disabled for JWT strategy - accounts/sessions managed via JWT
+  // adapter: PrismaAdapter(prisma),
+
+  providers,
 
   // Use JWT strategy for sessions
   session: {
@@ -157,5 +167,5 @@ export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development',
 
   // Secret for JWT encryption
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: env.NEXTAUTH_SECRET,
 }

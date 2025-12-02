@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import { createClientSchema, updateClientSchema, type CreateClientInput, type UpdateClientInput } from '@/lib/validations'
+import { sanitizeObject } from '@/lib/security'
 import { revalidatePath } from 'next/cache'
 
 export async function getClients() {
@@ -33,7 +34,10 @@ export async function createClient(input: CreateClientInput) {
     return { error: 'Non autorisé' }
   }
 
-  const validation = createClientSchema.safeParse(input)
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input)
+
+  const validation = createClientSchema.safeParse(sanitized)
   if (!validation.success) {
     return {
       error: 'Données invalides',
@@ -64,7 +68,10 @@ export async function updateClient(id: string, input: UpdateClientInput) {
     return { error: 'Non autorisé' }
   }
 
-  const validation = updateClientSchema.safeParse(input)
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input)
+
+  const validation = updateClientSchema.safeParse(sanitized)
   if (!validation.success) {
     return {
       error: 'Données invalides',
