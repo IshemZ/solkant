@@ -94,12 +94,76 @@ GOOGLE_CLIENT_SECRET=  # OAuth (optional)
 
 ## Code Conventions
 
-### File Organization
+### File Organization (App Router + Colocation)
 
-- **Route Handlers**: Use `(group)` folders for layout sharing without URL segments
-- **Server Actions**: One file per resource (`actions/clients.ts`, `actions/quotes.ts`)
-- **Components**: Flat structure in `components/` (no deep nesting except `ui/`, `auth/`)
-- **Validations**: One schema file per model in `lib/validations/` + index for exports
+#### Route Structure
+
+- **Route Groups**: Use `(group)` folders for layout sharing without URL segments (e.g., `(auth)`, `(dashboard)`)
+- **Special Files**: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
+- **Private Folders**: Prefix with `_` for non-routable folders (e.g., `_components/`, `_lib/`)
+
+#### Component Colocation Strategy
+
+**Colocate components in `app/*/\_components/`** when:
+
+- ✅ Used in ONE SINGLE feature/route
+- ✅ Contains feature-specific business logic
+- ✅ Will never be reused elsewhere
+
+**Keep components in root `/components`** when:
+
+- ✅ Reused across 2+ different features
+- ✅ Part of the design system (UI primitives)
+- ✅ Global layout/navigation components
+- ✅ Cross-cutting concerns (PDF generation, exports)
+
+#### File Organization Pattern
+
+```
+app/(dashboard)/dashboard/
+  ├── page.tsx                    # Server Component with data fetching
+  ├── loading.tsx                 # Streaming UI fallback
+  ├── error.tsx                   # Error boundary
+  ├── _components/                # Dashboard-specific components
+  │   └── DashboardStats.tsx
+  ├── devis/
+  │   ├── page.tsx
+  │   ├── loading.tsx
+  │   ├── error.tsx
+  │   ├── _components/            # Quote-specific components ONLY
+  │   │   ├── QuotesList.tsx
+  │   │   ├── QuoteForm.tsx
+  │   │   └── QuoteFilters.tsx
+  │   ├── nouveau/
+  │   │   └── page.tsx
+  │   └── [id]/
+  │       ├── page.tsx
+  │       └── _components/
+  │           └── QuoteDetails.tsx
+
+components/                       # SHARED components only
+  ├── ui/                         # Design system (shadcn/ui)
+  ├── layout/                     # Global navigation
+  ├── shared/                     # Business components (2+ features)
+  └── pdf/                        # Cross-feature utilities
+
+lib/
+  ├── validations/                # One schema file per model + index
+  └── utils.ts                    # Shared utilities
+
+app/actions/                      # Server Actions (one file per resource)
+  ├── clients.ts
+  ├── quotes.ts
+  └── services.ts
+```
+
+#### Benefits of This Architecture
+
+1. **Proximity**: Components live next to their usage
+2. **Clarity**: Server/Client separation is more visible
+3. **Scalability**: New feature = new `_components/` folder
+4. **Performance**: Better tree-shaking and code splitting
+5. **Maintainability**: Changes have local impact, not global
 
 ### TypeScript Patterns
 
@@ -134,13 +198,44 @@ Auto-generated in format `DEVIS-{YEAR}-{SEQUENCE}` (e.g., `DEVIS-2024-001`). The
 
 ## Common Tasks
 
-### Adding New Resource
+### Adding New Resource (App Router Pattern)
 
-1. Update `prisma/schema.prisma` with model + `businessId` relation
-2. Run `npx prisma migrate dev --name add_resource`
-3. Create Zod schema in `lib/validations/resource.ts` + export from `index.ts`
-4. Create Server Actions in `app/actions/resource.ts` with session checks
-5. Build UI components + route pages in `app/(dashboard)/dashboard/resource/`
+1. **Database Schema**: Update `prisma/schema.prisma` with model + `businessId` relation
+
+   ```bash
+   npx prisma migrate dev --name add_resource
+   ```
+
+2. **Validation**: Create Zod schema in `lib/validations/resource.ts` + export from `index.ts`
+
+3. **Server Actions**: Create in `app/actions/resource.ts` with:
+
+   - Session validation + `businessId` extraction
+   - Input validation with Zod
+   - Prisma query with `businessId` filter
+   - `revalidatePath()` after mutations
+
+4. **Route Structure**: Build in `app/(dashboard)/dashboard/resource/`
+
+   ```
+   resource/
+   ├── page.tsx              # Server Component (list view)
+   ├── loading.tsx           # Suspense fallback
+   ├── error.tsx             # Error boundary
+   ├── _components/          # Feature-specific components
+   │   ├── ResourceList.tsx
+   │   ├── ResourceForm.tsx
+   │   └── ResourceFilters.tsx
+   ├── nouveau/
+   │   └── page.tsx          # Create form page
+   └── [id]/
+       └── page.tsx          # Detail/edit page
+   ```
+
+5. **Component Organization**:
+   - Place feature-specific components in `_components/`
+   - Only move to `/components` if reused across 2+ features
+   - Keep Server Components by default, add `'use client'` only when needed
 
 ### Debugging Auth Issues
 
