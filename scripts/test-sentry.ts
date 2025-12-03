@@ -8,6 +8,12 @@
  * Vérifiez ensuite dans le dashboard Sentry que l'erreur apparaît.
  */
 
+import { config } from "dotenv";
+import { resolve } from "path";
+
+// Charger les variables d'environnement depuis .env.local
+config({ path: resolve(process.cwd(), ".env.local") });
+
 import * as Sentry from "@sentry/nextjs";
 
 // Initialiser Sentry comme en production
