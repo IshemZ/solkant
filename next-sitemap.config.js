@@ -1,4 +1,12 @@
 module.exports = {
-  siteUrl: "https://solkant.com", // change ça avec ton vrai domaine
+  siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "https://solkant.com",
   generateRobotsTxt: true,
+  robotsTxtOptions: {
+    policies: [
+      {
+        userAgent: "*",
+        allow: "/",
+      },
+    ],
+  },
 };
