@@ -4,6 +4,17 @@ import { authOptions } from "@/lib/auth";
 import DashboardNav from "@/components/layout/DashboardNav";
 import { SkipLink } from "@/components/shared/SkipLink";
 
+/**
+ * Force Dynamic Rendering pour toutes les routes dashboard
+ *
+ * CRITIQUE: Les routes protégées nécessitent une session utilisateur
+ * et ne peuvent PAS être prerenderées statiquement au build.
+ *
+ * Sans cette config, Next.js tente de prerender au build time,
+ * déclenchant la validation des env vars avant que l'app soit lancée.
+ */
+export const dynamic = "force-dynamic";
+
 export default async function DashboardLayout({
   children,
 }: {
