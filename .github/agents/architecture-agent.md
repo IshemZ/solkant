@@ -242,6 +242,118 @@ Lors de l'ajout d'une nouvelle resource :
 - [ ] Client Component pour interactivité uniquement
 - [ ] `error.tsx` et `loading.tsx` dans la route
 - [ ] Revalidation des caches appropriée
+- [ ] Composants colocalisés dans `_components/` si usage unique
+
+---
+
+## Organisation des Fichiers & Colocalization
+
+### Principe Fondamental
+
+**Colocaliser** les composants avec leur utilisation pour améliorer la maintenabilité et la navigation du code.
+
+### Structure Recommandée
+
+```
+app/(dashboard)/dashboard/
+  ├── page.tsx
+  ├── _components/              # Composants spécifiques au dashboard
+  │   └── DashboardStats.tsx    # Server Component avec queries Prisma
+  │
+  ├── devis/
+  │   ├── page.tsx
+  │   ├── loading.tsx
+  │   ├── error.tsx
+  │   ├── _components/          # Composants UNIQUEMENT pour devis
+  │   │   ├── QuotesList.tsx
+  │   │   ├── QuoteForm.tsx
+  │   │   └── QuoteView.tsx
+  │   ├── nouveau/
+  │   │   └── page.tsx
+  │   └── [id]/
+  │       └── page.tsx
+  │
+  ├── clients/
+  │   ├── page.tsx
+  │   ├── _components/
+  │   │   ├── ClientsList.tsx
+  │   │   └── ClientForm.tsx
+  │   └── [id]/
+  │       └── page.tsx
+  │
+  └── services/
+      ├── page.tsx
+      ├── _components/
+      │   ├── ServicesList.tsx
+      │   └── ServiceForm.tsx
+      └── [id]/
+          └── page.tsx
+
+components/                     # SEULEMENT composants partagés entre features
+  ├── ui/                       # Design system (shadcn/ui)
+  │   ├── button.tsx
+  │   ├── dialog.tsx
+  │   └── ...
+  ├── layout/                   # Navigation globale
+  │   ├── DashboardNav.tsx
+  │   └── MobileNav.tsx
+  ├── shared/                   # Composants métier réutilisés (2+ features)
+  │   ├── ConfirmDialog.tsx
+  │   └── SkipLink.tsx
+  └── pdf/                      # Génération PDF (cross-feature)
+      └── QuotePDF.tsx
+```
+
+### Règles de Décision
+
+**Quand mettre un composant dans `app/*/\_components/` ?**
+
+- ✅ Utilisé dans UNE SEULE feature/route
+- ✅ Logic métier spécifique à cette route
+- ✅ Ne sera jamais réutilisé ailleurs
+
+**Quand mettre un composant dans `/components` racine ?**
+
+- ✅ Réutilisé dans 2+ features différentes
+- ✅ Composant UI générique (design system)
+- ✅ Layout/navigation globale
+- ✅ Fonctionnalités transversales (PDF, export, etc.)
+
+### Avantages de cette Organisation
+
+1. **Navigation facilitée** : Composants près de leur utilisation
+2. **Clarté architecturale** : Séparation Server/Client plus visible
+3. **Scalabilité** : Nouvelle feature = nouveau dossier `_components`
+4. **Tree-shaking optimal** : Next.js optimise mieux les bundles
+5. **Réduction du couplage** : Composants isolés par feature
+6. **Refactoring sécurisé** : Impact local, pas global
+
+### ⚠️ Anti-Patterns à Éviter
+
+```
+❌ Tous les composants à plat dans /components
+❌ Server Components mélangés avec Client Components
+❌ Composants spécifiques dans /components/shared
+❌ Dossiers vides (clients/, quotes/, services/) dans /components
+```
+
+### Convention de Nommage
+
+- `_components/` : Le `_` indique que c'est un dossier privé (pas une route)
+- Noms descriptifs : `QuotesList.tsx`, pas `List.tsx`
+- Server Components : Pas de suffixe spécial
+- Client Components : Commencer par `"use client"`
+
+### Migration Progressive
+
+Lors de refactoring d'un projet existant :
+
+1. Commencer par une feature (ex: `devis/`)
+2. Créer `app/(dashboard)/dashboard/devis/_components/`
+3. Déplacer les composants spécifiques depuis `/components`
+4. Mettre à jour les imports dans `page.tsx`
+5. Tester puis répéter pour autres features
+6. Ne garder dans `/components` que les vrais composants partagés
 
 ---
 
@@ -254,4 +366,4 @@ Lors de l'ajout d'une nouvelle resource :
 ---
 
 **Mainteneur** : Architecture & Patterns Specialist  
-**Dernière mise à jour** : 1er décembre 2025
+**Dernière mise à jour** : 3 décembre 2025
