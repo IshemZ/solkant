@@ -1,25 +1,19 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-export default function LoginForm() {
+interface LoginFormProps {
+  initialError?: string;
+}
+
+export default function LoginForm({ initialError }: LoginFormProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(initialError || "");
   const [isLoading, setIsLoading] = useState(false);
-
-  // Afficher les erreurs OAuth depuis l'URL
-  useEffect(() => {
-    const urlError = searchParams.get("error");
-    if (urlError) {
-      console.error("[LoginForm] Erreur OAuth détectée:", urlError);
-      setError(`Erreur de connexion: ${urlError}`);
-    }
-  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
