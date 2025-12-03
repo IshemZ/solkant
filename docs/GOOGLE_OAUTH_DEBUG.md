@@ -2,7 +2,7 @@
 
 ## Symptôme
 
-Erreur 500 (Internal Server Error) lors du clic sur le bouton "Google" dans la page de login.
+Erreur 500 (Intexrnal Server Error) lors du clic sur le bouton "Google" dans la page de login.
 
 ## Causes Possibles
 
