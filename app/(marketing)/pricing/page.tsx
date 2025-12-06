@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 export const metadata: Metadata = {
   title: "Tarifs Solkant – Prix du logiciel de devis pour instituts de beauté",
@@ -85,6 +86,13 @@ export default function PricingPage() {
 
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { label: "Accueil", href: "/" },
+            { label: "Tarifs", href: "/pricing" },
+          ]}
+          className="mb-8"
+        />
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Tarifs Solkant : logiciel de devis pour instituts de beauté
@@ -477,67 +485,197 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-foreground/5 py-20">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-foreground mb-12">
-            Questions fréquentes sur les tarifs
-          </h2>
+      <section className="bg-foreground/5 py-20 sm:py-32">
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Questions fréquentes sur nos tarifs
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+              Tout ce que vous devez savoir sur les prix et abonnements Solkant
+            </p>
+          </div>
+
+          {/* Schema.org FAQPage JSON-LD */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "FAQPage",
+                mainEntity: [
+                  {
+                    "@type": "Question",
+                    name: "Le plan Gratuit est-il vraiment sans engagement ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Oui, totalement. Le plan Gratuit de Solkant ne nécessite pas de carte bancaire et vous pouvez l'utiliser indéfiniment. Vous pouvez créer jusqu'à 10 devis par mois avec toutes les fonctionnalités essentielles.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Puis-je changer de plan à tout moment ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Absolument. Vous pouvez passer du plan Gratuit au plan Pro (ou vice-versa) à tout moment depuis votre tableau de bord. Le changement est immédiat et vous ne payez que pour le temps restant du mois en cours.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Comment fonctionne la facturation du plan Pro ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Le plan Pro à 19€/mois est facturé mensuellement. Vous recevez une facture par email chaque mois. Vous pouvez annuler à tout moment sans frais supplémentaires. Aucune période d'engagement minimum n'est requise.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Y a-t-il des frais cachés ou des coûts supplémentaires ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Non, aucun. Le prix affiché (0€ pour Gratuit, 19€ pour Pro) est le prix total. Il n'y a pas de frais d'installation, de configuration, ni de coûts supplémentaires par utilisateur ou par devis.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Que se passe-t-il si je dépasse 10 devis sur le plan Gratuit ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Vous recevrez une notification lorsque vous approchez de la limite. Au-delà de 10 devis par mois, vous devrez passer au plan Pro pour continuer à créer des devis. Vos devis existants restent accessibles même si vous ne changez pas de plan.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Proposez-vous des réductions pour les abonnements annuels ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Actuellement, nous proposons uniquement des abonnements mensuels à 19€/mois. Nous prévoyons de proposer des tarifs annuels avec réduction dans le futur. Inscrivez-vous à notre newsletter pour être informé.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Puis-je annuler mon abonnement Pro à tout moment ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Oui, sans aucune pénalité. Vous pouvez annuler votre abonnement Pro depuis votre tableau de bord à tout moment. Vous conserverez l'accès au plan Pro jusqu'à la fin de votre période de facturation payée, puis vous serez automatiquement basculé sur le plan Gratuit.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Acceptez-vous les paiements par virement bancaire ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Actuellement, nous acceptons uniquement les paiements par carte bancaire via notre plateforme sécurisée (Stripe). Pour les entreprises nécessitant d'autres moyens de paiement, contactez-nous à contact@solkant.com.",
+                    },
+                  },
+                ],
+              }),
+            }}
+          />
 
           <div className="space-y-8">
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+            {/* FAQ 1 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Le plan Gratuit est-il vraiment sans engagement ?
+              </h3>
+              <p className="text-foreground/70">
+                Oui, totalement. Le plan Gratuit de Solkant ne nécessite pas de
+                carte bancaire et vous pouvez l&apos;utiliser indéfiniment. Vous
+                pouvez créer jusqu&apos;à 10 devis par mois avec toutes les
+                fonctionnalités essentielles.
+              </p>
+            </div>
+
+            {/* FAQ 2 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Puis-je changer de plan à tout moment ?
               </h3>
-              <p className="text-foreground/60">
-                Oui, vous pouvez passer du plan Gratuit au plan Pro (et
+              <p className="text-foreground/70">
+                Absolument. Vous pouvez passer du plan Gratuit au plan Pro (ou
                 vice-versa) à tout moment depuis votre tableau de bord. Le
-                changement est immédiat et la facturation est ajustée au
-                prorata.
+                changement est immédiat et vous ne payez que pour le temps
+                restant du mois en cours.
               </p>
             </div>
 
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Dois-je fournir ma carte bancaire pour l&apos;essai gratuit ?
+            {/* FAQ 3 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Comment fonctionne la facturation du plan Pro ?
               </h3>
-              <p className="text-foreground/60">
-                Non, le plan Gratuit ne nécessite aucune carte bancaire. Vous
-                pouvez créer votre compte et utiliser Solkant immédiatement sans
-                engagement.
+              <p className="text-foreground/70">
+                Le plan Pro à 19€/mois est facturé mensuellement. Vous recevez
+                une facture par email chaque mois. Vous pouvez annuler à tout
+                moment sans frais supplémentaires. Aucune période
+                d&apos;engagement minimum n&apos;est requise.
               </p>
             </div>
 
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+            {/* FAQ 4 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Y a-t-il des frais cachés ou des coûts supplémentaires ?
+              </h3>
+              <p className="text-foreground/70">
+                Non, aucun. Le prix affiché (0€ pour Gratuit, 19€ pour Pro) est
+                le prix total. Il n&apos;y a pas de frais d&apos;installation,
+                de configuration, ni de coûts supplémentaires par utilisateur ou
+                par devis.
+              </p>
+            </div>
+
+            {/* FAQ 5 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Que se passe-t-il si je dépasse 10 devis sur le plan Gratuit ?
               </h3>
-              <p className="text-foreground/60">
-                Vous recevrez une notification vous invitant à passer au plan
-                Pro. Vos devis existants restent accessibles, mais vous ne
-                pourrez plus en créer de nouveaux jusqu&apos;à la prochaine
-                période ou jusqu&apos;à votre passage au plan Pro.
+              <p className="text-foreground/70">
+                Vous recevrez une notification lorsque vous approchez de la
+                limite. Au-delà de 10 devis par mois, vous devrez passer au plan
+                Pro pour continuer à créer des devis. Vos devis existants
+                restent accessibles même si vous ne changez pas de plan.
               </p>
             </div>
 
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Y a-t-il un engagement de durée ?
+            {/* FAQ 6 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Proposez-vous des réductions pour les abonnements annuels ?
               </h3>
-              <p className="text-foreground/60">
-                Non, tous nos plans sont sans engagement. Vous pouvez annuler
-                votre abonnement à tout moment, et vous ne serez pas facturé
-                pour le mois suivant.
+              <p className="text-foreground/70">
+                Actuellement, nous proposons uniquement des abonnements mensuels
+                à 19€/mois. Nous prévoyons de proposer des tarifs annuels avec
+                réduction dans le futur. Inscrivez-vous à notre newsletter pour
+                être informé.
               </p>
             </div>
 
-            <div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
-                Les tarifs incluent-ils la TVA ?
+            {/* FAQ 7 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Puis-je annuler mon abonnement Pro à tout moment ?
               </h3>
-              <p className="text-foreground/60">
-                Les tarifs affichés sont hors taxes. La TVA applicable (20% en
-                France) sera ajoutée lors du paiement selon votre pays de
-                facturation.
+              <p className="text-foreground/70">
+                Oui, sans aucune pénalité. Vous pouvez annuler votre abonnement
+                Pro depuis votre tableau de bord à tout moment. Vous conserverez
+                l&apos;accès au plan Pro jusqu&apos;à la fin de votre période de
+                facturation payée, puis vous serez automatiquement basculé sur
+                le plan Gratuit.
+              </p>
+            </div>
+
+            {/* FAQ 8 */}
+            <div className="rounded-lg bg-background border border-foreground/10 p-6">
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Acceptez-vous les paiements par virement bancaire ?
+              </h3>
+              <p className="text-foreground/70">
+                Actuellement, nous acceptons uniquement les paiements par carte
+                bancaire via notre plateforme sécurisée (Stripe). Pour les
+                entreprises nécessitant d&apos;autres moyens de paiement,
+                contactez-nous à contact@solkant.com.
               </p>
             </div>
           </div>

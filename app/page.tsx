@@ -369,6 +369,85 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Comment ça marche Section */}
+      <section className="py-20 sm:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Comment ça marche ?
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+              Créez vos premiers devis professionnels en 3 étapes simples
+            </p>
+          </div>
+
+          <div className="grid gap-12 lg:grid-cols-3">
+            {/* Étape 1 */}
+            <div className="relative">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background text-2xl font-bold mb-6">
+                1
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Créez votre catalogue
+              </h3>
+              <p className="text-foreground/70 leading-relaxed">
+                Ajoutez vos prestations (soins visage, épilation, manucure,
+                etc.) avec les prix et durées. Votre catalogue est réutilisable
+                pour tous vos futurs devis. Vous pouvez organiser vos services
+                par catégorie pour retrouver rapidement ce dont vous avez
+                besoin.
+              </p>
+            </div>
+
+            {/* Étape 2 */}
+            <div className="relative">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background text-2xl font-bold mb-6">
+                2
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Sélectionnez vos prestations
+              </h3>
+              <p className="text-foreground/70 leading-relaxed">
+                Créez un nouveau devis en quelques clics : choisissez votre
+                client, sélectionnez les prestations dans votre catalogue, et
+                Solkant calcule automatiquement les totaux. Ajoutez des remises
+                ou des notes personnalisées si besoin. Le tout en moins de 3
+                minutes.
+              </p>
+            </div>
+
+            {/* Étape 3 */}
+            <div className="relative">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-foreground text-background text-2xl font-bold mb-6">
+                3
+              </div>
+              <h3 className="text-2xl font-bold text-foreground mb-4">
+                Générez et envoyez
+              </h3>
+              <p className="text-foreground/70 leading-relaxed">
+                Votre devis PDF professionnel est généré instantanément avec
+                votre logo et vos couleurs. Téléchargez-le, imprimez-le ou
+                envoyez-le directement par email à votre client. Suivez
+                facilement son statut (brouillon, envoyé, accepté, refusé)
+                depuis votre tableau de bord.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-16 text-center">
+            <Link
+              href="/register"
+              className="inline-block rounded-md bg-foreground px-8 py-3 text-base font-semibold text-background shadow-sm hover:bg-foreground/90"
+            >
+              Essayer gratuitement maintenant
+            </Link>
+            <p className="mt-4 text-sm text-foreground/60">
+              Aucune carte bancaire requise • Configuration en 2 minutes
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Pourquoi Solkant Section */}
       <section className="py-20 sm:py-32">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -516,6 +595,278 @@ export default function Home() {
                 depuis votre téléphone ou tablette.
               </p>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Comparaison Section */}
+      <section className="py-20 sm:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Pourquoi choisir Solkant plutôt qu&apos;Excel ou Word ?
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+              Découvrez ce qui fait la différence pour votre institut
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse bg-background rounded-lg overflow-hidden shadow-sm">
+              <thead>
+                <tr className="border-b border-foreground/10">
+                  <th className="px-6 py-4 text-left text-sm font-semibold text-foreground">
+                    Fonctionnalité
+                  </th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-foreground bg-foreground/5">
+                    Solkant
+                  </th>
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-foreground/60">
+                    Excel / Word
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    Temps de création d&apos;un devis
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <span className="font-semibold text-foreground">
+                      2-3 minutes
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 text-center text-foreground/60">
+                    15-20 minutes
+                  </td>
+                </tr>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    Calcul automatique des totaux
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <svg
+                      className="h-6 w-6 text-foreground/30 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    PDF professionnel automatique
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <svg
+                      className="h-6 w-6 text-foreground/30 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    Gestion des clients intégrée
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <svg
+                      className="h-6 w-6 text-foreground/30 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    Historique et statistiques
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <svg
+                      className="h-6 w-6 text-foreground/30 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-foreground/10">
+                  <td className="px-6 py-4 text-foreground/80">
+                    Accessibilité mobile
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <span className="text-sm text-foreground/60">Limité</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="px-6 py-4 text-foreground/80">
+                    Sauvegarde automatique cloud
+                  </td>
+                  <td className="px-6 py-4 text-center bg-foreground/5">
+                    <svg
+                      className="h-6 w-6 text-green-600 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </td>
+                  <td className="px-6 py-4 text-center">
+                    <svg
+                      className="h-6 w-6 text-foreground/30 mx-auto"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-lg text-foreground/80 mb-6">
+              Solkant vous fait gagner <strong>80% de temps</strong> sur la
+              création de vos devis tout en renforçant votre image
+              professionnelle.
+            </p>
+            <Link
+              href="/fonctionnalites"
+              className="inline-flex items-center text-foreground font-semibold hover:underline"
+            >
+              Découvrir toutes les fonctionnalités
+              <svg
+                className="ml-2 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>
@@ -694,6 +1045,46 @@ export default function Home() {
                       text: "Oui, vous pouvez commencer gratuitement et tester toutes les fonctionnalités de Solkant sans engagement ni carte bancaire.",
                     },
                   },
+                  {
+                    "@type": "Question",
+                    name: "Puis-je utiliser Solkant sur mobile ou tablette ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Oui, Solkant est accessible depuis n'importe quel navigateur web, que ce soit sur ordinateur, tablette ou smartphone. L'interface s'adapte automatiquement à la taille de votre écran.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Combien coûte Solkant ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Solkant propose un plan Gratuit (0€/mois, jusqu'à 10 devis/mois) et un plan Pro (19€/mois, devis illimités avec fonctionnalités avancées). Aucun engagement, vous pouvez changer de plan à tout moment.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Que se passe-t-il avec mes données si j'arrête d'utiliser Solkant ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Vous pouvez exporter toutes vos données (clients, services, devis) à tout moment au format PDF ou CSV. Même après l'arrêt de votre abonnement, vos données restent accessibles pendant 30 jours.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Ai-je besoin de compétences techniques pour utiliser Solkant ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Non, aucune compétence technique n'est requise. Solkant est conçu pour être intuitif. Si vous savez envoyer un email, vous savez utiliser Solkant. Un guide de démarrage rapide vous accompagne lors de la première utilisation.",
+                    },
+                  },
+                  {
+                    "@type": "Question",
+                    name: "Puis-je envoyer mes devis directement par email depuis Solkant ?",
+                    acceptedAnswer: {
+                      "@type": "Answer",
+                      text: "Oui, vous pouvez envoyer vos devis PDF directement par email à vos clients depuis Solkant. Vous pouvez également les télécharger ou les imprimer selon vos préférences.",
+                    },
+                  },
                 ],
               }),
             }}
@@ -754,6 +1145,183 @@ export default function Home() {
                 fonctionnalités de Solkant sans engagement ni carte bancaire.
               </p>
             </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Puis-je utiliser Solkant sur mobile ou tablette ?
+              </h3>
+              <p className="text-foreground/60">
+                Oui, Solkant est accessible depuis n&apos;importe quel
+                navigateur web, que ce soit sur ordinateur, tablette ou
+                smartphone. L&apos;interface s&apos;adapte automatiquement à la
+                taille de votre écran.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Combien coûte Solkant ?
+              </h3>
+              <p className="text-foreground/60">
+                Solkant propose un plan Gratuit (0€/mois, jusqu&apos;à 10
+                devis/mois) et un plan Pro (19€/mois, devis illimités avec
+                fonctionnalités avancées). Aucun engagement, vous pouvez changer
+                de plan à tout moment.{" "}
+                <Link
+                  href="/pricing"
+                  className="text-foreground hover:underline font-medium"
+                >
+                  Voir les tarifs détaillés
+                </Link>
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Que se passe-t-il avec mes données si j&apos;arrête
+                d&apos;utiliser Solkant ?
+              </h3>
+              <p className="text-foreground/60">
+                Vous pouvez exporter toutes vos données (clients, services,
+                devis) à tout moment au format PDF ou CSV. Même après
+                l&apos;arrêt de votre abonnement, vos données restent
+                accessibles pendant 30 jours.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Ai-je besoin de compétences techniques pour utiliser Solkant ?
+              </h3>
+              <p className="text-foreground/60">
+                Non, aucune compétence technique n&apos;est requise. Solkant est
+                conçu pour être intuitif. Si vous savez envoyer un email, vous
+                savez utiliser Solkant. Un guide de démarrage rapide vous
+                accompagne lors de la première utilisation.
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">
+                Puis-je envoyer mes devis directement par email depuis Solkant ?
+              </h3>
+              <p className="text-foreground/60">
+                Oui, vous pouvez envoyer vos devis PDF directement par email à
+                vos clients depuis Solkant. Vous pouvez également les
+                télécharger ou les imprimer selon vos préférences.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-foreground/60 mb-4">
+              Vous avez d&apos;autres questions ?
+            </p>
+            <Link
+              href="/contact"
+              className="inline-flex items-center text-foreground font-semibold hover:underline"
+            >
+              Contactez notre équipe
+              <svg
+                className="ml-2 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Section - Maillage interne */}
+      <section className="bg-foreground/5 py-20 sm:py-32">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+              Guides pratiques pour votre institut
+            </h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+              Découvrez nos conseils pour optimiser la gestion de votre activité
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-3">
+            <Link
+              href="/blog/comment-faire-devis-professionnel-institut-beaute"
+              className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Comment faire un devis professionnel pour votre institut
+              </h3>
+              <p className="text-sm text-foreground/60 mb-4">
+                Guide complet pour créer des devis conformes et professionnels
+                qui rassurent vos clients.
+              </p>
+              <span className="text-sm font-medium text-foreground hover:underline">
+                Lire l&apos;article →
+              </span>
+            </Link>
+
+            <Link
+              href="/blog/choisir-logiciel-devis-institut-beaute"
+              className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Comment choisir le bon logiciel de devis
+              </h3>
+              <p className="text-sm text-foreground/60 mb-4">
+                Critères essentiels pour choisir l&apos;outil qui correspond
+                vraiment aux besoins de votre institut.
+              </p>
+              <span className="text-sm font-medium text-foreground hover:underline">
+                Lire l&apos;article →
+              </span>
+            </Link>
+
+            <Link
+              href="/blog/optimiser-gestion-clients-institut-beaute"
+              className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+            >
+              <h3 className="text-lg font-semibold text-foreground mb-2">
+                Optimiser la gestion de vos clients
+              </h3>
+              <p className="text-sm text-foreground/60 mb-4">
+                Stratégies concrètes pour fidéliser votre clientèle et améliorer
+                votre organisation.
+              </p>
+              <span className="text-sm font-medium text-foreground hover:underline">
+                Lire l&apos;article →
+              </span>
+            </Link>
+          </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              href="/blog"
+              className="inline-flex items-center text-foreground font-semibold hover:underline"
+            >
+              Voir tous les articles
+              <svg
+                className="ml-2 h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </Link>
           </div>
         </div>
       </section>

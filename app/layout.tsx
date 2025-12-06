@@ -19,9 +19,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Solkant - Créez des devis élégants pour votre institut",
-  description:
-    "Solkant simplifie la création de devis professionnels pour les instituts de beauté. Gérez vos clients, services et générez des PDF personnalisés.",
+  title: "Solkant",
 };
 
 // Audit A11y en développement uniquement - DÉSACTIVÉ temporairement
@@ -50,6 +48,45 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        {/* Schema.org Organization - Données structurées globales */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "Solkant",
+              url: "https://solkant.com",
+              logo: "https://solkant.com/logo.png",
+              description:
+                "Logiciel SaaS de création de devis pour instituts de beauté, salons d'esthétique et spas. Gestion clients, catalogue de services et génération de PDF professionnels.",
+              foundingDate: "2024",
+              address: {
+                "@type": "PostalAddress",
+                addressCountry: "FR",
+              },
+              contactPoint: {
+                "@type": "ContactPoint",
+                contactType: "customer service",
+                email: "contact@solkant.com",
+                availableLanguage: ["French"],
+                url: "https://solkant.com/contact",
+              },
+              sameAs: [
+                // Ajouter ici vos réseaux sociaux quand disponibles
+                // "https://www.facebook.com/solkant",
+                // "https://www.linkedin.com/company/solkant",
+                // "https://twitter.com/solkant",
+              ],
+              areaServed: {
+                "@type": "Country",
+                name: "France",
+              },
+              applicationCategory: "BusinessApplication",
+              operatingSystem: "Web",
+            }),
+          }}
+        />
         {children}
         <Toaster position="top-right" richColors closeButton />
         <GoogleAnalytics />

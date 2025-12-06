@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { blogArticles } from "@/lib/blog-articles";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 
 export const metadata: Metadata = {
   title:
@@ -87,6 +88,13 @@ export default function BlogPage() {
 
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <Breadcrumbs
+          items={[
+            { label: "Accueil", href: "/" },
+            { label: "Blog", href: "/blog" },
+          ]}
+          className="mb-8"
+        />
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Guides et conseils pour gérer votre institut de beauté
