@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { CookieBanner } from "@/components/shared/CookieBanner";
 import "./globals.css";
 
 // NOTE: Validation des env vars déplacée dans instrumentation.ts
@@ -90,6 +91,7 @@ export default function RootLayout({
         {children}
         <Toaster position="top-right" richColors closeButton />
         <GoogleAnalytics />
+        <CookieBanner />
       </body>
     </html>
   );
