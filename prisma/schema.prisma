@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,59 +8,51 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// User model for authentication
 model User {
   id            String    @id @default(cuid())
   email         String    @unique
   emailVerified DateTime?
-  password      String?   // Null if using only OAuth
+  password      String?
   name          String?
   image         String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-
-  // Relations
   accounts      Account[]
-  sessions      Session[]
   business      Business?
+  sessions      Session[]
 
   @@map("users")
 }
 
-// NextAuth Account model (for OAuth)
 model Account {
   id                String  @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@map("accounts")
 }
 
-// NextAuth Session model
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
 
-// NextAuth VerificationToken model
 model VerificationToken {
   identifier String
   token      String   @unique
@@ -73,140 +62,124 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// Business/Institute information
 model Business {
-  id          String   @id @default(cuid())
-  name        String
-  address     String?
-  phone       String?
-  email       String?
-  logo        String?  // URL to logo image
-  siret       String?  // French business registration number
+  id                   String             @id @default(cuid())
+  name                 String
+  address              String?
+  phone                String?
+  email                String?
+  logo                 String?
+  siret                String?
+  primaryColor         String             @default("#D4B5A0")
+  secondaryColor       String             @default("#8B7355")
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  userId               String             @unique
+  stripeCustomerId     String?            @unique
+  stripeSubscriptionId String?            @unique
+  isPro                Boolean            @default(false)
+  subscriptionEndsAt   DateTime?
+  subscriptionStatus   SubscriptionStatus @default(TRIAL)
+  trialEndsAt          DateTime?
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clients              Client[]
+  quotes               Quote[]
+  services             Service[]
 
-  // Branding
-  primaryColor    String  @default("#D4B5A0")  // Beige tone for beauty industry
-  secondaryColor  String  @default("#8B7355")
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  userId      String   @unique
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clients     Client[]
-  services    Service[]
-  quotes      Quote[]
-
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
   @@map("businesses")
 }
 
-// Client model
 model Client {
-  id          String   @id @default(cuid())
-  firstName   String
-  lastName    String
-  email       String?
-  phone       String?
-  address     String?
-  notes       String?  @db.Text
-
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  businessId  String
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  quotes      Quote[]
+  id         String   @id @default(cuid())
+  firstName  String
+  lastName   String
+  email      String?
+  phone      String?
+  address    String?
+  notes      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  businessId String
+  business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  quotes     Quote[]
 
   @@index([businessId])
   @@map("clients")
 }
 
-// Service model (catalog of services offered)
 model Service {
-  id          String   @id @default(cuid())
+  id          String      @id @default(cuid())
   name        String
-  description String?  @db.Text
-  price       Float    // Price in euros
-  duration    Int?     // Duration in minutes
-  category    String?  // e.g., "Soins visage", "Épilation", "Manucure"
-
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
+  description String?
+  price       Float
+  duration    Int?
+  category    String?
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
   businessId  String
-  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   quoteItems  QuoteItem[]
+  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
   @@map("services")
 }
 
-// Quote model
 model Quote {
   id          String      @id @default(cuid())
-  quoteNumber String      @unique  // e.g., "DEVIS-2024-001"
+  quoteNumber String      @unique
   status      QuoteStatus @default(DRAFT)
-
-  validUntil  DateTime?   // Quote expiration date
-  notes       String?     @db.Text
-  discount    Float       @default(0)  // Discount in euros
-
-  // Calculated totals (can be computed from items)
+  validUntil  DateTime?
+  notes       String?
+  discount    Float       @default(0)
   subtotal    Float       @default(0)
-  total       Float       @default(0)  // subtotal - discount
-
+  total       Float       @default(0)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
-  sentAt      DateTime?   // When the quote was sent to client
-
-  // Relations
+  sentAt      DateTime?
   businessId  String
-  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
-
   clientId    String
-  client      Client      @relation(fields: [clientId], references: [id], onDelete: Restrict)
-
   items       QuoteItem[]
+  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  client      Client      @relation(fields: [clientId], references: [id])
 
   @@index([businessId])
   @@index([clientId])
   @@map("quotes")
 }
 
-// QuoteItem model (line items in a quote)
 model QuoteItem {
   id          String   @id @default(cuid())
-
-  // Service reference (can be null if custom item)
   serviceId   String?
-  service     Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
-
-  // Item details (copied from Service or custom)
   name        String
   description String?
-  price       Float    // Unit price
+  price       Float
   quantity    Int      @default(1)
-  total       Float    // price * quantity
-
+  total       Float
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
-  // Relations
   quoteId     String
   quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+  service     Service? @relation(fields: [serviceId], references: [id])
 
   @@index([quoteId])
   @@map("quote_items")
 }
 
-// Enum for quote status
 enum QuoteStatus {
-  DRAFT      // Being created
-  SENT       // Sent to client
-  ACCEPTED   // Client accepted
-  REJECTED   // Client rejected
-  EXPIRED    // Passed validity date
+  DRAFT
+  SENT
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  EXPIRED
 }

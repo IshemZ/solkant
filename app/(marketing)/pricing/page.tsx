@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { CheckoutButton } from "@/components/shared/CheckoutButton";
 
 export const metadata: Metadata = {
   title: "Tarifs Solkant – Prix du logiciel de devis pour instituts de beauté",
@@ -345,12 +346,9 @@ export default function PricingPage() {
               </ul>
             </div>
 
-            <Link
-              href="/register"
-              className="mt-8 block rounded-md bg-foreground px-6 py-3 text-center font-semibold text-background hover:bg-foreground/90"
-            >
-              Commencer l&apos;essai gratuit
-            </Link>
+            <div className="mt-8">
+              <CheckoutButton />
+            </div>
           </div>
 
           {/* Plan Entreprise */}
