@@ -95,7 +95,8 @@ export default function Article2Page() {
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "Article",
-            headline: "Devis beauté : les 10 erreurs fatales à éviter absolument",
+            headline:
+              "Devis beauté : les 10 erreurs fatales à éviter absolument",
             description:
               "Découvrez les erreurs les plus courantes dans les devis d'instituts de beauté et comment les éviter pour augmenter votre taux de conversion.",
             image: "https://solkant.com/images/og/article-erreurs-devis.png",
@@ -117,7 +118,8 @@ export default function Article2Page() {
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
+              "@id":
+                "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
             },
           }),
         }}
@@ -186,8 +188,9 @@ export default function Article2Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>L&apos;impact :</strong> Selon une étude du secteur beauté,
-            70% des clientes choisissent le premier institut qui leur répond avec
-            un devis clair. Chaque heure de retard diminue vos chances de 15%.
+            70% des clientes choisissent le premier institut qui leur répond
+            avec un devis clair. Chaque heure de retard diminue vos chances de
+            15%.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -203,9 +206,9 @@ export default function Article2Page() {
               >
                 Solkant
               </Link>
-              , sélectionnez vos prestations depuis votre catalogue pré-enregistré,
-              et générez un PDF professionnel instantanément. Objectif : envoyer
-              le devis dans les 2-3 heures maximum.
+              , sélectionnez vos prestations depuis votre catalogue
+              pré-enregistré, et générez un PDF professionnel instantanément.
+              Objectif : envoyer le devis dans les 2-3 heures maximum.
             </p>
           </div>
 
@@ -219,8 +222,8 @@ export default function Article2Page() {
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>L&apos;impact :</strong> En cas de litige, votre devis n&apos;a
-            aucune valeur juridique. De plus, cela donne une image peu
+            <strong>L&apos;impact :</strong> En cas de litige, votre devis
+            n&apos;a aucune valeur juridique. De plus, cela donne une image peu
             professionnelle et peut inquiéter les clientes les plus exigeantes.
           </p>
 
@@ -253,10 +256,10 @@ export default function Article2Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>L&apos;impact :</strong> Votre cliente ne sait pas ce
-            qu&apos;elle achète exactement. Elle peut imaginer que
-            c&apos;est &quot;cher pour pas grand-chose&quot; et aller voir
-            ailleurs. De plus, en cas de malentendu, vous n&apos;avez aucune
-            preuve de ce qui était prévu.
+            qu&apos;elle achète exactement. Elle peut imaginer que c&apos;est
+            &quot;cher pour pas grand-chose&quot; et aller voir ailleurs. De
+            plus, en cas de malentendu, vous n&apos;avez aucune preuve de ce qui
+            était prévu.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -271,9 +274,9 @@ export default function Article2Page() {
                 ❌ Avant : &quot;Soin visage - 80€&quot;
               </p>
               <p className="text-green-700 font-medium mt-2">
-                ✅ Après : &quot;Soin visage hydratant complet (60 min) - Nettoyage,
-                gommage, masque hydratant, massage du visage et du décolleté -
-                80€&quot;
+                ✅ Après : &quot;Soin visage hydratant complet (60 min) -
+                Nettoyage, gommage, masque hydratant, massage du visage et du
+                décolleté - 80€&quot;
               </p>
             </div>
           </div>
@@ -284,15 +287,16 @@ export default function Article2Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>Le problème :</strong> Vous calculez à la main sur Excel ou
-            sur papier et vous vous trompez dans le calcul de la TVA ou du total.
+            sur papier et vous vous trompez dans le calcul de la TVA ou du
+            total.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>L&apos;impact :</strong> Catastrophique pour votre crédibilité.
-            Si la cliente remarque l&apos;erreur (et elle la remarquera), elle se
-            demandera si elle peut vous faire confiance. Si l&apos;erreur est en
-            sa défaveur, elle ira ailleurs. Si c&apos;est en votre défaveur, vous
-            perdez de l&apos;argent.
+            <strong>L&apos;impact :</strong> Catastrophique pour votre
+            crédibilité. Si la cliente remarque l&apos;erreur (et elle la
+            remarquera), elle se demandera si elle peut vous faire confiance. Si
+            l&apos;erreur est en sa défaveur, elle ira ailleurs. Si c&apos;est
+            en votre défaveur, vous perdez de l&apos;argent.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -302,9 +306,9 @@ export default function Article2Page() {
             <p className="text-foreground/70">
               Utilisez un logiciel qui fait les calculs automatiquement. Avec
               Solkant, vous entrez simplement vos prestations et leurs prix HT,
-              et le système calcule automatiquement la TVA (20%) et le total TTC.
-              Zéro risque d&apos;erreur, zéro perte de temps à vérifier 3 fois
-              avec une calculatrice.
+              et le système calcule automatiquement la TVA (20%) et le total
+              TTC. Zéro risque d&apos;erreur, zéro perte de temps à vérifier 3
+              fois avec une calculatrice.
             </p>
           </div>
 
@@ -313,9 +317,9 @@ export default function Article2Page() {
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>Le problème :</strong> Devis manuscrit ou sur Word mal formaté,
-            avec des polices fantaisistes, des couleurs criardes, ou une mise en
-            page brouillonne.
+            <strong>Le problème :</strong> Devis manuscrit ou sur Word mal
+            formaté, avec des polices fantaisistes, des couleurs criardes, ou
+            une mise en page brouillonne.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
@@ -332,9 +336,9 @@ export default function Article2Page() {
             <p className="text-foreground/70">
               Investissez dans un template professionnel ou utilisez un outil
               qui génère automatiquement des PDF élégants. Privilégiez un design
-              sobre, épuré, avec une typographie lisible et une structure claire.
-              Votre logo en haut à gauche, un tableau bien organisé, et des
-              couleurs cohérentes avec votre charte graphique.
+              sobre, épuré, avec une typographie lisible et une structure
+              claire. Votre logo en haut à gauche, un tableau bien organisé, et
+              des couleurs cohérentes avec votre charte graphique.
             </p>
           </div>
 
@@ -344,8 +348,8 @@ export default function Article2Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>Le problème :</strong> Vous envoyez un devis générique sans
-            adresser directement la cliente par son nom, sans rappeler le contexte
-            de sa demande.
+            adresser directement la cliente par son nom, sans rappeler le
+            contexte de sa demande.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
@@ -362,9 +366,9 @@ export default function Article2Page() {
             <p className="text-foreground/70">
               Ajoutez toujours un petit paragraphe d&apos;introduction
               personnalisé. Exemple : &quot;Chère Madame Dupont, suite à notre
-              échange téléphonique de ce matin concernant votre demande de forfait
-              bien-être, voici le devis détaillé comme convenu.&quot; Cela prend
-              30 secondes mais fait toute la différence.
+              échange téléphonique de ce matin concernant votre demande de
+              forfait bien-être, voici le devis détaillé comme convenu.&quot;
+              Cela prend 30 secondes mais fait toute la différence.
             </p>
           </div>
 
@@ -373,15 +377,17 @@ export default function Article2Page() {
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>Le problème :</strong> Vous indiquez &quot;environ 100€&quot;
-            ou &quot;~85€&quot; au lieu de prix exacts au centime près.
+            <strong>Le problème :</strong> Vous indiquez &quot;environ
+            100€&quot; ou &quot;~85€&quot; au lieu de prix exacts au centime
+            près.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>L&apos;impact :</strong> Cela donne l&apos;impression que vous
-            improvisez vos tarifs au feeling. Une cliente ne peut pas valider un
-            devis avec des prix approximatifs, elle va forcément vous redemander
-            le montant exact, ce qui rallonge inutilement le processus.
+            <strong>L&apos;impact :</strong> Cela donne l&apos;impression que
+            vous improvisez vos tarifs au feeling. Une cliente ne peut pas
+            valider un devis avec des prix approximatifs, elle va forcément vous
+            redemander le montant exact, ce qui rallonge inutilement le
+            processus.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -389,10 +395,10 @@ export default function Article2Page() {
               ✅ La solution
             </h4>
             <p className="text-foreground/70">
-              Définissez une grille tarifaire précise pour toutes vos prestations
-              et respectez-la. Indiquez toujours les prix exacts : 89,00€ et non
-              pas &quot;environ 90€&quot;. Cela montre votre professionnalisme
-              et votre organisation.
+              Définissez une grille tarifaire précise pour toutes vos
+              prestations et respectez-la. Indiquez toujours les prix exacts :
+              89,00€ et non pas &quot;environ 90€&quot;. Cela montre votre
+              professionnalisme et votre organisation.
             </p>
           </div>
 
@@ -401,8 +407,8 @@ export default function Article2Page() {
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>Le problème :</strong> Vous envoyez le devis et vous attendez
-            passivement une réponse qui ne vient jamais.
+            <strong>Le problème :</strong> Vous envoyez le devis et vous
+            attendez passivement une réponse qui ne vient jamais.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
@@ -442,9 +448,9 @@ export default function Article2Page() {
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            <strong>L&apos;impact :</strong> Vous devez refaire le travail depuis
-            zéro, ou pire, vous proposez des tarifs différents de la première
-            fois, ce qui crée de la confusion et de la méfiance.
+            <strong>L&apos;impact :</strong> Vous devez refaire le travail
+            depuis zéro, ou pire, vous proposez des tarifs différents de la
+            première fois, ce qui crée de la confusion et de la méfiance.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -452,11 +458,11 @@ export default function Article2Page() {
               ✅ La solution
             </h4>
             <p className="text-foreground/70">
-              Utilisez un système qui archive automatiquement tous vos devis avec
-              leur statut (brouillon, envoyé, accepté, refusé). Solkant vous
-              permet de retrouver n&apos;importe quel devis en 2 clics grâce à
-              des filtres par cliente, par date, ou par numéro. Vous pouvez même
-              dupliquer un ancien devis pour gagner du temps.
+              Utilisez un système qui archive automatiquement tous vos devis
+              avec leur statut (brouillon, envoyé, accepté, refusé). Solkant
+              vous permet de retrouver n&apos;importe quel devis en 2 clics
+              grâce à des filtres par cliente, par date, ou par numéro. Vous
+              pouvez même dupliquer un ancien devis pour gagner du temps.
             </p>
           </div>
 
@@ -485,8 +491,8 @@ export default function Article2Page() {
               Proposez maximum 2-3 options clairement différenciées (basique /
               standard / premium). Mettez en avant celle que vous recommandez.
               Évitez les options à rallonge, privilégiez la clarté et la
-              simplicité. Si vraiment la cliente a des besoins complexes, proposez
-              un appel ou un RDV pour en discuter ensemble.
+              simplicité. Si vraiment la cliente a des besoins complexes,
+              proposez un appel ou un RDV pour en discuter ensemble.
             </p>
           </div>
 
@@ -502,11 +508,15 @@ export default function Article2Page() {
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-600 font-bold">✓</span>
-                <span>Vérifiez que toutes les mentions légales sont présentes</span>
+                <span>
+                  Vérifiez que toutes les mentions légales sont présentes
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-600 font-bold">✓</span>
-                <span>Décrivez précisément chaque prestation avec la durée</span>
+                <span>
+                  Décrivez précisément chaque prestation avec la durée
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-purple-600 font-bold">✓</span>

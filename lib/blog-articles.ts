@@ -31,7 +31,8 @@ export const blogArticles: BlogArticle[] = [
   },
   {
     slug: "digitaliser-gestion-institut-beaute",
-    title: "Pourquoi digitaliser la gestion de votre institut de beauté en 2025 ?",
+    title:
+      "Pourquoi digitaliser la gestion de votre institut de beauté en 2025 ?",
     description:
       "Les 7 raisons essentielles de passer au numérique et comment réussir votre transformation digitale étape par étape.",
     date: "2024-12-06",

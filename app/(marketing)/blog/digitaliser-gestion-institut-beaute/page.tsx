@@ -159,14 +159,15 @@ export default function Article3Page() {
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
-            Pourquoi digitaliser la gestion de votre institut de beauté en 2025 ?
+            Pourquoi digitaliser la gestion de votre institut de beauté en 2025
+            ?
           </h1>
 
           <p className="text-xl text-foreground/60 leading-relaxed">
             La transformation digitale n&apos;est plus réservée aux grandes
             entreprises. Découvrez comment les outils numériques peuvent
-            révolutionner votre quotidien, valoriser votre image et booster votre
-            chiffre d&apos;affaires.
+            révolutionner votre quotidien, valoriser votre image et booster
+            votre chiffre d&apos;affaires.
           </p>
         </header>
 
@@ -187,16 +188,17 @@ export default function Article3Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>Le constat :</strong> Vous passez en moyenne 8 à 10 heures
-            par semaine sur des tâches administratives (création de devis, mise à
-            jour des fiches clientes, recherche d&apos;informations dans vos
+            par semaine sur des tâches administratives (création de devis, mise
+            à jour des fiches clientes, recherche d&apos;informations dans vos
             dossiers).
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             <strong>La solution digitale :</strong> Un logiciel de gestion comme
             Solkant vous permet de diviser ce temps par 3. Créez un devis en 2
-            minutes au lieu de 15, retrouvez une fiche cliente en 3 clics au lieu
-            de fouiller dans des classeurs, générez des rapports automatiquement.
+            minutes au lieu de 15, retrouvez une fiche cliente en 3 clics au
+            lieu de fouiller dans des classeurs, générez des rapports
+            automatiquement.
           </p>
 
           <div className="rounded-lg bg-green-50 p-6 mb-6 border border-green-100">
@@ -282,7 +284,8 @@ export default function Article3Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             Les erreurs manuelles coûtent cher : une erreur de calcul dans un
-            devis, un double rendez-vous noté, un numéro de téléphone mal copié...
+            devis, un double rendez-vous noté, un numéro de téléphone mal
+            copié...
           </p>
 
           <div className="grid gap-6 md:grid-cols-2 mb-6">
@@ -317,8 +320,8 @@ export default function Article3Page() {
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Avec un outil en ligne (cloud), vous pouvez consulter vos informations
-            depuis :
+            Avec un outil en ligne (cloud), vous pouvez consulter vos
+            informations depuis :
           </p>
 
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
@@ -359,7 +362,9 @@ export default function Article3Page() {
           </h3>
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
             <li>Combien de devis envoyés ce mois-ci ?</li>
-            <li>Quel est votre taux de conversion (devis acceptés / envoyés) ?</li>
+            <li>
+              Quel est votre taux de conversion (devis acceptés / envoyés) ?
+            </li>
             <li>Quelles prestations se vendent le mieux ?</li>
             <li>Quel est votre panier moyen ?</li>
           </ul>
@@ -368,10 +373,12 @@ export default function Article3Page() {
             Analyse de vos clientes
           </h3>
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
-            <li>Qui sont vos meilleures clientes (chiffre d&apos;affaires) ?</li>
             <li>
-              Lesquelles n&apos;ont pas pris rendez-vous depuis 6 mois
-              (relance) ?
+              Qui sont vos meilleures clientes (chiffre d&apos;affaires) ?
+            </li>
+            <li>
+              Lesquelles n&apos;ont pas pris rendez-vous depuis 6 mois (relance)
+              ?
             </li>
             <li>Quelle est la fréquence moyenne de visite ?</li>
           </ul>
@@ -387,7 +394,8 @@ export default function Article3Page() {
 
           <p className="text-foreground/80 leading-relaxed mb-6">
             La réglementation impose des obligations strictes (mentions légales
-            sur les devis, conservation des données clients, respect du RGPD...).
+            sur les devis, conservation des données clients, respect du
+            RGPD...).
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
@@ -425,8 +433,8 @@ export default function Article3Page() {
           </h3>
           <p className="text-foreground/80 leading-relaxed mb-6">
             Ne digitalisez pas tout d&apos;un coup. Commencez par ce qui vous
-            fait le plus perdre de temps : la création de devis, la gestion de la
-            clientèle, ou les rendez-vous ?
+            fait le plus perdre de temps : la création de devis, la gestion de
+            la clientèle, ou les rendez-vous ?
           </p>
 
           <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">
@@ -441,8 +449,8 @@ export default function Article3Page() {
               sans formation de 3 jours
             </li>
             <li>
-              <strong>Spécialisée</strong> : pensée pour les instituts de beauté,
-              pas un outil générique
+              <strong>Spécialisée</strong> : pensée pour les instituts de
+              beauté, pas un outil générique
             </li>
             <li>
               <strong>Abordable</strong> : tarification transparente adaptée aux
@@ -499,7 +507,8 @@ export default function Article3Page() {
           </ul>
 
           <h2 className="text-2xl font-bold text-foreground mt-12 mb-4">
-            Les idées reçues sur la digitalisation (et pourquoi elles sont fausses)
+            Les idées reçues sur la digitalisation (et pourquoi elles sont
+            fausses)
           </h2>
 
           <div className="space-y-6">
@@ -512,10 +521,7 @@ export default function Article3Page() {
                 Les outils modernes sont conçus pour être ultra-intuitifs. Si
                 vous savez envoyer un email et utiliser WhatsApp, vous saurez
                 utiliser un logiciel comme{" "}
-                <Link
-                  href="/"
-                  className="text-purple-600 hover:underline"
-                >
+                <Link href="/" className="text-purple-600 hover:underline">
                   Solkant
                 </Link>
                 .
@@ -527,8 +533,8 @@ export default function Article3Page() {
                 ❌ &quot;C&apos;est trop cher pour mon petit institut&quot;
               </h4>
               <p className="text-foreground/70">
-                Les solutions SaaS démarrent souvent à moins de 20€/mois. Sachant
-                que vous économisez 5-10 heures par mois, le retour sur
+                Les solutions SaaS démarrent souvent à moins de 20€/mois.
+                Sachant que vous économisez 5-10 heures par mois, le retour sur
                 investissement est immédiat. C&apos;est moins cher qu&apos;un
                 abonnement téléphone professionnel.
               </p>
@@ -540,9 +546,9 @@ export default function Article3Page() {
               </h4>
               <p className="text-foreground/70">
                 Au contraire : un serveur professionnel avec sauvegardes
-                quotidiennes est bien plus sécurisé que votre ordinateur qui peut
-                tomber en panne, être volé, ou crasher. Les données sont chiffrées
-                et hébergées en Europe (conformité RGPD).
+                quotidiennes est bien plus sécurisé que votre ordinateur qui
+                peut tomber en panne, être volé, ou crasher. Les données sont
+                chiffrées et hébergées en Europe (conformité RGPD).
               </p>
             </div>
 
@@ -552,10 +558,10 @@ export default function Article3Page() {
                 digital&quot;
               </h4>
               <p className="text-foreground/70">
-                Le digital ne remplace pas le contact humain, il le facilite ! Vous
-                passez moins de temps sur l&apos;administratif et plus de temps
-                avec vos clientes. Elles apprécient recevoir un devis rapidement
-                par email plutôt que d&apos;attendre 3 jours.
+                Le digital ne remplace pas le contact humain, il le facilite !
+                Vous passez moins de temps sur l&apos;administratif et plus de
+                temps avec vos clientes. Elles apprécient recevoir un devis
+                rapidement par email plutôt que d&apos;attendre 3 jours.
               </p>
             </div>
           </div>
@@ -598,10 +604,10 @@ export default function Article3Page() {
               🚀 Prête à franchir le pas ?
             </h3>
             <p className="text-foreground/70 mb-6">
-              La transformation digitale de votre institut de beauté commence par
-              un premier petit pas. Commencez simple : la gestion des devis. Une
-              fois que vous aurez goûté à la simplicité et au gain de temps, vous
-              ne reviendrez jamais en arrière.
+              La transformation digitale de votre institut de beauté commence
+              par un premier petit pas. Commencez simple : la gestion des devis.
+              Une fois que vous aurez goûté à la simplicité et au gain de temps,
+              vous ne reviendrez jamais en arrière.
             </p>
             <Link
               href="/fonctionnalites"
@@ -628,11 +634,13 @@ export default function Article3Page() {
         {/* CTA Section */}
         <div className="mt-16 rounded-2xl bg-foreground/5 p-8 text-center">
           <h2 className="text-2xl font-bold text-foreground">
-            Testez Solkant gratuitement et digitalisez votre institut en 2 minutes
+            Testez Solkant gratuitement et digitalisez votre institut en 2
+            minutes
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-foreground/60">
-            Sans engagement, sans carte bancaire. Créez votre compte et découvrez
-            comment gagner 10 heures par mois sur votre gestion administrative.
+            Sans engagement, sans carte bancaire. Créez votre compte et
+            découvrez comment gagner 10 heures par mois sur votre gestion
+            administrative.
           </p>
           <div className="mt-6 flex items-center justify-center gap-4">
             <Link
