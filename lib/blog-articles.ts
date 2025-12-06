@@ -21,6 +21,24 @@ export const blogArticles: BlogArticle[] = [
     category: "Guides",
   },
   {
+    slug: "erreurs-eviter-devis-institut-beaute",
+    title: "Devis beauté : les 10 erreurs fatales à éviter absolument",
+    description:
+      "Découvrez les erreurs les plus courantes qui font fuir les clientes et comment les corriger pour maximiser vos conversions.",
+    date: "2024-12-06",
+    readTime: "7 min",
+    category: "Conseils",
+  },
+  {
+    slug: "digitaliser-gestion-institut-beaute",
+    title: "Pourquoi digitaliser la gestion de votre institut de beauté en 2025 ?",
+    description:
+      "Les 7 raisons essentielles de passer au numérique et comment réussir votre transformation digitale étape par étape.",
+    date: "2024-12-06",
+    readTime: "9 min",
+    category: "Transformation digitale",
+  },
+  {
     slug: "choisir-logiciel-devis-institut-beaute",
     title: "Comment choisir le bon logiciel de devis pour votre institut",
     description:

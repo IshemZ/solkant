@@ -760,6 +760,334 @@ export default function FeaturesPage() {
         </div>
       </section>
 
+      {/* Use Cases Section */}
+      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
+            Cas d&apos;usage concrets par type d&apos;institut
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            Découvrez comment des professionnelles comme vous utilisent Solkant
+            au quotidien pour simplifier leur gestion de devis et gagner du
+            temps.
+          </p>
+        </div>
+
+        <div className="space-y-16">
+          {/* Use Case 1 - Institut de beauté traditionnel */}
+          <div className="rounded-2xl border border-foreground/10 bg-gradient-to-br from-purple-50/50 to-white p-8 lg:p-12">
+            <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
+              <div className="lg:col-span-1">
+                <div className="inline-flex items-center justify-center rounded-full bg-purple-100 p-3 mb-4">
+                  <svg
+                    className="h-8 w-8 text-purple-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">
+                  Institut de beauté avec équipe
+                </h3>
+                <p className="text-foreground/60">
+                  Salon traditionnel, 3 esthéticiennes, 200+ clientes actives
+                </p>
+              </div>
+              <div className="lg:col-span-2 space-y-4">
+                <div className="rounded-lg bg-white p-6 shadow-sm border border-foreground/5">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    📋 Problématique avant Solkant
+                  </h4>
+                  <p className="text-foreground/70">
+                    Marie, gérante d&apos;un institut à Lyon, passait 20 minutes
+                    par devis sur Excel : saisie manuelle des prestations,
+                    calcul des totaux à la calculatrice, risque d&apos;erreur
+                    sur la TVA, impression puis scan pour envoi par email. Avec
+                    5-10 devis par semaine, cela représentait 2-3 heures
+                    perdues.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-purple-50 p-6 shadow-sm border border-purple-100">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    ✅ Solution avec Solkant
+                  </h4>
+                  <ul className="space-y-2 text-foreground/70">
+                    <li className="flex items-start gap-2">
+                      <span className="text-purple-600 font-bold">1.</span>
+                      <span>
+                        <strong>Catalogue pré-configuré :</strong> 40
+                        prestations (soins visage, épilations, manucure,
+                        pédicure) avec prix et durées enregistrées une fois pour
+                        toutes
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-purple-600 font-bold">2.</span>
+                      <span>
+                        <strong>Création rapide :</strong> sélection de la
+                        cliente dans la base (+ création rapide si nouvelle),
+                        ajout des prestations en 2 clics, ajustement des
+                        quantités
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-purple-600 font-bold">3.</span>
+                      <span>
+                        <strong>Génération PDF instantanée :</strong> document
+                        professionnel avec logo de l&apos;institut, calculs
+                        automatiques, numéro unique (DEVIS-2025-047)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-purple-600 font-bold">4.</span>
+                      <span>
+                        <strong>Suivi centralisé :</strong> tableau de bord avec
+                        tous les devis, filtres par statut (en attente,
+                        accepté), historique complet par cliente
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="rounded-lg bg-green-50 p-6 shadow-sm border border-green-100">
+                  <h4 className="font-semibold text-foreground mb-2">
+                    🎯 Résultats concrets
+                  </h4>
+                  <p className="text-foreground/70 mb-3">
+                    Temps de création d&apos;un devis :{" "}
+                    <strong>20 min → 3 min</strong>. Économie :{" "}
+                    <strong>2h30/semaine = 10h/mois</strong>. Marie utilise ce
+                    temps gagné pour développer son activité et fidéliser ses
+                    clientes.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Use Case 2 - Spa avec forfaits */}
+          <div className="rounded-2xl border border-foreground/10 bg-gradient-to-br from-blue-50/50 to-white p-8 lg:p-12">
+            <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
+              <div className="lg:col-span-1">
+                <div className="inline-flex items-center justify-center rounded-full bg-blue-100 p-3 mb-4">
+                  <svg
+                    className="h-8 w-8 text-blue-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">
+                  Spa & centre bien-être
+                </h3>
+                <p className="text-foreground/60">
+                  Spa haut de gamme, forfaits personnalisés, clientèle
+                  entreprise
+                </p>
+              </div>
+              <div className="lg:col-span-2 space-y-4">
+                <div className="rounded-lg bg-white p-6 shadow-sm border border-foreground/5">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    📋 Problématique avant Solkant
+                  </h4>
+                  <p className="text-foreground/70">
+                    Sophie gère un spa proposant des forfaits sur-mesure
+                    (journées détente, cures bien-être). Chaque devis
+                    nécessitait de combiner plusieurs prestations, appliquer des
+                    remises conditionnelles, et présenter un document impeccable
+                    pour une clientèle exigeante. Résultat : 30-40 min par devis
+                    sur Word.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-blue-50 p-6 shadow-sm border border-blue-100">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    ✅ Solution avec Solkant
+                  </h4>
+                  <ul className="space-y-2 text-foreground/70">
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold">1.</span>
+                      <span>
+                        <strong>Prestations modulables :</strong> massages (30,
+                        60, 90 min), soins corps, hammam, sauna... Chaque
+                        prestation a son prix et sa durée
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold">2.</span>
+                      <span>
+                        <strong>Composition de forfaits :</strong> sélection
+                        multiple de prestations, ajustement des quantités (ex :
+                        2 massages + 1 soin visage + accès spa)
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold">3.</span>
+                      <span>
+                        <strong>PDF élégant et professionnel :</strong> design
+                        épuré, tableau détaillé, total HT/TTC, mentions légales
+                        automatiques
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-blue-600 font-bold">4.</span>
+                      <span>
+                        <strong>Suivi des devis entreprises :</strong> statuts
+                        clairs (envoyé, relancé, accepté), notes internes,
+                        export facilité
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="rounded-lg bg-green-50 p-6 shadow-sm border border-green-100">
+                  <h4 className="font-semibold text-foreground mb-2">
+                    🎯 Résultats concrets
+                  </h4>
+                  <p className="text-foreground/70 mb-3">
+                    Temps par devis : <strong>35 min → 5 min</strong>. Image de
+                    marque renforcée grâce aux PDF élégants. Taux de conversion
+                    amélioré car les clientes reçoivent leur devis dans
+                    l&apos;heure.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Use Case 3 - Praticienne mobile */}
+          <div className="rounded-2xl border border-foreground/10 bg-gradient-to-br from-pink-50/50 to-white p-8 lg:p-12">
+            <div className="grid gap-8 lg:grid-cols-3 lg:gap-12">
+              <div className="lg:col-span-1">
+                <div className="inline-flex items-center justify-center rounded-full bg-pink-100 p-3 mb-4">
+                  <svg
+                    className="h-8 w-8 text-pink-600"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"
+                    />
+                  </svg>
+                </div>
+                <h3 className="text-2xl font-bold text-foreground mb-2">
+                  Praticienne indépendante à domicile
+                </h3>
+                <p className="text-foreground/60">
+                  Auto-entrepreneuse, prestations à domicile, gestion mobile
+                </p>
+              </div>
+              <div className="lg:col-span-2 space-y-4">
+                <div className="rounded-lg bg-white p-6 shadow-sm border border-foreground/5">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    📋 Problématique avant Solkant
+                  </h4>
+                  <p className="text-foreground/70">
+                    Camille, esthéticienne à domicile, jonglait entre son
+                    smartphone, des fichiers Excel sur Drive, et des impressions
+                    chez ses clientes. Impossible de créer un devis propre en
+                    situation, difficile de retrouver l&apos;historique, image
+                    peu professionnelle.
+                  </p>
+                </div>
+                <div className="rounded-lg bg-pink-50 p-6 shadow-sm border border-pink-100">
+                  <h4 className="font-semibold text-foreground mb-3">
+                    ✅ Solution avec Solkant
+                  </h4>
+                  <ul className="space-y-2 text-foreground/70">
+                    <li className="flex items-start gap-2">
+                      <span className="text-pink-600 font-bold">1.</span>
+                      <span>
+                        <strong>Accès mobile optimisé :</strong> interface
+                        responsive, création de devis depuis son téléphone entre
+                        deux rendez-vous
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-pink-600 font-bold">2.</span>
+                      <span>
+                        <strong>Catalogue simplifié :</strong> 15-20 prestations
+                        principales (manucure, épilation, maquillage
+                        événementiel) toujours à portée de clic
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-pink-600 font-bold">3.</span>
+                      <span>
+                        <strong>Envoi immédiat :</strong> génération PDF + envoi
+                        par email direct depuis l&apos;app, ou téléchargement
+                        pour WhatsApp
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-pink-600 font-bold">4.</span>
+                      <span>
+                        <strong>Base clients centralisée :</strong> fini les
+                        contacts éparpillés, tout l&apos;historique au même
+                        endroit
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+                <div className="rounded-lg bg-green-50 p-6 shadow-sm border border-green-100">
+                  <h4 className="font-semibold text-foreground mb-2">
+                    🎯 Résultats concrets
+                  </h4>
+                  <p className="text-foreground/70 mb-3">
+                    Professionnalisation immédiate : devis envoyés dans les 5
+                    minutes après discussion. Gain de crédibilité auprès des
+                    nouvelles clientes. Organisation simplifiée = moins de
+                    stress.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Call to action from use cases */}
+        <div className="mt-16 text-center">
+          <p className="text-lg text-foreground/60 mb-6">
+            Quel que soit votre type d&apos;activité, Solkant s&apos;adapte à
+            vos besoins
+          </p>
+          <Link
+            href="/pricing"
+            className="inline-flex items-center gap-2 rounded-md bg-foreground px-8 py-3 text-base font-semibold text-background shadow-sm hover:bg-foreground/90"
+          >
+            Découvrir les tarifs
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17 8l4 4m0 0l-4 4m4-4H3"
+              />
+            </svg>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-foreground/5 py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
