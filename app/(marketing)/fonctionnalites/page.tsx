@@ -14,6 +14,14 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: "https://solkant.com/images/og/features.png",
+        width: 1200,
+        height: 630,
+        alt: "Fonctionnalités Solkant - Gestion complète de devis pour instituts",
+      },
+    ],
   },
   alternates: {
     canonical: "https://solkant.com/fonctionnalites",

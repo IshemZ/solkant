@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: "https://solkant.com/images/og/pricing.png",
+        width: 1200,
+        height: 630,
+        alt: "Tarifs Solkant - Plans adaptés aux instituts de beauté",
+      },
+    ],
   },
   alternates: {
     canonical: "https://solkant.com/pricing",

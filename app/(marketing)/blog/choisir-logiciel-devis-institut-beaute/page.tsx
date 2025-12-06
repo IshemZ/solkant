@@ -1,11 +1,13 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { RelatedArticles } from "@/components/shared/RelatedArticles";
+import { blogArticles } from "@/lib/blog-articles";
 
 export const metadata: Metadata = {
   title:
     "Comment choisir le bon logiciel de devis pour votre institut de beauté",
   description:
-    "Guide complet pour sélectionner le meilleur outil de gestion de devis adapté à votre institut : critères essentiels, fonctionnalités, tarifs. Comparatif 2025.",
+    "Divisez par 5 le temps de création de vos devis ! Guide complet avec 8 critères essentiels, comparatif des fonctionnalités et conseils d'experts pour choisir le meilleur logiciel pour votre institut de beauté.",
   openGraph: {
     title: "Choisir un logiciel de devis pour institut de beauté",
     description:
@@ -14,6 +16,17 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
+    publishedTime: "2025-11-28T09:00:00Z",
+    modifiedTime: "2025-12-06T10:00:00Z",
+    authors: ["Solkant"],
+    images: [
+      {
+        url: "https://solkant.com/images/og/article-logiciel.png",
+        width: 1200,
+        height: 630,
+        alt: "Comment choisir le bon logiciel de devis pour votre institut",
+      },
+    ],
   },
   alternates: {
     canonical:
@@ -77,6 +90,127 @@ export default function Article2Page() {
         </div>
       </nav>
 
+      {/* Schema.org JSON-LD pour SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline:
+              "Comment choisir le bon logiciel de devis pour votre institut de beauté",
+            description:
+              "Guide complet pour sélectionner le meilleur outil de gestion de devis adapté à votre institut : critères essentiels, fonctionnalités, tarifs.",
+            image: "https://solkant.com/images/og/article-logiciel.png",
+            datePublished: "2025-11-28T09:00:00Z",
+            dateModified: "2025-12-06T10:00:00Z",
+            author: {
+              "@type": "Organization",
+              name: "Solkant",
+              url: "https://solkant.com",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Solkant",
+              url: "https://solkant.com",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://solkant.com/images/og/home.png",
+              },
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id":
+                "https://solkant.com/blog/choisir-logiciel-devis-institut-beaute",
+            },
+          }),
+        }}
+      />
+
+      {/* Schema.org Breadcrumb pour améliorer l'affichage dans les SERPs */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              {
+                "@type": "ListItem",
+                position: 1,
+                name: "Accueil",
+                item: "https://solkant.com",
+              },
+              {
+                "@type": "ListItem",
+                position: 2,
+                name: "Blog",
+                item: "https://solkant.com/blog",
+              },
+              {
+                "@type": "ListItem",
+                position: 3,
+                name: "Comment choisir le bon logiciel de devis",
+                item: "https://solkant.com/blog/choisir-logiciel-devis-institut-beaute",
+              },
+            ],
+          }),
+        }}
+      />
+
+      {/* Schema.org FAQ pour featured snippets Google */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Pourquoi investir dans un logiciel de devis pour mon institut de beauté ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Un logiciel de devis dédié peut diviser par 5 le temps de création de vos devis (2-3 minutes au lieu de 15-20), améliore votre image professionnelle avec des PDF élégants, réduit les erreurs grâce aux calculs automatiques, facilite le suivi avec un historique complet, et assure la conformité légale avec les mentions obligatoires incluses automatiquement.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Quels sont les critères essentiels pour choisir un logiciel de devis ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Les 8 critères essentiels sont : 1) Simplicité d'utilisation (créer un devis en moins de 5 minutes), 2) Fonctionnalités adaptées aux instituts (catalogue de services, gestion clients), 3) Prix et modèle tarifaire transparent, 4) Personnalisation du branding, 5) Accessibilité multi-supports (ordinateur, tablette, mobile), 6) Sécurité et conformité RGPD, 7) Support client en français, 8) Évolutivité et intégrations possibles.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Combien coûte un logiciel de devis pour institut de beauté ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Les tarifs varient selon le modèle : version Freemium gratuite avec limitations (nombre de devis/mois), abonnement mensuel entre 10-30€/mois généralement, paiement à la carte selon usage (rare), ou achat unique (souvent plus cher et obsolète rapidement). Il est recommandé de commencer par une version gratuite pour tester avant de s'engager.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Comment tester efficacement un logiciel de devis avant de l'acheter ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Pour tester efficacement un logiciel : 1) Créez un compte gratuit sans carte bancaire, 2) Ajoutez 3-4 services de votre catalogue avec prix, 3) Créez 2-3 clients fictifs, 4) Générez un devis complet réaliste, 5) Téléchargez et évaluez le PDF, 6) Testez sur mobile, 7) Contactez le support pour évaluer la réactivité, 8) Vérifiez la personnalisation (logo, couleurs). Durée recommandée : 1 à 2 semaines minimum.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Quelles sont les erreurs à éviter lors du choix d'un logiciel de devis ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Les erreurs courantes à éviter : choisir le moins cher sans tester (un outil mal adapté fait perdre du temps), prendre un logiciel trop complexe conçu pour grandes entreprises, ignorer les avis des autres instituts, ne pas profiter de la période d'essai gratuite, et négliger la version mobile (vérifier qu'elle est vraiment utilisable, pas juste responsive).",
+                },
+              },
+            ],
+          }),
+        }}
+      />
+
       {/* Article Header */}
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
@@ -103,7 +237,7 @@ export default function Article2Page() {
           <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
             <span className="font-medium text-foreground">Conseils</span>
             <span>•</span>
-            <time dateTime="2024-11-28">28 novembre 2024</time>
+            <time dateTime="2025-11-28">28 novembre 2025</time>
             <span>•</span>
             <span>6 min de lecture</span>
           </div>
@@ -182,7 +316,14 @@ export default function Article2Page() {
           </h3>
           <p className="text-foreground/80 leading-relaxed mb-6">
             Tous les logiciels de devis ne se valent pas. Recherchez
-            spécifiquement :
+            spécifiquement les{" "}
+            <Link
+              href="/fonctionnalites"
+              className="text-foreground font-semibold hover:underline"
+            >
+              fonctionnalités essentielles pour instituts de beauté
+            </Link>{" "}
+            :
           </p>
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
             <li>Catalogue de services personnalisable (vos prestations)</li>
@@ -388,7 +529,14 @@ export default function Article2Page() {
           <p className="text-foreground/80 leading-relaxed mb-6">
             Solkant a été conçu spécifiquement pour les instituts de beauté et
             petites structures de services. Il répond à tous les critères
-            essentiels :
+            essentiels et vous permet de{" "}
+            <Link
+              href="/blog/comment-faire-devis-professionnel-institut-beaute"
+              className="text-foreground font-semibold hover:underline"
+            >
+              créer des devis professionnels
+            </Link>{" "}
+            en quelques clics :
           </p>
 
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
@@ -426,11 +574,11 @@ export default function Article2Page() {
             Testez Solkant gratuitement dès maintenant
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-foreground/60">
-            Aucune carte bancaire requise. Créez votre premier devis en moins de
-            5 minutes et découvrez pourquoi des centaines d&apos;instituts nous
-            font confiance.
+            Rejoignez les centaines d&apos;instituts qui économisent 15 minutes
+            par devis. Aucune carte bancaire requise. Créez votre premier devis
+            professionnel en moins de 5 minutes.
           </p>
-          <div className="mt-6 flex items-center justify-center gap-4">
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/register"
               className="rounded-md bg-foreground px-6 py-3 font-semibold text-background hover:bg-foreground/90"
@@ -444,8 +592,24 @@ export default function Article2Page() {
               Voir les tarifs
             </Link>
           </div>
+          <p className="mt-4 text-sm text-foreground/60">
+            Des questions ?{" "}
+            <Link
+              href="/contact"
+              className="text-foreground font-semibold hover:underline"
+            >
+              Contactez-nous
+            </Link>
+            , nous sommes là pour vous aider.
+          </p>
         </div>
       </article>
+
+      {/* Articles connexes */}
+      <RelatedArticles
+        articles={blogArticles}
+        currentSlug="choisir-logiciel-devis-institut-beaute"
+      />
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

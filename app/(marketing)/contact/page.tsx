@@ -13,6 +13,14 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: "https://solkant.com/images/og/contact.png",
+        width: 1200,
+        height: 630,
+        alt: "Contact Solkant - Nous répondons à toutes vos questions",
+      },
+    ],
   },
   alternates: {
     canonical: "https://solkant.com/contact",

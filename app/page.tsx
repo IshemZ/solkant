@@ -16,6 +16,14 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: "https://solkant.com/images/og/home.png",
+        width: 1200,
+        height: 630,
+        alt: "Solkant - Créez des devis élégants pour votre institut de beauté",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",

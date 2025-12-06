@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { blogArticles } from "@/lib/blog-articles";
 
 export const metadata: Metadata = {
   title:
@@ -14,42 +15,19 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
+    images: [
+      {
+        url: "https://solkant.com/images/og/blog.png",
+        width: 1200,
+        height: 630,
+        alt: "Blog Solkant - Guides et conseils pour gérer votre institut",
+      },
+    ],
   },
   alternates: {
     canonical: "https://solkant.com/blog",
   },
 };
-
-// Articles (à déplacer vers une base de données ou CMS plus tard)
-const articles = [
-  {
-    slug: "comment-faire-devis-professionnel-institut-beaute",
-    title: "Comment faire un devis professionnel pour votre institut de beauté",
-    description:
-      "Guide complet pour créer des devis clairs, conformes et professionnels qui rassurent vos clients et valorisent votre expertise.",
-    date: "2024-12-01",
-    readTime: "8 min",
-    category: "Guides",
-  },
-  {
-    slug: "choisir-logiciel-devis-institut-beaute",
-    title: "Comment choisir le bon logiciel de devis pour votre institut",
-    description:
-      "Les critères essentiels pour sélectionner un outil de gestion de devis adapté à votre activité d'esthéticienne ou gérante de salon.",
-    date: "2024-11-28",
-    readTime: "6 min",
-    category: "Conseils",
-  },
-  {
-    slug: "optimiser-gestion-clients-institut-beaute",
-    title: "5 astuces pour optimiser la gestion de vos clients",
-    description:
-      "Découvrez comment mieux organiser votre fichier clients, suivre l'historique des prestations et fidéliser votre clientèle.",
-    date: "2024-11-25",
-    readTime: "5 min",
-    category: "Organisation",
-  },
-];
 
 export default function BlogPage() {
   return (
@@ -123,7 +101,7 @@ export default function BlogPage() {
       {/* Articles Grid */}
       <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8">
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {articles.map((article) => (
+          {blogArticles.map((article) => (
             <article
               key={article.slug}
               className="flex flex-col rounded-2xl border border-foreground/10 bg-background p-8 shadow-sm hover:shadow-md transition-shadow"

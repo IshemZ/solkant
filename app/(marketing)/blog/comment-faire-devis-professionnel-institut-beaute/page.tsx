@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { RelatedArticles } from "@/components/shared/RelatedArticles";
+import { blogArticles } from "@/lib/blog-articles";
 
 export const metadata: Metadata = {
   title:
@@ -14,6 +16,16 @@ export const metadata: Metadata = {
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
+    publishedTime: "2024-12-01T09:00:00Z",
+    authors: ["Solkant"],
+    images: [
+      {
+        url: "https://solkant.com/images/og/article-devis.png",
+        width: 1200,
+        height: 630,
+        alt: "Comment faire un devis professionnel pour votre institut de beauté",
+      },
+    ],
   },
   alternates: {
     canonical:
@@ -76,6 +88,43 @@ export default function Article1Page() {
           </div>
         </div>
       </nav>
+
+      {/* Schema.org JSON-LD pour SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Article",
+            headline:
+              "Comment faire un devis professionnel pour votre institut de beauté – Guide 2025",
+            description:
+              "Guide complet pour créer des devis professionnels pour institut de beauté : mentions obligatoires, calculs, présentation, outils.",
+            image: "https://solkant.com/images/og/article-devis.png",
+            datePublished: "2024-12-01T09:00:00Z",
+            dateModified: "2024-12-01T09:00:00Z",
+            author: {
+              "@type": "Organization",
+              name: "Solkant",
+              url: "https://solkant.com",
+            },
+            publisher: {
+              "@type": "Organization",
+              name: "Solkant",
+              url: "https://solkant.com",
+              logo: {
+                "@type": "ImageObject",
+                url: "https://solkant.com/images/og/home.png",
+              },
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id":
+                "https://solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
+            },
+          }),
+        }}
+      />
 
       {/* Article Header */}
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
@@ -405,6 +454,12 @@ export default function Article1Page() {
           </div>
         </div>
       </article>
+
+      {/* Articles connexes */}
+      <RelatedArticles
+        articles={blogArticles}
+        currentSlug="comment-faire-devis-professionnel-institut-beaute"
+      />
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">
