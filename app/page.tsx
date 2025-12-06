@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Schema.org JSON-LD pour SEO */}
+      {/* Schema.org JSON-LD pour SEO - SoftwareApplication */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -61,6 +61,59 @@ export default function Home() {
               "@type": "Audience",
               audienceType: "instituts de beauté, salons, spas",
             },
+          }),
+        }}
+      />
+
+      {/* Schema.org JSON-LD pour SEO - FAQPage */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: [
+              {
+                "@type": "Question",
+                name: "Solkant est-il adapté aux petits instituts de beauté ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Oui, Solkant a été conçu spécialement pour les petites structures : instituts de beauté, salons d'esthétique, spas, praticiennes indépendantes. L'interface est simple et ne nécessite aucune formation.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Puis-je personnaliser mes devis avec mon logo ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Absolument. Vous pouvez ajouter votre logo, adapter les couleurs à votre charte graphique et personnaliser les mentions légales pour refléter l'identité de votre institut.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Mes données sont-elles sécurisées ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Oui, vos données clients et devis sont hébergées de manière sécurisée en Europe et protégées par chiffrement. Nous respectons le RGPD.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Combien de temps faut-il pour créer un devis ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "En moyenne, 2 à 3 minutes. Une fois votre catalogue de services créé, il suffit de sélectionner les prestations et Solkant génère automatiquement un PDF professionnel prêt à envoyer.",
+                },
+              },
+              {
+                "@type": "Question",
+                name: "Y a-t-il un essai gratuit ?",
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: "Oui, vous pouvez commencer gratuitement et tester toutes les fonctionnalités de Solkant sans engagement ni carte bancaire.",
+                },
+              },
+            ],
           }),
         }}
       />
@@ -120,7 +173,7 @@ export default function Home() {
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
-            Créez des devis élégants pour votre institut de beauté
+            Logiciel de devis pour instituts de beauté – Solkant
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/60">
             Solkant simplifie la création de devis professionnels pour les

@@ -87,7 +87,7 @@ export default function PricingPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Des tarifs simples et transparents pour votre institut
+            Tarifs Solkant : logiciel de devis pour instituts de beauté
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
             Commencez gratuitement et ne payez que lorsque votre activité se

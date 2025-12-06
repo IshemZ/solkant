@@ -87,7 +87,7 @@ export default function ContactPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Nous sommes là pour vous aider
+            Contactez Solkant – Support logiciel de devis
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
             Une question, une demande de démonstration ou besoin d&apos;aide ?

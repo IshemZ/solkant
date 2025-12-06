@@ -89,7 +89,7 @@ export default function BlogPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Blog Solkant
+            Guides et conseils pour gérer votre institut de beauté
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
             Guides pratiques et conseils d&apos;experts pour optimiser la

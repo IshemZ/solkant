@@ -88,7 +88,7 @@ export default function FeaturesPage() {
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-            Toutes les fonctionnalités pour gérer vos devis professionnels
+            Fonctionnalités du logiciel de devis Solkant pour instituts
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
             Solkant vous accompagne au quotidien avec des outils simples et
