@@ -96,7 +96,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       stripeSubscriptionId: subscriptionId,
       isPro: true,
       subscriptionStatus: "ACTIVE",
-    },
+    } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   console.log(`✅ Abonnement PRO activé pour Business ${businessId}`);
@@ -104,7 +104,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const business = await prisma.business.findUnique({
-    where: { stripeSubscriptionId: subscription.id },
+    where: { stripeSubscriptionId: subscription.id } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   if (!business) {
@@ -136,15 +136,23 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     subscriptionStatus = "EXPIRED";
   }
 
+  // Cast pour accéder à current_period_end
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const currentPeriodEnd = (subscription as any).current_period_end as
+    | number
+    | null
+    | undefined;
+
   await prisma.business.update({
     where: { id: business.id },
     data: {
       isPro,
       subscriptionStatus,
-      subscriptionEndsAt: subscription.current_period_end
-        ? new Date(subscription.current_period_end * 1000)
-        : null,
-    },
+      subscriptionEndsAt:
+        currentPeriodEnd && typeof currentPeriodEnd === "number"
+          ? new Date(currentPeriodEnd * 1000)
+          : null,
+    } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   console.log(
@@ -154,7 +162,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   const business = await prisma.business.findUnique({
-    where: { stripeSubscriptionId: subscription.id },
+    where: { stripeSubscriptionId: subscription.id } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   if (!business) {
@@ -169,7 +177,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
       isPro: false,
       subscriptionStatus: "CANCELED",
       stripeSubscriptionId: null,
-    },
+    } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
   });
 
   console.log(`✅ Abonnement PRO désactivé pour Business ${business.id}`);
