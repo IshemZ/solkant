@@ -200,7 +200,10 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   footer: {
-    marginTop: 30,
+    position: "absolute",
+    bottom: 60,
+    left: 40,
+    right: 40,
     paddingTop: 20,
     borderTopWidth: 1,
     borderTopColor: "#e5e5e5",
@@ -211,10 +214,13 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
   generatedBy: {
+    position: "absolute",
+    bottom: 30,
+    left: 40,
+    right: 40,
     fontSize: 8,
     color: "#999999",
     textAlign: "center",
-    marginTop: 20,
   },
   notes: {
     marginTop: 10,
