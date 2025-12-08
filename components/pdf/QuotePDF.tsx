@@ -46,7 +46,9 @@ const styles = StyleSheet.create({
   },
   headerLeft: {
     flex: 1,
-    alignItems: "center",
+  },
+  headerRight: {
+    alignItems: "flex-end",
   },
   logo: {
     width: "100%",
@@ -182,6 +184,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#8B7355",
   },
+  installmentPayment: {
+    fontSize: 9,
+    color: "#666666",
+    marginTop: 10,
+    fontStyle: "italic",
+  },
   signatureSection: {
     marginTop: 30,
     alignItems: "flex-end",
@@ -225,9 +233,7 @@ const styles = StyleSheet.create({
     color: "#666666",
   },
 });
-//TODO: Enlever le titre "Devis"
-//TODO: Mettre la ref du devis et la date en haut à droite au dessus de la colonne Total et mettre la mention " Devis valable 30 jours "
-//TODO : Ajouter en dessous du total si paiement en x fois sans frais : Divisé le total en x paiements de xx €
+
 export default function QuotePDF({ quote }: QuotePDFProps) {
   return (
     <Document>
@@ -240,15 +246,15 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
               <Image src={quote.business.logo} style={styles.logo} />
             </View>
           )}
-          <View style={styles.headerLeft}>
-            <Text style={styles.title}>DEVIS</Text>
+          <View style={styles.headerLeft} />
+          <View style={styles.headerRight}>
             <Text style={styles.quoteNumber}>{quote.quoteNumber}</Text>
             <Text style={styles.date}>Date: {formatDate(quote.createdAt)}</Text>
-            {quote.validUntil && (
-              <Text style={styles.date}>
-                Valable jusqu&apos;au: {formatDate(quote.validUntil)}
-              </Text>
-            )}
+            <Text style={styles.date}>
+              {quote.validUntil
+                ? `Valable jusqu'au: ${formatDate(quote.validUntil)}`
+                : "Devis valable 30 jours"}
+            </Text>
           </View>
         </View>
 
@@ -348,6 +354,11 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
                 {quote.total.toFixed(2)} €
               </Text>
             </View>
+
+            <Text style={styles.installmentPayment}>
+              Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
+              4
+            </Text>
           </View>
         </View>
 
