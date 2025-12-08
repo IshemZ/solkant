@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { createQuoteSchema, type CreateQuoteInput } from "@/lib/validations";
+import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 
@@ -110,7 +111,10 @@ export async function createQuote(input: CreateQuoteInput) {
     return { error: "Non autorisé" };
   }
 
-  const validation = createQuoteSchema.safeParse(input);
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input);
+
+  const validation = createQuoteSchema.safeParse(sanitized);
   if (!validation.success) {
     return {
       error: "Données invalides",

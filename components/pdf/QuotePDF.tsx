@@ -286,17 +286,25 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
 
           <View style={styles.column}>
             <Text style={styles.sectionTitle}>Client</Text>
-            <Text style={styles.businessName}>
-              {quote.client.firstName} {quote.client.lastName}
-            </Text>
-            {quote.client.address && (
-              <Text style={styles.text}>{quote.client.address}</Text>
-            )}
-            {quote.client.phone && (
-              <Text style={styles.text}>{quote.client.phone}</Text>
-            )}
-            {quote.client.email && (
-              <Text style={styles.text}>{quote.client.email}</Text>
+            {quote.client ? (
+              <>
+                <Text style={styles.businessName}>
+                  {quote.client.firstName} {quote.client.lastName}
+                </Text>
+                {quote.client.address && (
+                  <Text style={styles.text}>{quote.client.address}</Text>
+                )}
+                {quote.client.phone && (
+                  <Text style={styles.text}>{quote.client.phone}</Text>
+                )}
+                {quote.client.email && (
+                  <Text style={styles.text}>{quote.client.email}</Text>
+                )}
+              </>
+            ) : (
+              <Text style={[styles.text, { fontStyle: "italic" }]}>
+                Client supprimé
+              </Text>
             )}
           </View>
         </View>

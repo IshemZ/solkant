@@ -78,7 +78,7 @@ describe("Hydration Safety", () => {
   });
 
   describe("Anti-patterns Detection", () => {
-    it("Date.now() produirait des résultats différents (démonstration)", () => {
+    it("Date.now() produirait des résultats différents (démonstration)", async () => {
       // Ce test démontre POURQUOI Date.now() est un anti-pattern
       const badRender = () => {
         // ❌ Mauvais : différent à chaque rendu
@@ -87,13 +87,11 @@ describe("Hydration Safety", () => {
 
       const result1 = badRender();
       // Simuler un petit délai (serveur vs client)
-      const delay = new Promise((resolve) => setTimeout(resolve, 1));
+      await new Promise((resolve) => setTimeout(resolve, 5));
 
-      return delay.then(() => {
-        const result2 = badRender();
-        // Ce test RÉUSSIT en montrant que Date.now() varie
-        expect(result1).not.toBe(result2);
-      });
+      const result2 = badRender();
+      // Ce test RÉUSSIT en montrant que Date.now() varie
+      expect(result1).not.toBe(result2);
     });
 
     it("ne devrait PAS utiliser Math.random() dans le rendu", () => {

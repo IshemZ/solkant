@@ -1,0 +1,326 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { createCheckoutSession } from "@/app/actions/stripe";
+import prisma from "@/lib/prisma";
+import { getServerSession } from "next-auth";
+import { stripe } from "@/lib/stripe";
+
+// Mock dependencies
+vi.mock("next-auth", () => ({
+  getServerSession: vi.fn(),
+}));
+
+vi.mock("@/lib/prisma", () => ({
+  default: {
+    business: {
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("@/lib/stripe", () => ({
+  stripe: {
+    customers: {
+      create: vi.fn(),
+    },
+    checkout: {
+      sessions: {
+        create: vi.fn(),
+      },
+    },
+  },
+  STRIPE_PRICE_ID_PRO: "price_test_123",
+}));
+
+describe("Stripe Server Actions", () => {
+  const mockSession = {
+    user: {
+      id: "user_123",
+      businessId: "business_123",
+      email: "test@example.com",
+      name: "Test User",
+    },
+  };
+
+  const mockBusiness = {
+    id: "business_123",
+    name: "Mon Institut",
+    address: "1 rue de Paris",
+    phone: "0123456789",
+    email: "contact@institut.fr",
+    logo: null,
+    siret: "12345678901234",
+    primaryColor: "#D4B5A0",
+    secondaryColor: "#8B7355",
+    userId: "user_123",
+    stripeCustomerId: null,
+    stripeSubscriptionId: null,
+    isPro: false,
+    subscriptionStatus: "TRIAL" as const,
+    subscriptionEndsAt: null,
+    trialEndsAt: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    // Set default NEXT_PUBLIC_APP_URL for tests
+    process.env.NEXT_PUBLIC_APP_URL = "http://localhost:3000";
+  });
+
+  describe("createCheckoutSession", () => {
+    it("should create checkout session for new customer", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
+
+      const mockCustomer = { id: "cus_test_123" };
+      vi.mocked(stripe.customers.create).mockResolvedValue(mockCustomer as any);
+
+      vi.mocked(prisma.business.update).mockResolvedValue({
+        ...mockBusiness,
+        stripeCustomerId: "cus_test_123",
+      });
+
+      const mockCheckoutSession = {
+        id: "cs_test_123",
+        url: "https://checkout.stripe.com/session/test",
+      };
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue(
+        mockCheckoutSession as any
+      );
+
+      const result = await createCheckoutSession();
+
+      expect(result.url).toBe("https://checkout.stripe.com/session/test");
+      expect(result.error).toBeUndefined();
+
+      // Verify customer creation
+      expect(stripe.customers.create).toHaveBeenCalledWith({
+        email: "test@example.com",
+        name: "Mon Institut",
+        metadata: {
+          businessId: "business_123",
+          userId: "user_123",
+        },
+      });
+
+      // Verify customer ID saved to database
+      expect(prisma.business.update).toHaveBeenCalledWith({
+        where: { id: "business_123" },
+        data: { stripeCustomerId: "cus_test_123" },
+      });
+
+      // Verify checkout session creation
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customer: "cus_test_123",
+          mode: "subscription",
+          line_items: [
+            {
+              price: "price_test_123",
+              quantity: 1,
+            },
+          ],
+        })
+      );
+    });
+
+    it("should use existing customer ID", async () => {
+      const businessWithStripeId = {
+        ...mockBusiness,
+        stripeCustomerId: "cus_existing_123",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(
+        businessWithStripeId
+      );
+
+      const mockCheckoutSession = {
+        id: "cs_test_123",
+        url: "https://checkout.stripe.com/session/test",
+      };
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue(
+        mockCheckoutSession as any
+      );
+
+      const result = await createCheckoutSession();
+
+      expect(result.url).toBe("https://checkout.stripe.com/session/test");
+
+      // Should NOT create new customer
+      expect(stripe.customers.create).not.toHaveBeenCalled();
+      expect(prisma.business.update).not.toHaveBeenCalled();
+
+      // Should use existing customer ID
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customer: "cus_existing_123",
+        })
+      );
+    });
+
+    it("should return error if not authenticated", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(null);
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe("Non authentifié");
+      expect(result.url).toBeUndefined();
+      expect(stripe.customers.create).not.toHaveBeenCalled();
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+    });
+
+    it("should return error if no email in session", async () => {
+      vi.mocked(getServerSession).mockResolvedValue({
+        user: {
+          id: "user_123",
+          businessId: "business_123",
+          email: null,
+          name: "Test User",
+        },
+      } as any);
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe("Non authentifié");
+      expect(prisma.business.findUnique).not.toHaveBeenCalled();
+    });
+
+    it("should return error if business not found", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(null);
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe("Business introuvable");
+      expect(stripe.customers.create).not.toHaveBeenCalled();
+      expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+    });
+
+    it("should handle Stripe customer creation error", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
+      vi.mocked(stripe.customers.create).mockRejectedValue(
+        new Error("Stripe API error")
+      );
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe(
+        "Erreur lors de la création de la session de paiement"
+      );
+      expect(result.url).toBeUndefined();
+    });
+
+    it("should handle Stripe checkout session creation error", async () => {
+      const businessWithStripeId = {
+        ...mockBusiness,
+        stripeCustomerId: "cus_existing_123",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(
+        businessWithStripeId
+      );
+      vi.mocked(stripe.checkout.sessions.create).mockRejectedValue(
+        new Error("Stripe session error")
+      );
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe(
+        "Erreur lors de la création de la session de paiement"
+      );
+      expect(result.url).toBeUndefined();
+    });
+
+    it("should include correct URLs in checkout session", async () => {
+      const businessWithStripeId = {
+        ...mockBusiness,
+        stripeCustomerId: "cus_existing_123",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(
+        businessWithStripeId
+      );
+
+      const mockCheckoutSession = {
+        id: "cs_test_123",
+        url: "https://checkout.stripe.com/session/test",
+      };
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue(
+        mockCheckoutSession as any
+      );
+
+      await createCheckoutSession();
+
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          success_url: "http://localhost:3000/dashboard?checkout=success",
+          cancel_url: "http://localhost:3000/pricing?checkout=cancel",
+        })
+      );
+    });
+
+    it("should include metadata in checkout session", async () => {
+      const businessWithStripeId = {
+        ...mockBusiness,
+        stripeCustomerId: "cus_existing_123",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(
+        businessWithStripeId
+      );
+
+      const mockCheckoutSession = {
+        id: "cs_test_123",
+        url: "https://checkout.stripe.com/session/test",
+      };
+      vi.mocked(stripe.checkout.sessions.create).mockResolvedValue(
+        mockCheckoutSession as any
+      );
+
+      await createCheckoutSession();
+
+      expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          metadata: {
+            businessId: "business_123",
+            userId: "user_123",
+          },
+          subscription_data: {
+            metadata: {
+              businessId: "business_123",
+              userId: "user_123",
+            },
+          },
+        })
+      );
+    });
+
+    it("should handle database update error when saving customer ID", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
+
+      const mockCustomer = { id: "cus_test_123" };
+      vi.mocked(stripe.customers.create).mockResolvedValue(mockCustomer as any);
+
+      // Database update fails
+      vi.mocked(prisma.business.update).mockRejectedValue(
+        new Error("Database error")
+      );
+
+      const result = await createCheckoutSession();
+
+      expect(result.error).toBe(
+        "Erreur lors de la création de la session de paiement"
+      );
+      expect(result.url).toBeUndefined();
+    });
+  });
+});

@@ -7,6 +7,7 @@ import {
   updateBusinessSchema,
   type UpdateBusinessInput,
 } from "@/lib/validations";
+import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 
 export async function getBusinessInfo() {
@@ -35,8 +36,11 @@ export async function updateBusiness(input: UpdateBusinessInput) {
     return { error: "Non autorisé" };
   }
 
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input);
+
   // Validate input
-  const validation = updateBusinessSchema.safeParse(input);
+  const validation = updateBusinessSchema.safeParse(sanitized);
   if (!validation.success) {
     console.error("Validation error:", validation.error.flatten());
     return {

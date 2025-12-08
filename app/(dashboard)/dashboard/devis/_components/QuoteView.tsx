@@ -49,7 +49,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
   }
 
   async function handleSendEmail() {
-    if (!quote.client.email) {
+    if (!quote.client || !quote.client.email) {
       alert("Le client n'a pas d'adresse email");
       return;
     }
@@ -103,10 +103,10 @@ export default function QuoteView({ quote }: QuoteViewProps) {
         <div className="flex gap-3">
           <button
             onClick={handleSendEmail}
-            disabled={isSending || !quote.client.email}
+            disabled={isSending || !quote.client || !quote.client.email}
             className="inline-flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed"
             title={
-              !quote.client.email
+              !quote.client || !quote.client.email
                 ? "Le client n'a pas d'email"
                 : "Envoyer par email"
             }
@@ -182,17 +182,23 @@ export default function QuoteView({ quote }: QuoteViewProps) {
               Pour
             </h2>
             <div className="text-gray-900">
-              <p className="font-bold">
-                {quote.client.firstName} {quote.client.lastName}
-              </p>
-              {quote.client.address && (
-                <p className="text-sm">{quote.client.address}</p>
-              )}
-              {quote.client.phone && (
-                <p className="text-sm">{quote.client.phone}</p>
-              )}
-              {quote.client.email && (
-                <p className="text-sm">{quote.client.email}</p>
+              {quote.client ? (
+                <>
+                  <p className="font-bold">
+                    {quote.client.firstName} {quote.client.lastName}
+                  </p>
+                  {quote.client.address && (
+                    <p className="text-sm">{quote.client.address}</p>
+                  )}
+                  {quote.client.phone && (
+                    <p className="text-sm">{quote.client.phone}</p>
+                  )}
+                  {quote.client.email && (
+                    <p className="text-sm">{quote.client.email}</p>
+                  )}
+                </>
+              ) : (
+                <p className="text-sm italic text-gray-500">Client supprimé</p>
               )}
             </div>
           </div>

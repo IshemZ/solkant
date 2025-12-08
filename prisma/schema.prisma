@@ -76,11 +76,12 @@ model Business {
   updatedAt            DateTime           @updatedAt
   userId               String             @unique
   stripeCustomerId     String?            @unique
+  stripePriceId        String?
   stripeSubscriptionId String?            @unique
-  isPro                Boolean            @default(false)
   subscriptionEndsAt   DateTime?
   subscriptionStatus   SubscriptionStatus @default(TRIAL)
   trialEndsAt          DateTime?
+  isPro                Boolean            @default(false)
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   clients              Client[]
   quotes               Quote[]

@@ -128,7 +128,9 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                       </Link>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground">
-                      {quote.client.firstName} {quote.client.lastName}
+                      {quote.client
+                        ? `${quote.client.firstName} ${quote.client.lastName}`
+                        : "Client supprimé"}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
                       {formatDate(quote.createdAt)}

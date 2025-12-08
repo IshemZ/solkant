@@ -77,6 +77,25 @@ const envSchema = z.object({
       "Google Analytics Measurement ID (optionnel, format: G-XXXXXXXXXX)"
     ),
 
+  // ===== STRIPE (OPTIONAL) =====
+  STRIPE_SECRET_KEY: z
+    .string()
+    .regex(
+      /^sk_(test|live)_[a-zA-Z0-9]{24,}$/,
+      "Format Stripe Secret Key invalide (doit commencer par sk_test_ ou sk_live_)"
+    )
+    .optional()
+    .describe("Stripe Secret Key pour les paiements (optionnel)"),
+
+  STRIPE_PRICE_ID_PRO: z
+    .string()
+    .regex(
+      /^price_[a-zA-Z0-9]{24,}$/,
+      "Format Stripe Price ID invalide (doit commencer par price_)"
+    )
+    .optional()
+    .describe("Stripe Price ID pour l'abonnement Pro (optionnel)"),
+
   // ===== RATE LIMITING (OPTIONAL) =====
   UPSTASH_REDIS_URL: z
     .string()
@@ -262,6 +281,14 @@ export function getEnv(): Env {
 }
 
 /**
+ * Reset cache pour les tests
+ * @internal - Usage interne seulement pour les tests
+ */
+export function resetEnvCache(): void {
+  cachedEnv = undefined;
+}
+
+/**
  * Vérifie si une feature optionnelle est activée
  * Basé sur la présence des env vars nécessaires
  *
@@ -286,6 +313,13 @@ export const features = {
   get googleAnalytics(): boolean {
     // Cette variable est publique, accessible côté client
     return !!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+  },
+
+  /** Stripe payments activés */
+  get stripePayments(): boolean {
+    if (typeof window !== "undefined") return false; // Côté client
+    const env = getEnv();
+    return !!(env.STRIPE_SECRET_KEY && env.STRIPE_PRICE_ID_PRO);
   },
 
   /** Rate limiting activé (Upstash Redis) */
@@ -332,6 +366,7 @@ export function logEnvSummary(): void {
     `  Sentry Monitoring: ${features.sentryMonitoring ? "✅" : "❌"}`
   );
   console.log(`  Google Analytics: ${features.googleAnalytics ? "✅" : "❌"}`);
+  console.log(`  Stripe Payments: ${features.stripePayments ? "✅" : "❌"}`);
   console.log(`  Rate Limiting: ${features.rateLimiting ? "✅" : "❌"}`);
   console.log("");
 }
@@ -388,6 +423,11 @@ NEXTAUTH_SECRET="" # Générer avec: openssl rand -base64 32
 # ===== ANALYTICS (OPTIONAL) =====
 # Google Analytics (obtenir sur https://analytics.google.com)
 # NEXT_PUBLIC_GA_MEASUREMENT_ID="G-XXXXXXXXXX"
+
+# ===== STRIPE (OPTIONAL) =====
+# Stripe pour les paiements (obtenir sur https://stripe.com)
+# STRIPE_SECRET_KEY="sk_test_..." # ou sk_live_ pour production
+# STRIPE_PRICE_ID_PRO="price_..." # ID du produit abonnement Pro
 
 # ===== RATE LIMITING (OPTIONAL) =====
 # Upstash Redis

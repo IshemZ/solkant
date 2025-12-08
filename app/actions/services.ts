@@ -9,6 +9,7 @@ import {
   type CreateServiceInput,
   type UpdateServiceInput,
 } from "@/lib/validations";
+import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 
@@ -42,7 +43,10 @@ export async function createService(input: CreateServiceInput) {
     return { error: "Non autorisé" };
   }
 
-  const validation = createServiceSchema.safeParse(input);
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input);
+
+  const validation = createServiceSchema.safeParse(sanitized);
   if (!validation.success) {
     return {
       error: "Données invalides",
@@ -77,7 +81,10 @@ export async function updateService(id: string, input: UpdateServiceInput) {
     return { error: "Non autorisé" };
   }
 
-  const validation = updateServiceSchema.safeParse(input);
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input);
+
+  const validation = updateServiceSchema.safeParse(sanitized);
   if (!validation.success) {
     return {
       error: "Données invalides",
