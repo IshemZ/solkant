@@ -4,6 +4,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { updateBusiness } from "@/app/actions/business";
 import type { Business } from "@prisma/client";
+import LogoUpload from "@/components/business/LogoUpload";
+import { useRouter } from "next/navigation";
 
 interface BusinessSettingsFormProps {
   business: Business;
@@ -15,6 +17,7 @@ export default function BusinessSettingsForm({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[]>>({});
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -59,6 +62,12 @@ export default function BusinessSettingsForm({
           {error}
         </div>
       )}
+
+      {/* Logo Upload */}
+      <LogoUpload
+        currentLogo={business.logo}
+        onLogoChange={() => router.refresh()}
+      />
 
       <div>
         <label

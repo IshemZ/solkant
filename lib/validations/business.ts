@@ -32,7 +32,25 @@ export const createBusinessSchema = z.object({
     .trim()
     .optional()
     .nullable(),
-  logo: z.string().url("URL du logo invalide").optional().nullable(),
+  logo: z
+    .string()
+    .refine(
+      (val) => {
+        if (!val) return true;
+        // Accepter les URLs normales et les data URLs (base64)
+        return (
+          val.startsWith("http://") ||
+          val.startsWith("https://") ||
+          val.startsWith("data:image/")
+        );
+      },
+      {
+        message:
+          "URL du logo invalide (doit être une URL HTTP ou une image base64)",
+      }
+    )
+    .optional()
+    .nullable(),
   siret: z
     .string()
     .regex(/^\d{14}$/, "Le SIRET doit contenir exactement 14 chiffres")
@@ -100,7 +118,24 @@ export const updateBusinessSchema = z.object({
     .transform((val) => (val === "" || !val ? null : val))
     .optional(),
   logo: z
-    .union([z.string().url("URL du logo invalide"), z.literal(""), z.null()])
+    .union([
+      z.string().refine(
+        (val) => {
+          if (!val) return true;
+          return (
+            val.startsWith("http://") ||
+            val.startsWith("https://") ||
+            val.startsWith("data:image/")
+          );
+        },
+        {
+          message:
+            "URL du logo invalide (doit être une URL HTTP ou une image base64)",
+        }
+      ),
+      z.literal(""),
+      z.null(),
+    ])
     .transform((val) => (val === "" || !val ? null : val))
     .optional(),
   siret: z

@@ -58,3 +58,55 @@ export async function updateBusiness(input: UpdateBusinessInput) {
     return { error: "Erreur lors de la mise à jour" };
   }
 }
+
+export async function uploadBusinessLogo(logoData: string) {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.businessId) {
+    return { error: "Non autorisé" };
+  }
+
+  // Valider que c'est bien une data URL d'image
+  if (!logoData.startsWith("data:image/")) {
+    return { error: "Format d'image invalide" };
+  }
+
+  // Limiter la taille (5MB en base64 ≈ 3.75MB original)
+  if (logoData.length > 5 * 1024 * 1024) {
+    return { error: "L'image est trop volumineuse (max 5MB)" };
+  }
+
+  try {
+    const business = await prisma.business.update({
+      where: { id: session.user.businessId },
+      data: { logo: logoData },
+    });
+
+    revalidatePath("/dashboard/parametres");
+    return { data: business };
+  } catch (error) {
+    console.error("Error uploading logo:", error);
+    return { error: "Erreur lors de l'upload du logo" };
+  }
+}
+
+export async function deleteBusinessLogo() {
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.businessId) {
+    return { error: "Non autorisé" };
+  }
+
+  try {
+    const business = await prisma.business.update({
+      where: { id: session.user.businessId },
+      data: { logo: null },
+    });
+
+    revalidatePath("/dashboard/parametres");
+    return { data: business };
+  } catch (error) {
+    console.error("Error deleting logo:", error);
+    return { error: "Erreur lors de la suppression du logo" };
+  }
+}
