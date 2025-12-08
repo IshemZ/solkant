@@ -225,7 +225,9 @@ const styles = StyleSheet.create({
     color: "#666666",
   },
 });
-
+//TODO: Enlever le titre "Devis"
+//TODO: Mettre la ref du devis et la date en haut à droite au dessus de la colonne Total et mettre la mention " Devis valable 30 jours "
+//TODO : Ajouter en dessous du total si paiement en x fois sans frais : Divisé le total en x paiements de xx €
 export default function QuotePDF({ quote }: QuotePDFProps) {
   return (
     <Document>
