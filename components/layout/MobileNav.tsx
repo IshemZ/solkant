@@ -1,28 +1,29 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import * as Dialog from '@radix-ui/react-dialog'
-import SignOutButton from './SignOutButton'
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import * as Dialog from "@radix-ui/react-dialog";
+import SignOutButton from "./SignOutButton";
 
 interface MobileNavProps {
-  userName?: string | null
-  userEmail?: string | null
+  userName?: string | null;
+  userEmail?: string | null;
 }
 
 export default function MobileNav({ userName, userEmail }: MobileNavProps) {
-  const [open, setOpen] = useState(false)
-  const pathname = usePathname()
+  const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   const navLinks = [
-    { href: '/dashboard', label: 'Tableau de bord' },
-    { href: '/dashboard/devis/nouveau', label: 'Nouveau devis', primary: true },
-    { href: '/dashboard/devis', label: 'Mes devis' },
-    { href: '/dashboard/clients', label: 'Clients' },
-    { href: '/dashboard/services', label: 'Services' },
-    { href: '/dashboard/parametres', label: 'Paramètres' },
-  ]
+    { href: "/dashboard", label: "Tableau de bord" },
+    { href: "/dashboard/devis/nouveau", label: "Nouveau devis", primary: true },
+    { href: "/dashboard/devis", label: "Mes devis" },
+    { href: "/dashboard/clients", label: "Clients" },
+    { href: "/dashboard/services", label: "Services" },
+    { href: "/dashboard/abonnement", label: "Abonnement" },
+    { href: "/dashboard/parametres", label: "Paramètres" },
+  ];
 
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
@@ -92,7 +93,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
             {/* Navigation Links */}
             <nav className="flex-1 space-y-2">
               {navLinks.map((link) => {
-                const isActive = pathname === link.href
+                const isActive = pathname === link.href;
                 return (
                   <Link
                     key={link.href}
@@ -100,10 +101,10 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                     onClick={() => setOpen(false)}
                     className={
                       link.primary
-                        ? 'flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90'
+                        ? "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
                         : isActive
-                        ? 'flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors'
-                        : 'flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground'
+                        ? "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors"
+                        : "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
                     }
                   >
                     {link.primary && (
@@ -123,7 +124,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                     )}
                     {link.label}
                   </Link>
-                )
+                );
               })}
             </nav>
 
@@ -135,5 +136,5 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  )
+  );
 }

@@ -74,3 +74,98 @@ export async function createCheckoutSession() {
     return { error: "Erreur lors de la création de la session de paiement" };
   }
 }
+
+export async function getSubscriptionStatus() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return { error: "Non authentifié" };
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!business) {
+      return { error: "Business introuvable" };
+    }
+
+    // Récupérer les informations de l'abonnement
+    const stripeSubscriptionId = (
+      business as {
+        stripeSubscriptionId?: string | null;
+      }
+    ).stripeSubscriptionId;
+
+    if (!stripeSubscriptionId) {
+      return {
+        data: {
+          plan: "free",
+          status: "active",
+          currentPeriodEnd: null,
+        },
+      };
+    }
+
+    // Récupérer l'abonnement depuis Stripe
+    const subscription = await stripe.subscriptions.retrieve(
+      stripeSubscriptionId
+    );
+
+    // Type assertion pour accéder aux propriétés
+    const subData = subscription as unknown as {
+      status: string;
+      current_period_end: number;
+      cancel_at_period_end: boolean;
+    };
+
+    return {
+      data: {
+        plan: "pro",
+        status: subData.status,
+        currentPeriodEnd: new Date(
+          subData.current_period_end * 1000
+        ).toISOString(),
+        cancelAtPeriodEnd: subData.cancel_at_period_end,
+      },
+    };
+  } catch (error) {
+    console.error("Erreur récupération abonnement:", error);
+    return { error: "Erreur lors de la récupération de l'abonnement" };
+  }
+}
+
+export async function createCustomerPortalSession() {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return { error: "Non authentifié" };
+    }
+
+    const business = await prisma.business.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (!business) {
+      return { error: "Business introuvable" };
+    }
+
+    const stripeCustomerId = (business as { stripeCustomerId?: string | null })
+      .stripeCustomerId;
+
+    if (!stripeCustomerId) {
+      return { error: "Aucun compte Stripe trouvé" };
+    }
+
+    // Créer une session de portail client
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: stripeCustomerId,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/abonnement`,
+    });
+
+    return { url: portalSession.url };
+  } catch (error) {
+    console.error("Erreur création portail client:", error);
+    return { error: "Erreur lors de la création du portail client" };
+  }
+}
