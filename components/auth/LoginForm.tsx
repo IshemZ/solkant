@@ -1,15 +1,17 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface LoginFormProps {
   initialError?: string;
 }
 
-export default function LoginForm({ initialError }: LoginFormProps) {
+function LoginFormContent({ initialError }: LoginFormProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(initialError || "");
@@ -33,7 +35,7 @@ export default function LoginForm({ initialError }: LoginFormProps) {
         return;
       }
 
-      router.push("/dashboard");
+      router.push(callbackUrl);
       router.refresh();
     } catch {
       setError("Une erreur est survenue. Veuillez réessayer.");
@@ -46,7 +48,7 @@ export default function LoginForm({ initialError }: LoginFormProps) {
       setIsLoading(true);
       setError("");
       console.log("[LoginForm] Démarrage de la connexion Google OAuth...");
-      await signIn("google", { callbackUrl: "/dashboard" });
+      await signIn("google", { callbackUrl });
     } catch (err) {
       console.error("[LoginForm] Erreur lors de la connexion Google:", err);
       setError("Erreur lors de la connexion avec Google");
@@ -150,5 +152,21 @@ export default function LoginForm({ initialError }: LoginFormProps) {
         </span>
       </button>
     </div>
+  );
+}
+
+export default function LoginForm({ initialError }: LoginFormProps) {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-6 animate-pulse">
+          <div className="h-10 bg-foreground/10 rounded" />
+          <div className="h-10 bg-foreground/10 rounded" />
+          <div className="h-10 bg-foreground/10 rounded" />
+        </div>
+      }
+    >
+      <LoginFormContent initialError={initialError} />
+    </Suspense>
   );
 }

@@ -1,75 +1,79 @@
-'use client'
+"use client";
 
-import { signIn } from 'next-auth/react'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { signIn } from "next-auth/react";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
-export default function RegisterForm() {
-  const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+function RegisterFormContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
+    e.preventDefault();
+    setError("");
 
     // Validation
     if (password !== confirmPassword) {
-      setError('Les mots de passe ne correspondent pas')
-      return
+      setError("Les mots de passe ne correspondent pas");
+      return;
     }
 
     if (password.length < 8) {
-      setError('Le mot de passe doit contenir au moins 8 caractères')
-      return
+      setError("Le mot de passe doit contenir au moins 8 caractères");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Une erreur est survenue')
-        setIsLoading(false)
-        return
+        setError(data.error || "Une erreur est survenue");
+        setIsLoading(false);
+        return;
       }
 
       // Auto sign in after registration
-      const result = await signIn('credentials', {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
-      })
+      });
 
       if (result?.error) {
-        setError('Compte créé mais échec de connexion. Veuillez essayer de vous connecter.')
-        setIsLoading(false)
-        return
+        setError(
+          "Compte créé mais échec de connexion. Veuillez essayer de vous connecter."
+        );
+        setIsLoading(false);
+        return;
       }
 
-      router.push('/dashboard')
-      router.refresh()
+      router.push(callbackUrl);
+      router.refresh();
     } catch {
-      setError('Une erreur est survenue. Veuillez réessayer.')
-      setIsLoading(false)
+      setError("Une erreur est survenue. Veuillez réessayer.");
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true)
-    await signIn('google', { callbackUrl: '/dashboard' })
-  }
+    setIsLoading(true);
+    await signIn("google", { callbackUrl });
+  };
 
   return (
     <div className="space-y-6">
@@ -163,7 +167,7 @@ export default function RegisterForm() {
           disabled={isLoading}
           className="w-full rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {isLoading ? 'Création du compte...' : 'Créer un compte'}
+          {isLoading ? "Création du compte..." : "Créer un compte"}
         </button>
       </form>
 
@@ -207,5 +211,21 @@ export default function RegisterForm() {
         </span>
       </button>
     </div>
-  )
+  );
+}
+
+export default function RegisterForm() {
+  return (
+    <Suspense
+      fallback={
+        <div className="space-y-6 animate-pulse">
+          <div className="h-10 bg-foreground/10 rounded" />
+          <div className="h-10 bg-foreground/10 rounded" />
+          <div className="h-10 bg-foreground/10 rounded" />
+        </div>
+      }
+    >
+      <RegisterFormContent />
+    </Suspense>
+  );
 }

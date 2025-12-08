@@ -92,6 +92,19 @@ export default function DashboardNav({
                 Mes devis
               </Link>
               <Link
+                href="/dashboard/abonnement"
+                className={
+                  pathname === "/dashboard/abonnement"
+                    ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
+                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                }
+                aria-current={
+                  pathname === "/dashboard/abonnement" ? "page" : undefined
+                }
+              >
+                Abonnement
+              </Link>
+              <Link
                 href="/dashboard/parametres"
                 className={
                   pathname === "/dashboard/parametres"
