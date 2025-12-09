@@ -1,8 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { z } from "zod";
 import {
   Button,
   Input,
@@ -21,7 +23,11 @@ import {
   CardTitle,
 } from "@/components/ui";
 import { createService, updateService } from "@/app/actions/services";
-import { serviceCategories, type CreateServiceInput } from "@/lib/validations";
+import {
+  serviceCategories,
+  createServiceSchema,
+  type CreateServiceInput,
+} from "@/lib/validations";
 import type { Service } from "@prisma/client";
 
 interface ServiceFormProps {
@@ -34,48 +40,52 @@ export default function ServiceForm({
   mode = "create",
 }: ServiceFormProps) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [isActive, setIsActive] = useState(service?.isActive ?? true);
-
   const isEdit = mode === "edit";
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
+  // Utiliser le type d'input pour le formulaire (avec isActive optionnel grâce au .default())
+  type ServiceInput = z.input<typeof createServiceSchema>;
 
-    const formData = new FormData(e.currentTarget);
+  const form = useForm<ServiceInput>({
+    resolver: zodResolver(createServiceSchema),
+    defaultValues: {
+      name: service?.name || "",
+      description: service?.description || null,
+      price: service?.price || 0,
+      duration: service?.duration || null,
+      category: service?.category || null,
+      isActive: service?.isActive ?? true,
+    },
+    mode: "onChange", // Validation en temps réel
+  });
 
-    // Conversion des champs numériques
-    const priceStr = formData.get("price") as string;
-    const durationStr = formData.get("duration") as string;
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors, isSubmitting },
+    setError,
+  } = form;
 
-    const data: CreateServiceInput = {
-      name: formData.get("name") as string,
-      description: (formData.get("description") as string) || null,
-      price: priceStr ? parseFloat(priceStr) : 0,
-      duration: durationStr ? parseInt(durationStr, 10) : null,
-      category: (formData.get("category") as string) || null,
-      isActive,
-    };
-
+  const onSubmit = async (data: ServiceInput) => {
     try {
+      // Le schéma Zod applique le .default() lors de la validation
+      // Donc data.isActive sera toujours défini après résolution
       const result =
         isEdit && service
-          ? await updateService(service.id, data)
-          : await createService(data);
+          ? await updateService(service.id, data as CreateServiceInput)
+          : await createService(data as CreateServiceInput);
 
       if (result.error) {
         toast.error(result.error);
         if (result.fieldErrors) {
-          const fieldErrors: Record<string, string> = {};
           Object.entries(result.fieldErrors).forEach(([key, value]) => {
             if (Array.isArray(value) && value.length > 0) {
-              fieldErrors[key] = value[0];
+              setError(key as keyof ServiceInput, {
+                type: "server",
+                message: value[0],
+              });
             }
           });
-          setErrors(fieldErrors);
         }
       } else {
         toast.success(
@@ -86,10 +96,8 @@ export default function ServiceForm({
       }
     } catch {
       toast.error("Une erreur est survenue");
-    } finally {
-      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <Card>
@@ -104,20 +112,18 @@ export default function ServiceForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Nom */}
           <FormField
             label="Nom du service"
             id="name"
             required
-            error={errors.name}
+            error={errors.name?.message}
           >
             <Input
               id="name"
-              name="name"
-              defaultValue={service?.name}
+              {...register("name")}
               placeholder="Soin visage complet"
-              required
               aria-invalid={!!errors.name}
               aria-describedby={errors.name ? "name-error" : undefined}
             />
@@ -127,13 +133,12 @@ export default function ServiceForm({
           <FormField
             label="Description"
             id="description"
-            error={errors.description}
+            error={errors.description?.message}
             hint="Décrivez le service en détail"
           >
             <Textarea
               id="description"
-              name="description"
-              defaultValue={service?.description || ""}
+              {...register("description")}
               placeholder="Description détaillée du service..."
               rows={3}
               aria-invalid={!!errors.description}
@@ -149,19 +154,17 @@ export default function ServiceForm({
               label="Prix (€)"
               id="price"
               required
-              error={errors.price}
+              error={errors.price?.message}
               hint="Prix en euros"
             >
               <Input
                 id="price"
-                name="price"
                 type="number"
                 step="0.01"
                 min="0"
                 max="999999.99"
-                defaultValue={service?.price.toString()}
+                {...register("price", { valueAsNumber: true })}
                 placeholder="50.00"
-                required
                 aria-invalid={!!errors.price}
                 aria-describedby={errors.price ? "price-error" : "price-hint"}
               />
@@ -170,16 +173,18 @@ export default function ServiceForm({
             <FormField
               label="Durée (minutes)"
               id="duration"
-              error={errors.duration}
+              error={errors.duration?.message}
               hint="Durée estimée du service"
             >
               <Input
                 id="duration"
-                name="duration"
                 type="number"
                 min="1"
                 max="1440"
-                defaultValue={service?.duration?.toString() || ""}
+                {...register("duration", {
+                  valueAsNumber: true,
+                  setValueAs: (v) => (v === "" ? null : Number(v)),
+                })}
                 placeholder="60"
                 aria-invalid={!!errors.duration}
                 aria-describedby={
@@ -193,21 +198,30 @@ export default function ServiceForm({
           <FormField
             label="Catégorie"
             id="category"
-            error={errors.category}
+            error={errors.category?.message}
             hint="Choisissez une catégorie pour mieux organiser vos services"
           >
-            <Select name="category" defaultValue={service?.category || ""}>
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Sélectionner une catégorie" />
-              </SelectTrigger>
-              <SelectContent>
-                {serviceCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Controller
+              name="category"
+              control={control}
+              render={({ field }) => (
+                <Select
+                  value={field.value || ""}
+                  onValueChange={(value) => field.onChange(value || null)}
+                >
+                  <SelectTrigger id="category">
+                    <SelectValue placeholder="Sélectionner une catégorie" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {serviceCategories.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            />
           </FormField>
 
           {/* Service actif */}
@@ -216,19 +230,25 @@ export default function ServiceForm({
             id="isActive"
             hint="Les services inactifs ne seront pas proposés aux clients"
           >
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isActive"
-                checked={isActive}
-                onCheckedChange={(checked) => setIsActive(checked === true)}
-              />
-              <label
-                htmlFor="isActive"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Service actif
-              </label>
-            </div>
+            <Controller
+              name="isActive"
+              control={control}
+              render={({ field }) => (
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="isActive"
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                  <label
+                    htmlFor="isActive"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Service actif
+                  </label>
+                </div>
+              )}
+            />
           </FormField>
 
           {/* Actions */}

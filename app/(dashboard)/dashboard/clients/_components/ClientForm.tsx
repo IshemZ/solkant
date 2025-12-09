@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import {
   Button,
@@ -15,7 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui";
 import { createClient, updateClient } from "@/app/actions/clients";
-import type { CreateClientInput } from "@/lib/validations";
+import { createClientSchema, type CreateClientInput } from "@/lib/validations";
 import type { Client } from "@prisma/client";
 
 interface ClientFormProps {
@@ -28,26 +29,27 @@ export default function ClientForm({
   mode = "create",
 }: ClientFormProps) {
   const router = useRouter();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-
   const isEdit = mode === "edit";
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setErrors({});
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    setError,
+  } = useForm<CreateClientInput>({
+    resolver: zodResolver(createClientSchema),
+    defaultValues: {
+      firstName: client?.firstName || "",
+      lastName: client?.lastName || "",
+      email: client?.email || null,
+      phone: client?.phone || null,
+      address: client?.address || null,
+      notes: client?.notes || null,
+    },
+    mode: "onChange", // Validation en temps réel
+  });
 
-    const formData = new FormData(e.currentTarget);
-    const data: CreateClientInput = {
-      firstName: formData.get("firstName") as string,
-      lastName: formData.get("lastName") as string,
-      email: (formData.get("email") as string) || null,
-      phone: (formData.get("phone") as string) || null,
-      address: (formData.get("address") as string) || null,
-      notes: (formData.get("notes") as string) || null,
-    };
-
+  async function onSubmit(data: CreateClientInput) {
     try {
       const result =
         isEdit && client
@@ -57,13 +59,14 @@ export default function ClientForm({
       if (result.error) {
         toast.error(result.error);
         if (result.fieldErrors) {
-          const fieldErrors: Record<string, string> = {};
           Object.entries(result.fieldErrors).forEach(([key, value]) => {
             if (Array.isArray(value) && value.length > 0) {
-              fieldErrors[key] = value[0];
+              setError(key as keyof CreateClientInput, {
+                type: "server",
+                message: value[0],
+              });
             }
           });
-          setErrors(fieldErrors);
         }
       } else {
         toast.success(
@@ -74,8 +77,6 @@ export default function ClientForm({
       }
     } catch {
       toast.error("Une erreur est survenue");
-    } finally {
-      setIsSubmitting(false);
     }
   }
 
@@ -92,20 +93,18 @@ export default function ClientForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {/* Prénom et Nom */}
           <div className="grid gap-4 md:grid-cols-2">
             <FormField
               label="Prénom"
               id="firstName"
               required
-              error={errors.firstName}
+              error={errors.firstName?.message}
             >
               <Input
                 id="firstName"
-                name="firstName"
-                defaultValue={client?.firstName}
-                required
+                {...register("firstName")}
                 aria-invalid={!!errors.firstName}
                 aria-describedby={
                   errors.firstName ? "firstName-error" : undefined
@@ -117,13 +116,11 @@ export default function ClientForm({
               label="Nom"
               id="lastName"
               required
-              error={errors.lastName}
+              error={errors.lastName?.message}
             >
               <Input
                 id="lastName"
-                name="lastName"
-                defaultValue={client?.lastName}
-                required
+                {...register("lastName")}
                 aria-invalid={!!errors.lastName}
                 aria-describedby={
                   errors.lastName ? "lastName-error" : undefined
@@ -137,14 +134,13 @@ export default function ClientForm({
             <FormField
               label="Email"
               id="email"
-              error={errors.email}
+              error={errors.email?.message}
               hint="Format : exemple@email.com"
             >
               <Input
                 id="email"
-                name="email"
                 type="email"
-                defaultValue={client?.email || ""}
+                {...register("email")}
                 placeholder="exemple@email.com"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : "email-hint"}
@@ -154,14 +150,13 @@ export default function ClientForm({
             <FormField
               label="Téléphone"
               id="phone"
-              error={errors.phone}
+              error={errors.phone?.message}
               hint="Format français : 06 12 34 56 78"
             >
               <Input
                 id="phone"
-                name="phone"
                 type="tel"
-                defaultValue={client?.phone || ""}
+                {...register("phone")}
                 placeholder="06 12 34 56 78"
                 aria-invalid={!!errors.phone}
                 aria-describedby={errors.phone ? "phone-error" : "phone-hint"}
@@ -170,11 +165,14 @@ export default function ClientForm({
           </div>
 
           {/* Adresse */}
-          <FormField label="Adresse" id="address" error={errors.address}>
+          <FormField
+            label="Adresse"
+            id="address"
+            error={errors.address?.message}
+          >
             <Input
               id="address"
-              name="address"
-              defaultValue={client?.address || ""}
+              {...register("address")}
               placeholder="123 Rue Exemple, 75001 Paris"
               aria-invalid={!!errors.address}
               aria-describedby={errors.address ? "address-error" : undefined}
@@ -185,13 +183,12 @@ export default function ClientForm({
           <FormField
             label="Notes"
             id="notes"
-            error={errors.notes}
+            error={errors.notes?.message}
             hint="Informations supplémentaires sur le client"
           >
             <Textarea
               id="notes"
-              name="notes"
-              defaultValue={client?.notes || ""}
+              {...register("notes")}
               placeholder="Notes, préférences, historique..."
               rows={4}
               aria-invalid={!!errors.notes}
