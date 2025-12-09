@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import SignOutButton from "./SignOutButton";
-import MobileNav from "./MobileNav";
+import SignOutButton from "@/components/layout/SignOutButton";
+import MobileNav from "@/components/layout/MobileNav";
 
 interface DashboardNavProps {
   userName?: string | null;

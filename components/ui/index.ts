@@ -82,4 +82,3 @@ export { Textarea } from "./textarea";
 export { EmptyState } from "./empty-state";
 export { FormField } from "./form-field";
 export { LoadingSpinner } from "./loading-spinner";
-export { QuoteStatusBadge } from "./quote-status-badge";

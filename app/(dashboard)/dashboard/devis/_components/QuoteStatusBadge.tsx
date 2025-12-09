@@ -1,4 +1,4 @@
-import { Badge } from "./badge";
+import { Badge } from "@/components/ui/badge";
 import { QuoteStatus } from "@prisma/client";
 import { cn } from "@/lib/utils";
 

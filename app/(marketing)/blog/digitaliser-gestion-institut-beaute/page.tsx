@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { RelatedArticles } from "@/components/shared/RelatedArticles";
+import { RelatedArticles } from "@/app/(marketing)/blog/_components/RelatedArticles";
 import { blogArticles } from "@/lib/blog-articles";
 
 export const metadata: Metadata = {

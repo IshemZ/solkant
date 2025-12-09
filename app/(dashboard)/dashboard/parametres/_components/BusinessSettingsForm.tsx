@@ -4,7 +4,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { updateBusiness } from "@/app/actions/business";
 import type { Business } from "@prisma/client";
-import LogoUpload from "@/components/business/LogoUpload";
+import LogoUpload from "./LogoUpload";
 import { useRouter } from "next/navigation";
 
 interface BusinessSettingsFormProps {

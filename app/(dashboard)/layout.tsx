@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
-import DashboardNav from "@/components/layout/DashboardNav";
+import DashboardNav from "./dashboard/_components/DashboardNav";
 import { SkipLink } from "@/components/shared/SkipLink";
 
 /**
