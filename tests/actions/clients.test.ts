@@ -12,6 +12,7 @@ vi.mock("@/lib/prisma", () => ({
   default: {
     client: {
       findMany: vi.fn(),
+      findFirst: vi.fn(),
       create: vi.fn(),
       delete: vi.fn(),
     },
@@ -170,6 +171,21 @@ describe("Client Server Actions", () => {
   describe("deleteClient - Multi-tenancy Security", () => {
     it("should only delete client from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+
+      // Mock findFirst pour vérifier l'existence
+      vi.mocked(prisma.client.findFirst).mockResolvedValue({
+        id: "client_123",
+        firstName: "Jean",
+        lastName: "Dupont",
+        email: "jean@example.com",
+        phone: null,
+        address: null,
+        notes: null,
+        businessId: "business_123",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
       vi.mocked(prisma.client.delete).mockResolvedValue({
         id: "client_123",
         firstName: "Jean",
@@ -185,6 +201,15 @@ describe("Client Server Actions", () => {
 
       await deleteClient("client_123");
 
+      // ✅ CRITIQUE: Vérifier filtrage businessId dans findFirst
+      expect(prisma.client.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: "client_123",
+          businessId: "business_123",
+        },
+        select: { firstName: true, lastName: true, email: true },
+      });
+
       // ✅ CRITIQUE: Vérifier filtrage businessId dans delete
       expect(prisma.client.delete).toHaveBeenCalledWith({
         where: {
@@ -196,13 +221,14 @@ describe("Client Server Actions", () => {
 
     it("should return error if client not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
-      vi.mocked(prisma.client.delete).mockRejectedValue(
-        new Error("Record not found")
-      );
+
+      // Mock findFirst retourne null (client inexistant ou autre business)
+      vi.mocked(prisma.client.findFirst).mockResolvedValue(null);
 
       const result = await deleteClient("client_other");
 
-      expect(result.error).toBe("Erreur lors de la suppression du client");
+      expect(result.error).toBe("Client introuvable");
+      expect(prisma.client.delete).not.toHaveBeenCalled();
     });
   });
 });

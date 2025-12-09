@@ -14,6 +14,12 @@
     "test:coverage": "vitest --coverage",
     "test:run": "vitest run",
     "test:hydration": "vitest run tests/lib/date-utils.test.ts tests/components/hydration.test.tsx tests/components/loading-states.test.tsx",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:multi-tenant": "vitest run tests/multi-tenant/",
+    "test:all": "npm run test:run && npm run test:e2e",
     "a11y:audit": "echo 'Install pa11y-ci: npm install -D pa11y-ci' && echo 'Run: npm run dev & sleep 5 && npx pa11y-ci'",
     "env:check": "tsx scripts/check-env.ts",
     "env:template": "tsx scripts/generate-env-template.ts",
@@ -52,7 +58,9 @@
     "zod": "^4.1.13"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@axe-core/react": "^4.11.0",
+    "@playwright/test": "^1.57.0",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^14.3.1",

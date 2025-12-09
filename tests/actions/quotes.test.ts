@@ -332,7 +332,6 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-
       expect(result.data).toBeDefined();
       expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
     });
@@ -493,7 +492,6 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
 
       const result = await createQuote(quoteInput);
-
 
       expect(result.data?.subtotal).toBe(130);
       expect(result.data?.total).toBe(130);
@@ -672,6 +670,23 @@ describe("Quote Server Actions", () => {
   describe("deleteQuote - Multi-tenancy Security", () => {
     it("should only delete quote from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+
+      // Mock findFirst pour vérifier l'existence
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue({
+        id: "quote_123",
+        quoteNumber: "DEVIS-2024-001",
+        clientId: "clxxx333333333333333",
+        businessId: "clxxx222222222222222",
+        status: "DRAFT",
+        validUntil: new Date(),
+        discount: 0,
+        subtotal: 100,
+        total: 100,
+        notes: null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
       vi.mocked(prisma.quote.delete).mockResolvedValue({
         id: "quote_123",
         quoteNumber: "DEVIS-2024-001",
@@ -691,7 +706,16 @@ describe("Quote Server Actions", () => {
 
       expect(result.success).toBe(true);
 
-      // ✅ CRITIQUE: Vérifier filtrage businessId
+      // ✅ CRITIQUE: Vérifier filtrage businessId dans findFirst
+      expect(prisma.quote.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: "quote_123",
+          businessId: "clxxx222222222222222",
+        },
+        select: { quoteNumber: true, clientId: true, total: true },
+      });
+
+      // ✅ CRITIQUE: Vérifier filtrage businessId dans delete
       expect(prisma.quote.delete).toHaveBeenCalledWith({
         where: {
           id: "quote_123",
@@ -711,13 +735,14 @@ describe("Quote Server Actions", () => {
 
     it("should return error if quote not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
-      vi.mocked(prisma.quote.delete).mockRejectedValue(
-        new Error("Record not found")
-      );
+
+      // Mock findFirst retourne null (quote inexistant ou autre business)
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const result = await deleteQuote("quote_other");
 
-      expect(result.error).toBe("Erreur lors de la suppression du devis");
+      expect(result.error).toBe("Devis introuvable");
+      expect(prisma.quote.delete).not.toHaveBeenCalled();
     });
   });
 });

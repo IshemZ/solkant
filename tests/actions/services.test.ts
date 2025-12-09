@@ -17,6 +17,7 @@ vi.mock("@/lib/prisma", () => ({
   default: {
     service: {
       findMany: vi.fn(),
+      findFirst: vi.fn(),
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
@@ -301,6 +302,21 @@ describe("Service Server Actions", () => {
   describe("deleteService - Multi-tenancy Security", () => {
     it("should only delete service from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+
+      // Mock findFirst pour vérifier l'existence
+      vi.mocked(prisma.service.findFirst).mockResolvedValue({
+        id: "service_123",
+        name: "Coupe classique",
+        description: null,
+        price: 30,
+        duration: 45,
+        category: null,
+        isActive: true,
+        businessId: "business_123",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
       vi.mocked(prisma.service.delete).mockResolvedValue({
         id: "service_123",
         name: "Coupe classique",
@@ -315,6 +331,15 @@ describe("Service Server Actions", () => {
       });
 
       await deleteService("service_123");
+
+      // ✅ CRITIQUE: Vérifier filtrage businessId dans findFirst
+      expect(prisma.service.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: "service_123",
+          businessId: "business_123",
+        },
+        select: { name: true, price: true },
+      });
 
       // ✅ CRITIQUE: Vérifier filtrage businessId dans delete
       expect(prisma.service.delete).toHaveBeenCalledWith({
@@ -336,13 +361,14 @@ describe("Service Server Actions", () => {
 
     it("should return error if service not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
-      vi.mocked(prisma.service.delete).mockRejectedValue(
-        new Error("Record not found")
-      );
+
+      // Mock findFirst retourne null (service inexistant ou autre business)
+      vi.mocked(prisma.service.findFirst).mockResolvedValue(null);
 
       const result = await deleteService("service_other");
 
-      expect(result.error).toBe("Erreur lors de la suppression du service");
+      expect(result.error).toBe("Service introuvable");
+      expect(prisma.service.delete).not.toHaveBeenCalled();
     });
   });
 });
