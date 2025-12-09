@@ -21,6 +21,12 @@ export async function getClients() {
     return { error: "Non autorisé" };
   }
 
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
+
   try {
     const clients = await prisma.client.findMany({
       where: { businessId: session.user.businessId },
@@ -43,6 +49,12 @@ export async function createClient(input: CreateClientInput) {
   if (!session?.user?.businessId) {
     return { error: "Non autorisé" };
   }
+
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -95,6 +107,12 @@ export async function updateClient(id: string, input: UpdateClientInput) {
   if (!session?.user?.businessId) {
     return { error: "Non autorisé" };
   }
+
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);

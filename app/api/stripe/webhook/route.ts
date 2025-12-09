@@ -38,6 +38,26 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ✅ IDEMPOTENCE: Vérifier si l'événement a déjà été traité
+    const existingEvent = await prisma.webhookEvent.findUnique({
+      where: { eventId: event.id },
+    });
+
+    if (existingEvent?.processed) {
+      console.log(`✅ Événement déjà traité: ${event.id}`);
+      return NextResponse.json({ received: true });
+    }
+
+    // Enregistrer l'événement (non traité au départ)
+    await prisma.webhookEvent.upsert({
+      where: { eventId: event.id },
+      update: {},
+      create: {
+        eventId: event.id,
+        processed: false,
+      },
+    });
+
     // Gérer les différents événements
     switch (event.type) {
       case "checkout.session.completed": {
@@ -61,6 +81,12 @@ export async function POST(req: NextRequest) {
       default:
         console.log(`Event non géré: ${event.type}`);
     }
+
+    // ✅ Marquer l'événement comme traité
+    await prisma.webhookEvent.update({
+      where: { eventId: event.id },
+      data: { processed: true },
+    });
 
     return NextResponse.json({ received: true });
   } catch (error) {

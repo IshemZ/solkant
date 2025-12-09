@@ -184,3 +184,13 @@ enum SubscriptionStatus {
   CANCELED
   EXPIRED
 }
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@map("webhook_events")
+}

@@ -16,6 +16,12 @@ export async function getQuotes() {
     return { error: "Non autorisé" };
   }
 
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
+
   try {
     const quotes = await prisma.quote.findMany({
       where: { businessId: session.user.businessId },
@@ -46,6 +52,12 @@ export async function getQuote(id: string) {
   if (!session?.user?.businessId) {
     return { error: "Non autorisé" };
   }
+
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
 
   try {
     const quote = await prisma.quote.findFirst({
@@ -111,6 +123,12 @@ export async function createQuote(input: CreateQuoteInput) {
   if (!session?.user?.businessId) {
     return { error: "Non autorisé" };
   }
+
+  // Ajouter contexte Sentry pour traçabilité
+  Sentry.setContext("business", {
+    businessId: session.user.businessId,
+    userId: session.user.id,
+  });
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);

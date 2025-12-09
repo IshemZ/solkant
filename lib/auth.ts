@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 import { getEnv, features } from "./env";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * NextAuth configuration
@@ -101,46 +102,114 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       // For Google OAuth: create User and Business if they don't exist
       if (account?.provider === "google" && user.email) {
-        try {
-          // Check if user exists
-          let dbUser = await prisma.user.findUnique({
-            where: { email: user.email },
-            include: { business: true },
-          });
+        let retries = 3;
+        let lastError: Error | null = null;
 
-          // Create user if doesn't exist
-          if (!dbUser) {
-            dbUser = await prisma.user.create({
-              data: {
-                email: user.email,
-                name: user.name || undefined,
-                image: user.image || undefined,
-                emailVerified: new Date(),
-              },
+        // ✅ RETRY LOGIC: Tenter jusqu'à 3 fois en cas d'erreur transitoire
+        while (retries > 0) {
+          try {
+            // Check if user exists
+            let dbUser = await prisma.user.findUnique({
+              where: { email: user.email },
               include: { business: true },
             });
-          }
 
-          // Create Business if doesn't exist
-          if (!dbUser.business) {
-            await prisma.business.create({
-              data: {
-                name: `Institut de ${user.name || "beauté"}`,
-                userId: dbUser.id,
-                email: user.email || undefined,
-              },
-            });
-          }
+            // Create user if doesn't exist
+            if (!dbUser) {
+              dbUser = await prisma.user.create({
+                data: {
+                  email: user.email,
+                  name: user.name || undefined,
+                  image: user.image || undefined,
+                  emailVerified: new Date(),
+                },
+                include: { business: true },
+              });
 
-          // Update user.id with database ID for JWT token
-          user.id = dbUser.id;
-        } catch (error) {
-          console.error(
-            "[Google OAuth] ERREUR dans le callback signIn:",
-            error
-          );
-          return false;
+              console.log(`✅ [Google OAuth] Utilisateur créé: ${dbUser.id}`);
+            }
+
+            // Create Business if doesn't exist (avec transaction pour atomicité)
+            if (!dbUser.business) {
+              await prisma.$transaction(async (tx) => {
+                const business = await tx.business.create({
+                  data: {
+                    name: `Institut de ${user.name || "beauté"}`,
+                    userId: dbUser!.id,
+                    email: user.email || undefined,
+                  },
+                });
+
+                console.log(
+                  `✅ [Google OAuth] Business créé: ${business.id} pour user: ${
+                    dbUser!.id
+                  }`
+                );
+              });
+
+              // Recharger l'utilisateur avec le Business
+              dbUser = await prisma.user.findUnique({
+                where: { id: dbUser.id },
+                include: { business: true },
+              });
+            }
+
+            // Update user.id with database ID for JWT token
+            user.id = dbUser!.id;
+
+            console.log(
+              `✅ [Google OAuth] SignIn réussi pour: ${
+                user.email
+              }, businessId: ${dbUser!.business?.id}`
+            );
+
+            return true;
+          } catch (error) {
+            lastError = error as Error;
+            retries--;
+
+            console.error(
+              `[Google OAuth] ❌ ERREUR (${3 - retries}/3):`,
+              error
+            );
+
+            // Erreurs transitoires: DB timeout, connection issues
+            const isTransientError =
+              error instanceof Error &&
+              (error.message.includes("timeout") ||
+                error.message.includes("connection") ||
+                error.message.includes("ECONNREFUSED") ||
+                error.message.includes("ETIMEDOUT"));
+
+            // Si erreur non-transitoire ou plus de retries, abandonner
+            if (!isTransientError || retries === 0) {
+              console.error(
+                "[Google OAuth] ❌ Échec définitif après retries:",
+                lastError
+              );
+
+              // Logger dans Sentry pour monitoring
+              Sentry.captureException(lastError, {
+                tags: {
+                  action: "google_oauth_signin",
+                  provider: "google",
+                },
+                extra: {
+                  email: user.email,
+                  retries: 3 - retries,
+                },
+              });
+
+              return false;
+            }
+
+            // Attendre avant de réessayer (exponential backoff)
+            const delay = (4 - retries) * 500; // 500ms, 1000ms, 1500ms
+            await new Promise((resolve) => setTimeout(resolve, delay));
+          }
         }
+
+        return false;
       }
 
       return true;
