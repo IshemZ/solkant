@@ -10,6 +10,15 @@ vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));
 
+vi.mock("next/headers", () => ({
+  headers: vi.fn(() => ({
+    get: vi.fn((name: string) => {
+      if (name === "host") return "localhost:3000";
+      return null;
+    }),
+  })),
+}));
+
 vi.mock("@/lib/prisma", () => ({
   default: {
     business: {
@@ -260,8 +269,10 @@ describe("Stripe Server Actions", () => {
 
       expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(
         expect.objectContaining({
-          success_url: "http://localhost:3000/dashboard?checkout=success",
-          cancel_url: "http://localhost:3000/pricing?checkout=cancel",
+          success_url:
+            "http://localhost:3000/dashboard/abonnement?checkout=success",
+          cancel_url:
+            "http://localhost:3000/dashboard/abonnement?checkout=cancel",
         })
       );
     });

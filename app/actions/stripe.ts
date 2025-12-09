@@ -75,6 +75,10 @@ export async function createCheckoutSession() {
       },
     });
 
+    if (!checkoutSession.url) {
+      return { error: "URL de session Checkout invalide" };
+    }
+
     return { url: checkoutSession.url };
   } catch (error) {
     console.error("Erreur création session Checkout:", error);

@@ -7,6 +7,10 @@ vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));
 
+vi.mock("@/lib/auth", () => ({
+  authOptions: {},
+}));
+
 describe("Security Helper Functions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
