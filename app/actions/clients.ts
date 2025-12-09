@@ -12,6 +12,7 @@ import {
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
+import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 
 export async function getClients() {
   const session = await getServerSession(authOptions);
@@ -59,6 +60,20 @@ export async function createClient(input: CreateClientInput) {
       data: {
         ...validation.data,
         businessId: session.user.businessId,
+      },
+    });
+
+    await auditLog({
+      action: AuditAction.CLIENT_CREATED,
+      level: AuditLevel.INFO,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: client.id,
+      resourceType: "Client",
+      metadata: {
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email,
       },
     });
 
@@ -121,10 +136,37 @@ export async function deleteClient(id: string) {
   }
 
   try {
+    // Récupérer les infos avant suppression
+    const client = await prisma.client.findFirst({
+      where: {
+        id,
+        businessId: session.user.businessId,
+      },
+      select: { firstName: true, lastName: true, email: true },
+    });
+
+    if (!client) {
+      return { error: "Client introuvable" };
+    }
+
     await prisma.client.delete({
       where: {
         id,
         businessId: session.user.businessId,
+      },
+    });
+
+    await auditLog({
+      action: AuditAction.CLIENT_DELETED,
+      level: AuditLevel.CRITICAL,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: id,
+      resourceType: "Client",
+      metadata: {
+        firstName: client.firstName,
+        lastName: client.lastName,
+        email: client.email,
       },
     });
 

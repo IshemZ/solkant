@@ -12,6 +12,7 @@ import {
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
+import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 
 export async function getServices() {
   const session = await getServerSession(authOptions);
@@ -121,10 +122,36 @@ export async function deleteService(id: string) {
   }
 
   try {
+    // Récupérer les infos avant suppression
+    const service = await prisma.service.findFirst({
+      where: {
+        id,
+        businessId: session.user.businessId,
+      },
+      select: { name: true, price: true },
+    });
+
+    if (!service) {
+      return { error: "Service introuvable" };
+    }
+
     await prisma.service.delete({
       where: {
         id,
         businessId: session.user.businessId,
+      },
+    });
+
+    await auditLog({
+      action: AuditAction.SERVICE_DELETED,
+      level: AuditLevel.CRITICAL,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: id,
+      resourceType: "Service",
+      metadata: {
+        name: service.name,
+        price: service.price,
       },
     });
 

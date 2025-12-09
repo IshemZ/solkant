@@ -4,6 +4,12 @@ import { authOptions } from "@/lib/auth";
 import { getQuote } from "@/app/actions/quotes";
 import { renderToStream } from "@react-pdf/renderer";
 import QuotePDF from "@/components/pdf/QuotePDF";
+import {
+  auditLog,
+  AuditAction,
+  AuditLevel,
+  extractRequestInfo,
+} from "@/lib/audit-logger";
 
 export async function GET(
   request: NextRequest,
@@ -25,6 +31,21 @@ export async function GET(
   try {
     const pdfElement = QuotePDF({ quote: result.data });
     const stream = await renderToStream(pdfElement);
+
+    // Log d'audit pour génération de PDF
+    const requestInfo = extractRequestInfo(request);
+    await auditLog({
+      action: AuditAction.QUOTE_PDF_GENERATED,
+      level: AuditLevel.INFO,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: result.data.id,
+      resourceType: "Quote",
+      metadata: {
+        quoteNumber: result.data.quoteNumber,
+      },
+      ...requestInfo,
+    });
 
     return new NextResponse(stream as unknown as BodyInit, {
       headers: {

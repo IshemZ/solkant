@@ -7,6 +7,7 @@ import { createQuoteSchema, type CreateQuoteInput } from "@/lib/validations";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
+import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 
 export async function getQuotes() {
   const session = await getServerSession(authOptions);
@@ -157,6 +158,21 @@ export async function createQuote(input: CreateQuoteInput) {
       },
     });
 
+    // Log d'audit pour traçabilité
+    await auditLog({
+      action: AuditAction.QUOTE_CREATED,
+      level: AuditLevel.INFO,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: quote.id,
+      resourceType: "Quote",
+      metadata: {
+        quoteNumber: quote.quoteNumber,
+        clientId: quote.clientId,
+        total: quote.total,
+      },
+    });
+
     revalidatePath("/dashboard/devis");
     return { data: quote };
   } catch (error) {
@@ -177,10 +193,38 @@ export async function deleteQuote(id: string) {
   }
 
   try {
+    // Récupérer les infos du devis avant suppression pour l'audit
+    const quote = await prisma.quote.findFirst({
+      where: {
+        id,
+        businessId: session.user.businessId,
+      },
+      select: { quoteNumber: true, clientId: true, total: true },
+    });
+
+    if (!quote) {
+      return { error: "Devis introuvable" };
+    }
+
     await prisma.quote.delete({
       where: {
         id,
         businessId: session.user.businessId,
+      },
+    });
+
+    // Log d'audit critique pour suppression
+    await auditLog({
+      action: AuditAction.QUOTE_DELETED,
+      level: AuditLevel.CRITICAL,
+      userId: session.user.id,
+      businessId: session.user.businessId,
+      resourceId: id,
+      resourceType: "Quote",
+      metadata: {
+        quoteNumber: quote.quoteNumber,
+        clientId: quote.clientId,
+        total: quote.total,
       },
     });
 

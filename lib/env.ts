@@ -87,6 +87,15 @@ const envSchema = z.object({
     .optional()
     .describe("Stripe Secret Key pour les paiements (optionnel)"),
 
+  STRIPE_WEBHOOK_SECRET: z
+    .string()
+    .regex(
+      /^whsec_[a-zA-Z0-9]{24,}$/,
+      "Format Stripe Webhook Secret invalide (doit commencer par whsec_)"
+    )
+    .optional()
+    .describe("Stripe Webhook Secret pour vérifier les événements (optionnel)"),
+
   STRIPE_PRICE_ID_PRO: z
     .string()
     .regex(
