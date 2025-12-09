@@ -21,7 +21,9 @@ export async function generateMetadata({
   }
 
   const quote = result.data;
-  const clientName = `${quote.client.firstName} ${quote.client.lastName}`;
+  const clientName = quote.client
+    ? `${quote.client.firstName} ${quote.client.lastName}`
+    : "Client supprimé";
 
   return {
     title: `Devis ${quote.quoteNumber} - ${clientName} | Solkant`,

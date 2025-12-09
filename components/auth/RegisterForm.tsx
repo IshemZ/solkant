@@ -47,22 +47,9 @@ function RegisterFormContent() {
         return;
       }
 
-      // Auto sign in after registration
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
-      });
-
-      if (result?.error) {
-        setError(
-          "Compte créé mais échec de connexion. Veuillez essayer de vous connecter."
-        );
-        setIsLoading(false);
-        return;
-      }
-
-      router.push(callbackUrl);
+      // ✅ NOUVEAU FLOW: Rediriger vers la page de vérification email
+      // L'utilisateur doit vérifier son email avant de pouvoir se connecter
+      router.push("/check-email");
       router.refresh();
     } catch {
       setError("Une erreur est survenue. Veuillez réessayer.");

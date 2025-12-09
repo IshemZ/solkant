@@ -17,7 +17,7 @@ import type {
 import { formatDate } from "@/lib/date-utils";
 
 interface QuoteWithRelations extends Quote {
-  client: Client;
+  client: Client | null;
   business: Business;
   items: (QuoteItem & { service: Service | null })[];
 }

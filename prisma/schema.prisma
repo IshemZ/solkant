@@ -9,17 +9,19 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  emailVerified DateTime?
-  password      String?
-  name          String?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  business      Business?
-  sessions      Session[]
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  emailVerified        DateTime?
+  password             String?
+  name                 String?
+  image                String?
+  verificationToken    String?   @unique
+  tokenExpiry          DateTime?
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  accounts             Account[]
+  business             Business?
+  sessions             Session[]
 
   @@map("users")
 }
@@ -141,10 +143,10 @@ model Quote {
   updatedAt   DateTime    @updatedAt
   sentAt      DateTime?
   businessId  String
-  clientId    String
+  clientId    String?
   items       QuoteItem[]
   business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  client      Client      @relation(fields: [clientId], references: [id])
+  client      Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
 
   @@index([businessId])
   @@index([clientId])
@@ -163,7 +165,7 @@ model QuoteItem {
   updatedAt   DateTime @updatedAt
   quoteId     String
   quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
-  service     Service? @relation(fields: [serviceId], references: [id])
+  service     Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
 
   @@index([quoteId])
   @@map("quote_items")

@@ -11,7 +11,7 @@ import { FileText } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
 
 interface QuoteWithRelations extends Quote {
-  client: Client;
+  client: Client | null;
   items: (QuoteItem & { service: Service | null })[];
 }
 

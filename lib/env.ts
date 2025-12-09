@@ -65,6 +65,16 @@ const envSchema = z.object({
     .optional()
     .describe("Sentry DSN pour error monitoring (optionnel)"),
 
+  // ===== EMAIL (OPTIONAL) =====
+  RESEND_API_KEY: z
+    .string()
+    .regex(
+      /^re_[a-zA-Z0-9_-]+$/,
+      "Format Resend API Key invalide (doit commencer par re_)"
+    )
+    .optional()
+    .describe("Resend API Key pour l'envoi d'emails (optionnel)"),
+
   // ===== ANALYTICS (OPTIONAL) =====
   NEXT_PUBLIC_GA_MEASUREMENT_ID: z
     .string()
@@ -338,6 +348,13 @@ export const features = {
     return !!(env.UPSTASH_REDIS_URL && env.UPSTASH_REDIS_TOKEN);
   },
 
+  /** Resend email service activé */
+  get emailService(): boolean {
+    if (typeof window !== "undefined") return false; // Côté client
+    const env = getEnv();
+    return !!env.RESEND_API_KEY;
+  },
+
   /** Mode production */
   get isProduction(): boolean {
     return process.env.NODE_ENV === "production";
@@ -377,6 +394,9 @@ export function logEnvSummary(): void {
   console.log(`  Google Analytics: ${features.googleAnalytics ? "✅" : "❌"}`);
   console.log(`  Stripe Payments: ${features.stripePayments ? "✅" : "❌"}`);
   console.log(`  Rate Limiting: ${features.rateLimiting ? "✅" : "❌"}`);
+  console.log(
+    `  Email Service (Resend): ${features.emailService ? "✅" : "❌"}`
+  );
   console.log("");
 }
 

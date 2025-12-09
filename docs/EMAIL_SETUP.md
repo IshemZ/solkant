@@ -1,52 +1,179 @@
 # Configuration de l'Envoi d'Emails - Solkant
 
-Ce document explique comment configurer l'envoi d'emails pour les devis en production.
+Ce document explique comment configurer l'envoi d'emails dans Solkant (vérification email + envoi de devis).
 
 ---
 
-## 📧 Fonctionnalité Actuelle
+## 📧 Fonctionnalités Email
 
-### Mode Démonstration (Actuel)
+Solkant utilise les emails pour :
 
-L'envoi d'emails est actuellement simulé. Quand vous cliquez sur "Envoyer par email" :
+1. **✅ Vérification d'email** (IMPLÉMENTÉ)
 
-- ✅ Le système vérifie que le client a un email
-- ✅ Un message de confirmation s'affiche
-- ✅ Les logs affichent les détails de l'envoi simulé
-- ❌ Aucun email n'est réellement envoyé
+   - Envoi automatique lors de l'inscription par credentials
+   - Token unique valide 24h
+   - Blocage d'accès au dashboard sans vérification
 
-### Pour Production
-
-Vous devez configurer un service d'envoi d'emails professionnel.
+2. **Envoi de devis** (Mode simulation actuellement)
+   - Envoi de devis PDF aux clients
+   - Notification par email
 
 ---
 
-## 🚀 Configuration avec Resend (Recommandé)
+## 🧪 Mode Développement (Sans Resend)
 
-[Resend](https://resend.com) est le service recommandé pour Next.js.
+Si `RESEND_API_KEY` n'est pas défini, le système fonctionne en **mode simulation** :
+
+- Les emails ne sont PAS envoyés
+- Les détails sont affichés dans la console :
+  ```
+  📧 [MODE SIMULATION] Email de vérification:
+     À: user@example.com
+     Nom: Marie Dupont
+     Token: abc123...
+     Lien: http://localhost:3000/verify-email?token=abc123...
+  ```
+- Copiez le lien de la console pour tester le flow
+
+**⚠️ En production, le mode simulation est désactivé** - vous DEVEZ configurer Resend.
+
+---
+
+## 🔍 Troubleshooting
+
+### L'email n'arrive pas
+
+1. **Vérifier les logs** :
+
+   ```bash
+   # En dev, vérifier la console
+   npm run dev
+
+   # En production, vérifier Vercel logs
+   vercel logs
+   ```
+
+2. **Vérifier Resend Dashboard** :
+
+   - Allez sur https://resend.com/emails
+   - Consultez le statut de livraison
+
+3. **Problèmes courants** :
+   - ❌ Domaine non vérifié → L'email est rejeté
+   - ❌ Email dans spam → Configurer SPF/DKIM/DMARC
+   - ❌ Rate limit dépassé → Plan gratuit limité à 100/jour
+
+### Token expiré
+
+Les tokens expirent après **24 heures**. Solutions :
+
+1. Se connecter avec l'email (même non vérifié)
+
+[Resend](https://resend.com) est le service d'email recommandé pour Next.js.
 
 ### 1. Créer un Compte Resend
 
 1. Allez sur https://resend.com
-2. Créez un compte gratuit
-3. Ajoutez et vérifiez votre domaine
+2. Créez un compte gratuit (100 emails/jour inclus)
+3. Ajoutez et vérifiez votre domaine custom
 4. Générez une clé API
 
-### 2. Installer Resend
+### 2. Installation
+
+Le package est déjà installé :
 
 ```bash
-npm install resend
+npm install resend  # Déjà fait
 ```
 
-### 3. Ajouter la Clé API
+### 3. Configuration Variables d'Environnement
 
 Ajoutez dans `.env.local` :
 
 ```env
-RESEND_API_KEY=re_votre_cle_api
+# Resend API Key pour envoi d'emails
+RESEND_API_KEY=re_votre_cle_api_ici
 ```
 
-### 4. Activer l'Envoi Réel
+**⚠️ Important** :
+
+- La clé doit commencer par `re_`
+- En développement sans cette variable, les emails sont simulés dans la console
+- En production, cette variable est **obligatoire** pour la vérification email
+
+### 4. Vérifier votre Domaine
+
+Dans Resend Dashboard :
+
+- Ajoutez votre domaine (ex: `solkant.com`)
+- Configurez les DNS records (SPF, DKIM, DMARC)
+- Attendez la vérification (~10 minutes)
+
+### 5. Mettre à Jour l'Expéditeur
+
+Dans `lib/email.ts`, modifiez :
+
+```typescript
+const EMAIL_CONFIG = {
+  from: "Solkant <noreply@votredomaine.com>", // ⚠️ Remplacer
+  replyTo: "support@votredomaine.com",
+  // ...
+};
+```
+
+---
+
+## 📋 Architecture du Système de Vérification Email
+
+### Flow Utilisateur
+
+```
+1. Inscription (/register)
+   ↓
+2. API crée User + Business + génère token
+   ↓
+3. Email envoyé avec lien /verify-email?token=xxx
+   ↓
+4. Page /check-email affichée
+   ↓
+5. Utilisateur clique sur le lien dans l'email
+   ↓
+6. Token vérifié → emailVerified = NOW()
+   ↓
+7. Redirection /login?verified=true
+   ↓
+8. Connexion → Accès au dashboard autorisé
+```
+
+### Fichiers Impactés
+
+| Fichier                            | Rôle                                                       |
+| ---------------------------------- | ---------------------------------------------------------- |
+| `prisma/schema.prisma`             | Champs `verificationToken`, `tokenExpiry`, `emailVerified` |
+| `lib/email.ts`                     | Service Resend + templates HTML                            |
+| `lib/env.ts`                       | Validation `RESEND_API_KEY`                                |
+| `app/actions/auth.ts`              | Server Actions pour tokens                                 |
+| `app/api/auth/register/route.ts`   | Génération token à l'inscription                           |
+| `app/(auth)/verify-email/page.tsx` | Page de validation token                                   |
+| `app/(auth)/check-email/page.tsx`  | Page post-inscription                                      |
+| `app/(dashboard)/layout.tsx`       | Blocage accès si non vérifié                               |
+| `components/auth/RegisterForm.tsx` | Redirection vers /check-email                              |
+| `components/auth/LoginForm.tsx`    | Messages vérification                                      |
+
+### Sécurité
+
+✅ **Mesures de sécurité implémentées** :
+
+- Token cryptographiquement sécurisé (32 bytes = 64 caractères hex)
+- Expiration 24h
+- One-time use (invalidé après utilisation)
+- Unique constraint en base
+- Rate limiting basique (1 renvoi/heure max)
+- Filtrage `businessId` pour multi-tenancy
+
+---
+
+## 🧪 Mode Développement (Sans Resend)
 
 Décommentez le code dans `/app/api/quotes/[id]/send-email/route.ts` :
 
