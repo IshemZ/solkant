@@ -2,11 +2,27 @@
 
 Documentation des agents spécialisés pour le développement de Solkant.
 
+> **🔄 Refactorisation 9 décembre 2025** : Architecture optimisée pour éliminer les redondances et clarifier les responsabilités. Voir [ARCHITECTURE_REFACTORING.md](./ARCHITECTURE_REFACTORING.md) pour détails complets.
+
+---
+
 ## 📋 Vue d'ensemble
 
-Ce dossier contient **9 agents Copilot spécialisés** conçus pour orchestrer le développement de Solkant de manière experte et structurée. Chaque agent couvre un domaine spécifique du stack technique.
+Ce dossier contient **9 agents Copilot spécialisés** avec une architecture **SoC (Separation of Concerns)** pour une interopérabilité optimale.
 
-> **Configuration Partagée** : Consultez [\_shared-config.md](./_shared-config.md) pour les configurations communes (variables d'env, commandes Prisma, patterns réutilisables).
+```
+┌─────────────────────────────────────────────┐
+│ Frontend Layer    → ARCHITECTURE_NEXTJS     │
+│   ↓ délègue mutations à...                 │
+│ Business Layer    → DATA_SECURITY           │
+│   ↓ délègue queries à...                   │
+│ Data Layer        → DATABASE_PRISMA         │
+│                                             │
+│ Cross-cutting     → UX_UI, PAYMENTS, etc.  │
+└─────────────────────────────────────────────┘
+```
+
+> **Configuration Partagée** : Consultez [\_shared-config.md](./_shared-config.md) pour les configurations techniques (variables d'env, commandes Prisma).
 
 ---
 
@@ -18,341 +34,359 @@ Ce dossier contient **9 agents Copilot spécialisés** conçus pour orchestrer l
 
 **Quand l'utiliser** :
 
-- Demandes complexes nécessitant plusieurs domaines d'expertise
+- Demandes complexes nécessitant 3+ domaines d'expertise
 - Besoin d'une vue d'ensemble avant d'agir
-- Coordonner plusieurs modifications inter-dépendantes
+- Problèmes multi-couches (UI + DB + sécurité + performance)
 
 **Ce qu'il fait** :
 
 - Analyse la demande et identifie les domaines impactés
 - Crée un plan d'action structuré
-- Active les agents spécialisés au bon moment
+- Active les agents spécialisés dans le bon ordre
 - Fournit une checklist de vérification finale
 
-**Exemple d'utilisation** :
+**Exemple** :
 
 ```
-@orchestrateur Je veux ajouter un système de notifications
-par email quand un devis est accepté
+@orchestrateur Optimiser le dashboard : chargement lent (5s),
+problèmes de queries N+1, et ajouter des skeletons
 ```
 
 ---
 
 ### 2. 🏗️ **ARCHITECTURE_NEXTJS** (`architecture-nextjs.agent.md`)
 
-**Rôle** : Expert App Router, Server Components, performance
+**Rôle** : Expert Frontend - App Router, Server/Client Components, Performance UI
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Créer/modifier des routes Next.js
-- Optimiser les performances (streaming, Suspense)
-- Questions sur Server Actions vs API Routes
-- Organisation des composants (colocation)
-- Problèmes TypeScript/Next.js
+- ✅ Routing, layouts, route groups
+- ✅ Décision Server vs Client Components
+- ✅ Streaming, Suspense, code splitting
+- ✅ Colocation des composants feature-specific (`_components/`)
+- ✅ Data fetching patterns (lecture)
 
-**Ce qu'il fait** :
+**NE FAIT PAS** :
 
-- Guide sur les patterns Next.js 16 modernes
-- Optimise la structure de code
-- Résout les problèmes de Server/Client Components
-- Applique les meilleures pratiques App Router
+- ❌ Server Actions (mutations) → **DATA_SECURITY**
+- ❌ Validation Zod → **DATA_SECURITY**
+- ❌ Optimisation queries Prisma → **DATABASE_PRISMA**
+- ❌ Composants réutilisables (2+ features) → **UX_UI**
 
-**Exemple d'utilisation** :
+**Exemple** :
 
 ```
-@architecture-nextjs Comment implémenter du streaming
-pour une liste de devis avec 1000+ entrées ?
+@architecture-nextjs Comment structurer la nouvelle page
+/dashboard/rapports avec streaming pour 10k+ lignes ?
 ```
 
 ---
 
 ### 3. 🔒 **DATA_SECURITY** (`data-security.agent.md`)
 
-**Rôle** : Expert sécurité multi-tenant, validation Zod, Server Actions sécurisées
+**Rôle** : Expert Business Layer - Server Actions, Validation, Multi-Tenancy
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Créer/modifier des Server Actions avec validation
-- Questions de sécurité multi-tenant
-- Validation Zod (schemas, messages français)
-- Problèmes d'isolation de données
-- Guards d'accès, ownership checks
-- NextAuth JWT customization
+- ✅ **SEUL agent qui crée/modifie les Server Actions**
+- ✅ Validation Zod (schemas + runtime + messages français)
+- ✅ Multi-tenancy applicatif (filtrage `businessId` dans queries)
+- ✅ Auth guards (session NextAuth, JWT, ownership)
+- ✅ Structure de retour `{data, error}`
 
-**Ce qu'il fait** :
+**NE FAIT PAS** :
 
-- Vérifie que CHAQUE requête filtre par `businessId` (CRITIQUE)
-- Crée des validations Zod robustes avec messages français
-- Sécurise les Server Actions (auth, validation, ownership)
-- Gère les sessions NextAuth JWT
+- ❌ Modifier schema Prisma → **DATABASE_PRISMA**
+- ❌ Créer migrations → **DATABASE_PRISMA**
+- ❌ Optimiser indexes → **DATABASE_PRISMA**
+- ❌ Créer routes Next.js → **ARCHITECTURE_NEXTJS**
 
-**Exemple d'utilisation** :
-
-```
-@data-security J'ai une fuite de données : les clients
-d'un business apparaissent chez un autre salon
-```
-
-**Délègue à DATABASE_PRISMA** : Schema Prisma, migrations, optimisation DB
-
----
-
-### 4. 💳 **PAYMENTS** (`payments.agent.md`)
-
-**Rôle** : Expert Stripe (abonnements, checkout, webhooks)
-
-**Quand l'utiliser** :
-
-- Intégrer Stripe checkout
-- Gérer abonnements freemium (trial 30j → 9,99€/mois)
-- Configurer webhooks Stripe
-- Customer portal
-- Problèmes de paiement
-
-**Ce qu'il fait** :
-
-- Configure Stripe checkout sessions
-- Gère webhooks (signature verification, idempotence)
-- Implémente guards accès PRO
-- Synchronise statuts abonnement avec DB
-
-**Exemple d'utilisation** :
+**Exemple** :
 
 ```
-@payments Comment implémenter une période d'essai de 30 jours
-avec transition automatique vers abonnement payant ?
+@data-security Créer Server Action pour créer un devis
+avec validation des items et vérification du client ownership
 ```
 
 ---
 
-### 5. 🔍 **MONITORING** (`monitoring.agent.md`)
+### 4. 🗄️ **DATABASE_PRISMA** (`database-prisma.agent.md`)
 
-**Rôle** : Expert Sentry, Google Analytics, logging, observabilité
+**Rôle** : Expert Data Layer - Schema, Migrations, Optimisation Queries
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Configurer Sentry error tracking
-- Ajouter Google Analytics events
-- Déboguer erreurs en production
-- Performance monitoring
-- Alertes et notifications
+- ✅ Schema Prisma design et relations
+- ✅ Migrations (création, test, déploiement)
+- ✅ Indexes pour performance (`@@index([businessId])`)
+- ✅ Query optimization (N+1, select vs include, explain plans)
+- ✅ Transactions Prisma (`$transaction()`)
 
-**Ce qu'il fait** :
+**NE FAIT PAS** :
 
-- Configure Sentry (server/client/edge)
-- Capture erreurs avec contexte (tags, breadcrumbs)
-- Implémente Google Analytics 4
-- Crée dashboards et alertes
+- ❌ Server Actions complètes → **DATA_SECURITY**
+- ❌ Validation Zod → **DATA_SECURITY**
+- ❌ Filtrage applicatif `businessId` → **DATA_SECURITY**
+- ❌ UI/routing → **ARCHITECTURE_NEXTJS**
 
-**Exemple d'utilisation** :
+**Exemple** :
 
 ```
-@monitoring Comment tracker les conversions (sign-up, subscription)
-et capturer les erreurs Stripe avec contexte métier ?
-```
-
----
-
-### 6. 🧪 **TESTING** (`testing.agent.md`)
-
-**Rôle** : Expert Vitest, Testing Library, Playwright, qualité
-
-**Quand l'utiliser** :
-
-- Intégration/debug Stripe (abonnements)
-- Configuration Sentry (monitoring)
-- Problèmes OAuth Google
-- Webhooks (signature, idempotency)
-- Accessibilité (WCAG, A11y)
-- RGPD/cookies
-
-**Ce qu'il fait** :
-
-- Configure les intégrations SaaS
-- Debug les webhooks Stripe
-- Résout les problèmes OAuth
-- Garantit la conformité WCAG 2.1 AA
-
-**Exemple d'utilisation** :
-
-```text
-@saas-integrations Mon webhook Stripe renvoie une erreur
-"Invalid signature" en production
+@database-prisma La query getClients() est lente (2s)
+avec 10,000 clients, comment optimiser ?
 ```
 
 ---
 
-### 5. 🧪 **TESTING** (`testing.agent.md`)
+### 5. 🎨 **UX_UI** (`ux-ui.agent.md`)
 
-**Rôle** : Expert testing React/Next.js, garantie qualité
+**Rôle** : Expert Design System, Composants Réutilisables, Accessibilité
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Setup environnement de tests (Vitest, Playwright)
-- Écrire tests pour Server Actions
-- Tests de composants React
-- Validation des schémas Zod
-- Tests E2E
-- Améliorer la couverture de code
+- ✅ Design system (`/components/ui/` - shadcn/ui)
+- ✅ Composants partagés (`/components/shared/` - 2+ features)
+- ✅ Accessibilité WCAG 2.1 AA (ARIA, keyboard nav)
+- ✅ Loading states (skeletons, spinners, empty states)
+- ✅ Forms UX (error states, feedback utilisateur)
 
-**Ce qu'il fait** :
+**NE FAIT PAS** :
 
-- Configure stack de tests (Vitest + Testing Library)
-- Crée tests unitaires et d'intégration
-- Patterns de mock pour Prisma/NextAuth
-- Guide sur les tests de sécurité multi-tenant
-- Setup CI/CD pour tests automatiques
+- ❌ Composants feature-specific (1 feature) → **ARCHITECTURE_NEXTJS**
+- ❌ Routing/layouts → **ARCHITECTURE_NEXTJS**
+- ❌ Server Actions → **DATA_SECURITY**
 
-**Exemple d'utilisation** :
+**Règle de décision** :
 
-```text
-@testing Comment tester ma Server Action createClient()
-pour vérifier le filtrage businessId ?
+- 1 feature → `_components/` (ARCHITECTURE)
+- 2+ features → `/components/shared/` (UX_UI)
+
+**Exemple** :
+
+```
+@ux-ui Créer un composant ClientCard réutilisable
+utilisé dans /clients et /devis/nouveau
 ```
 
 ---
 
-### 6. 🎨 **UX_UI** (`ux-ui.agent.md`)
+### 6. 💳 **PAYMENTS** (`payments.agent.md`)
 
-**Rôle** : Expert design systems, accessibilité, composants réutilisables
+**Rôle** : Expert Stripe - Abonnements, Checkout, Webhooks
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Setup shadcn/ui et design system
-- Créer composants UI accessibles
-- Loading states et skeleton screens
-- Formulaires avec validation visuelle
-- Audit accessibilité WCAG 2.1 AA
-- Responsive design
-- Empty states et feedback utilisateur
+- ✅ Stripe checkout sessions
+- ✅ Abonnements freemium (trial 30j → 9,99€/mois)
+- ✅ Webhooks Stripe (signature, idempotence)
+- ✅ Customer portal
+- ✅ Guards accès PRO
 
-**Ce qu'il fait** :
+**Exemple** :
 
-- Guide sur l'installation et configuration shadcn/ui
-- Crée composants accessibles (A11y)
-- Implémente loading.tsx pour toutes les routes
-- Patterns UX pour SaaS (toasts, confirmations, etc.)
-- Audit contraste, navigation clavier, screen readers
-
-**Exemple d'utilisation** :
-
-```text
-@ux-ui Comment créer un formulaire accessible
-avec shadcn/ui et validation en temps réel ?
+```
+@payments Implémenter webhook Stripe pour sync
+statut abonnement après renouvellement automatique
 ```
 
 ---
 
-### 7. 📈 **SEO** (`seo.agent.md`)
+### 7. 🔍 **MONITORING** (`monitoring.agent.md`)
 
-**Rôle** : Expert SEO pour SaaS B2B français
+**Rôle** : Expert Sentry, Google Analytics, Observabilité
 
-**Quand l'utiliser** :
+**Responsabilité unique** :
 
-- Optimiser métadonnées pages marketing
-- Structurer contenu SEO (H1, H2, H3)
-- Créer FAQ avec schema.org
-- Améliorer référencement naturel
-- Rédiger contenu optimisé en français
-- Configurer sitemap et robots.txt
+- ✅ Configuration Sentry (server/client/edge)
+- ✅ Capture erreurs avec contexte (tags, breadcrumbs)
+- ✅ Google Analytics 4 (events, conversions)
+- ✅ Performance monitoring
+- ✅ Alertes et dashboards
 
-**Ce qu'il fait** :
+**Exemple** :
 
-- Optimise `metadata` Next.js pour SEO
-- Crée contenu ciblé (instituts de beauté)
-- Génère JSON-LD pour FAQPage, SoftwareApplication
-- Guide sur le maillage interne
-- Stratégies de mots-clés longue traîne
-
-**Exemple d'utilisation** :
-
-```text
-@seo Comment optimiser la page pricing pour le mot-clé
-"logiciel devis institut beauté" ?
+```
+@monitoring Capturer erreurs Server Actions dans Sentry
+avec contexte businessId et action name
 ```
 
 ---
 
-## 🚀 Comment utiliser les agents
+### 8. 🧪 **TESTING** (`testing.agent.md`)
 
-### Syntaxe dans GitHub Copilot Chat
+**Rôle** : Expert Testing - Vitest, Testing Library, Playwright
 
-```text
-@nom-agent Votre question ou demande
+**Responsabilité unique** :
+
+- ✅ Setup environnement tests (Vitest + Playwright)
+- ✅ Tests unitaires (Server Actions, validations Zod)
+- ✅ Tests intégration (composants React)
+- ✅ Tests E2E (Playwright - flows utilisateur)
+  **Exemple** :
+
 ```
-
-### Workflows recommandés
-
-#### Workflow 1 : Nouvelle fonctionnalité complète
-
-1. **@orchestrateur** : "Je veux ajouter un système de remises sur les devis"
-
-   - Il analyse et crée un plan
-   - Il identifie : DATA_SECURITY (schema), ARCHITECTURE_NEXTJS (UI), SAAS_INTEGRATIONS (si facturation)
-
-2. **@data-security** : "Créer le modèle Discount avec relation Quote"
-
-   - Migration Prisma
-   - Validation Zod
-
-3. **@architecture-nextjs** : "Créer l'UI pour appliquer une remise"
-   - Composant `DiscountForm`
-   - Server Action
-
-#### Workflow 2 : Bug de sécurité
-
-```text
-@data-security J'ai ce code dans getClients() :
-const clients = await prisma.client.findMany();
-Est-ce sécurisé ?
+@testing Créer tests unitaires pour Server Action createClient()
+avec validation businessId et ownership checks
 ```
-
-→ L'agent détectera immédiatement le problème de filtrage `businessId` manquant
-
-#### Workflow 3 : Optimisation performance
-
-```text
-@architecture-nextjs Ma page /dashboard/devis est lente
-avec 500+ devis. Comment optimiser ?
-```
-
-→ L'agent proposera : streaming, pagination, select partiel Prisma
-
-#### Workflow 4 : Intégration externe
-
-```text
-@saas-integrations Comment ajouter l'envoi d'emails
-via SendGrid quand un devis est créé ?
-```
-
-→ L'agent guidera l'intégration webhook-safe et RGPD-compliant
 
 ---
 
-## 📚 Cheat Sheet : Quel agent pour quelle question ?
+### 9. 📈 **SEO** (`seo.agent.md`)
 
-| Question                                      | Agent                  |
-| --------------------------------------------- | ---------------------- |
-| "Comment créer une nouvelle page dashboard ?" | `@architecture-nextjs` |
-| "Ajouter un champ au modèle Client"           | `@data-security`       |
-| "Corriger une fuite de données entre salons"  | `@data-security`       |
-| "Intégrer Stripe pour la facturation"         | `@saas-integrations`   |
-| "Mon webhook Stripe ne fonctionne pas"        | `@saas-integrations`   |
-| "Optimiser le chargement de la page"          | `@architecture-nextjs` |
-| "Sécuriser un endpoint d'API"                 | `@data-security`       |
-| "Configurer Google Analytics"                 | `@saas-integrations`   |
-| "Tâche complexe avec plusieurs aspects"       | `@orchestrateur`       |
-| "Rendre mon formulaire accessible"            | `@ux-ui`               |
-| "Server Component vs Client Component ?"      | `@architecture-nextjs` |
-| "Migration Prisma sécurisée"                  | `@data-security`       |
-| "Setup tests pour Server Actions"             | `@testing`             |
-| "Créer loading states et skeletons"           | `@ux-ui`               |
-| "Optimiser métadonnées pour SEO"              | `@seo`                 |
-| "Audit accessibilité WCAG"                    | `@ux-ui`               |
-| "Tester sécurité multi-tenant"                | `@testing`             |
-| "Rédiger FAQ optimisée pour le référencement" | `@seo`                 |
-| "Installer et configurer shadcn/ui"           | `@ux-ui`               |
-| "Tests E2E avec Playwright"                   | `@testing`             |
+**Rôle** : Expert SEO - Référencement Naturel pour SaaS B2B Français
+
+**Responsabilité unique** :
+
+- ✅ Métadonnées Next.js (`export const metadata`)
+- ✅ Contenu optimisé pages marketing (français)
+- ✅ Schema.org (FAQPage, SoftwareApplication)
+- ✅ FAQ SEO structurée
+- ✅ Maillage interne et sitemap
+
+**Exemple** :
+
+```
+@seo Optimiser la page pricing pour le mot-clé
+"logiciel devis institut beauté"
+```
+
+---
+
+## 📊 MATRICE DE DÉCISION RAPIDE
+
+### Quelle Question → Quel Agent ?
+
+| Demande Développeur                                         | Agent Principal     | Agents Collaborateurs                |
+| ----------------------------------------------------------- | ------------------- | ------------------------------------ |
+| Créer une nouvelle page dashboard                           | ARCHITECTURE_NEXTJS | → DATA_SECURITY (actions)            |
+| Créer/modifier une Server Action                            | DATA_SECURITY       | —                                    |
+| Ajouter un champ au schema Prisma                           | DATABASE_PRISMA     | → DATA_SECURITY (sync Zod)           |
+| Optimiser une query Prisma lente                            | DATABASE_PRISMA     | —                                    |
+| Créer un composant réutilisable (2+ features)               | UX_UI               | —                                    |
+| Page lente : UI + DB                                        | **ORCHESTRATEUR**   | → ARCHITECTURE + DATABASE_PRISMA     |
+| Intégrer Stripe checkout                                    | PAYMENTS            | → DATA_SECURITY (validation webhook) |
+| Corriger une fuite de données multi-tenant                  | DATA_SECURITY       | —                                    |
+| Configurer Sentry error tracking                            | MONITORING          | → DATA_SECURITY (wrapping actions)   |
+| Créer tests E2E pour flow de devis                          | TESTING             | —                                    |
+| Améliorer accessibilité formulaire                          | UX_UI               | —                                    |
+| Optimiser SEO page pricing                                  | SEO                 | —                                    |
+| Décider colocation composant (\_components/ vs /components) | ARCHITECTURE_NEXTJS | → UX_UI si réutilisable              |
+| Ajouter validation Zod sur formulaire                       | DATA_SECURITY       | —                                    |
+| Problème de N+1 queries                                     | DATABASE_PRISMA     | —                                    |
+
+### Indicateurs pour ORCHESTRATEUR
+
+Activer l'**ORCHESTRATEUR** quand :
+
+- ✅ La demande touche **3+ domaines** différents
+- ✅ Besoin d'une **vue d'ensemble** avant d'agir
+- ✅ Risque de **conflit** entre agents (ex: qui optimise quoi ?)
+- ✅ Problème **multi-couches** (UI + DB + sécurité)
+
+**Exemples** :
+
+- "Optimiser le dashboard qui charge en 5s" → UI (streaming) + DB (N+1) + UX (skeletons)
+- "Ajouter système de notifications email" → Architecture (routing) + Security (actions) + Integrations (SendGrid)
+
+---
+
+## 🚀 Workflows Recommandés
+
+### Workflow 1 : Nouvelle Fonctionnalité Complète
+
+**Demande** : "Ajouter un système de remises sur les devis"
+
+```
+1. @orchestrateur Analyser la demande
+   → Plan : Schema DB, Validation, UI, Tests
+
+2. @database-prisma Créer modèle Discount + migration
+
+3. @data-security Créer schéma Zod + Server Actions
+   - applyDiscount(quoteId, discountPercent)
+   - removeDiscount(quoteId)
+
+4. @architecture-nextjs Intégrer dans UI devis
+   - Formulaire application remise
+   - Affichage prix réduit
+
+5. @testing Tests pour logique remise
+   - Validation pourcentage (0-100)
+   - Multi-tenancy (ownership quote)
+```
+
+### Workflow 2 : Bug de Sécurité
+
+**Symptôme** : "Les clients d'un salon apparaissent chez un autre"
+
+```
+1. @data-security Analyser Server Action getClients()
+   → Détection : businessId filter manquant
+
+2. Fix immédiat :
+   ✅ Ajouter where: { businessId: session.user.businessId }
+
+3. @testing Créer test de régression
+   - Vérifier isolation multi-tenant
+```
+
+### Workflow 3 : Optimisation Performance
+
+**Symptôme** : "Page /dashboard/devis lente (3s de chargement)"
+
+```
+1. @orchestrateur Analyse multi-couches
+
+2. @database-prisma Optimiser queries
+   - Index sur businessId + createdAt
+   - Pagination cursor-based
+   - Select limité aux champs nécessaires
+
+3. @architecture-nextjs Implémenter streaming
+   - Suspense boundary
+   - loading.tsx avec skeleton
+
+4. @ux-ui Créer skeleton screens
+   - QuotesListSkeleton réutilisable
+```
+
+---
+
+## 🎓 Guide de Délégation
+
+### Comment Savoir Si Je Dois Déléguer ?
+
+Chaque agent a une section **"🚦 CHECKLIST : DOIS-JE DÉLÉGUER ?"** avec :
+
+#### Exemple dans ARCHITECTURE_NEXTJS
+
+```markdown
+- [ ] Besoin de créer une **Server Action** (mutation) ? → DATA_SECURITY
+- [ ] Besoin de **validation Zod** ? → DATA_SECURITY
+- [ ] Besoin de modifier le **schema Prisma** ? → DATABASE_PRISMA
+- [ ] Query Prisma **lente** ? → DATABASE_PRISMA
+```
+
+#### Exemple dans DATA_SECURITY
+
+```markdown
+- [ ] Besoin de **modifier le schema** Prisma ? → DATABASE_PRISMA
+- [ ] Query Prisma **lente** (performance) ? → DATABASE_PRISMA
+- [ ] Besoin de créer une **route Next.js** ? → ARCHITECTURE_NEXTJS
+- [ ] Problème **multi-couches** ? → ORCHESTRATEUR
+```
+
+### Phrases de Délégation Standardisées
+
+Dans chaque agent :
+
+> "Pour [action spécifique], consultez l'agent **[NOM_AGENT]** qui gère [responsabilité]."
+
+**Exemples** :
+
+- "Pour créer la Server Action sécurisée, consultez l'agent **DATA_SECURITY**."
+- "Pour optimiser cette query, consultez l'agent **DATABASE_PRISMA**."
+- "Pour créer ce composant réutilisable, consultez l'agent **UX_UI**."
 
 ---
 
