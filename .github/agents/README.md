@@ -4,13 +4,13 @@ Documentation des agents spécialisés pour le développement de Solkant.
 
 ## 📋 Vue d'ensemble
 
-Ce dossier contient **7 agents Copilot spécialisés** conçus pour orchestrer le développement de Solkant de manière experte et structurée. Chaque agent couvre un domaine spécifique du stack technique.
+Ce dossier contient **9 agents Copilot spécialisés** conçus pour orchestrer le développement de Solkant de manière experte et structurée. Chaque agent couvre un domaine spécifique du stack technique.
 
-> **Configuration Partagée** : Consultez [\_shared-config.md](./_shared-config.md) pour les configurations communes (variables d'env, commandes Prisma, conventions de code).
+> **Configuration Partagée** : Consultez [\_shared-config.md](./_shared-config.md) pour les configurations communes (variables d'env, commandes Prisma, patterns réutilisables).
 
 ---
 
-## 🎯 Les 7 Agents
+## 🎯 Les 9 Agents
 
 ### 1. 🎭 **ORCHESTRATEUR** (`orchestrateur.agent.md`)
 
@@ -68,23 +68,23 @@ pour une liste de devis avec 1000+ entrées ?
 
 ### 3. 🔒 **DATA_SECURITY** (`data-security.agent.md`)
 
-**Rôle** : Expert multi-tenancy, Prisma, validation Zod, sécurité
+**Rôle** : Expert sécurité multi-tenant, validation Zod, Server Actions sécurisées
 
 **Quand l'utiliser** :
 
-- Modifier le schema Prisma
-- Créer/modifier des Server Actions avec DB
+- Créer/modifier des Server Actions avec validation
 - Questions de sécurité multi-tenant
-- Validation Zod
-- Migrations de base de données
+- Validation Zod (schemas, messages français)
 - Problèmes d'isolation de données
+- Guards d'accès, ownership checks
+- NextAuth JWT customization
 
 **Ce qu'il fait** :
 
 - Vérifie que CHAQUE requête filtre par `businessId` (CRITIQUE)
-- Guide sur le design de schémas Prisma
-- Crée des validations Zod robustes
-- Sécurise l'authentification NextAuth
+- Crée des validations Zod robustes avec messages français
+- Sécurise les Server Actions (auth, validation, ownership)
+- Gère les sessions NextAuth JWT
 
 **Exemple d'utilisation** :
 
@@ -93,11 +93,69 @@ pour une liste de devis avec 1000+ entrées ?
 d'un business apparaissent chez un autre salon
 ```
 
+**Délègue à DATABASE_PRISMA** : Schema Prisma, migrations, optimisation DB
+
 ---
 
-### 4. 💳 **SAAS_INTEGRATIONS** (`saas-integrations.agent.md`)
+### 4. 💳 **PAYMENTS** (`payments.agent.md`)
 
-**Rôle** : Expert Stripe, Sentry, OAuth, webhooks, accessibilité
+**Rôle** : Expert Stripe (abonnements, checkout, webhooks)
+
+**Quand l'utiliser** :
+
+- Intégrer Stripe checkout
+- Gérer abonnements freemium (trial 30j → 9,99€/mois)
+- Configurer webhooks Stripe
+- Customer portal
+- Problèmes de paiement
+
+**Ce qu'il fait** :
+
+- Configure Stripe checkout sessions
+- Gère webhooks (signature verification, idempotence)
+- Implémente guards accès PRO
+- Synchronise statuts abonnement avec DB
+
+**Exemple d'utilisation** :
+
+```
+@payments Comment implémenter une période d'essai de 30 jours
+avec transition automatique vers abonnement payant ?
+```
+
+---
+
+### 5. 🔍 **MONITORING** (`monitoring.agent.md`)
+
+**Rôle** : Expert Sentry, Google Analytics, logging, observabilité
+
+**Quand l'utiliser** :
+
+- Configurer Sentry error tracking
+- Ajouter Google Analytics events
+- Déboguer erreurs en production
+- Performance monitoring
+- Alertes et notifications
+
+**Ce qu'il fait** :
+
+- Configure Sentry (server/client/edge)
+- Capture erreurs avec contexte (tags, breadcrumbs)
+- Implémente Google Analytics 4
+- Crée dashboards et alertes
+
+**Exemple d'utilisation** :
+
+```
+@monitoring Comment tracker les conversions (sign-up, subscription)
+et capturer les erreurs Stripe avec contexte métier ?
+```
+
+---
+
+### 6. 🧪 **TESTING** (`testing.agent.md`)
+
+**Rôle** : Expert Vitest, Testing Library, Playwright, qualité
 
 **Quand l'utiliser** :
 
