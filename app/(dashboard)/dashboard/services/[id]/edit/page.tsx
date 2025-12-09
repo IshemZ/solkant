@@ -5,13 +5,43 @@ import { authOptions } from "@/lib/auth";
 import ServiceForm from "../../_components/ServiceForm";
 import prisma from "@/lib/prisma";
 
-export const metadata: Metadata = {
-  title: "Modifier service - Solkant",
-  description: "Modifier les informations d'un service",
-};
-
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
+  const { id } = await params;
+  const session = await getServerSession(authOptions);
+
+  if (!session?.user?.businessId) {
+    return {
+      title: "Accès refusé | Solkant",
+      description: "Vous devez être connecté pour accéder à cette page.",
+    };
+  }
+
+  const service = await prisma.service.findFirst({
+    where: {
+      id,
+      businessId: session.user.businessId,
+    },
+  });
+
+  if (!service) {
+    return {
+      title: "Service introuvable | Solkant",
+      description: "Ce service n'existe pas ou n'est plus accessible.",
+    };
+  }
+
+  return {
+    title: `Modifier ${service.name} | Solkant`,
+    description: `Modification du service ${
+      service.name
+    } - ${service.price.toFixed(2)} € - ${service.duration} min`,
+  };
 }
 
 export default async function EditServicePage({ params }: PageProps) {
