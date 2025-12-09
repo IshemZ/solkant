@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { stripe, STRIPE_PRICE_ID_PRO } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
+import { headers } from "next/headers";
 
 export async function createCheckoutSession() {
   try {
@@ -43,7 +44,13 @@ export async function createCheckoutSession() {
       });
     }
 
-    // 4. Créer la session Checkout
+    // 4. Obtenir l'URL de base
+    const headersList = await headers();
+    const host = headersList.get("host") || "";
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const baseUrl = `${protocol}://${host}`;
+
+    // 5. Créer la session Checkout
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: "subscription",
@@ -54,8 +61,8 @@ export async function createCheckoutSession() {
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?checkout=success`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/pricing?checkout=cancel`,
+      success_url: `${baseUrl}/dashboard/abonnement?checkout=success`,
+      cancel_url: `${baseUrl}/dashboard/abonnement?checkout=cancel`,
       metadata: {
         businessId: business.id,
         userId: session.user.id,
@@ -157,10 +164,16 @@ export async function createCustomerPortalSession() {
       return { error: "Aucun compte Stripe trouvé" };
     }
 
+    // Obtenir l'URL de base
+    const headersList = await headers();
+    const host = headersList.get("host") || "";
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+    const baseUrl = `${protocol}://${host}`;
+
     // Créer une session de portail client
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/abonnement`,
+      return_url: `${baseUrl}/dashboard/abonnement`,
     });
 
     return { url: portalSession.url };
