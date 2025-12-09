@@ -196,3 +196,16 @@ model WebhookEvent {
   @@index([eventId])
   @@map("webhook_events")
 }
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  code      String   // Code OTP à 6 chiffres
+  expiresAt DateTime // Validité : 15 minutes
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([code])
+  @@map("password_reset_tokens")
+}

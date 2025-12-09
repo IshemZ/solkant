@@ -20,7 +20,7 @@ export {
   validateOrThrow,
   validateOrNull,
   type ActionResponse,
-} from './helpers'
+} from "./helpers";
 
 // Authentication
 export {
@@ -28,7 +28,15 @@ export {
   registerSchema,
   type LoginInput,
   type RegisterInput,
-} from './auth'
+} from "./auth";
+
+// Password Reset
+export {
+  requestPasswordResetSchema,
+  resetPasswordWithOTPSchema,
+  type RequestPasswordResetInput,
+  type ResetPasswordWithOTPInput,
+} from "./password-reset";
 
 // Business
 export {
@@ -36,7 +44,7 @@ export {
   updateBusinessSchema,
   type CreateBusinessInput,
   type UpdateBusinessInput,
-} from './business'
+} from "./business";
 
 // Client
 export {
@@ -44,7 +52,7 @@ export {
   updateClientSchema,
   type CreateClientInput,
   type UpdateClientInput,
-} from './client'
+} from "./client";
 
 // Service
 export {
@@ -54,7 +62,7 @@ export {
   type CreateServiceInput,
   type UpdateServiceInput,
   type ServiceCategory,
-} from './service'
+} from "./service";
 
 // Quote
 export {
@@ -68,4 +76,4 @@ export {
   type UpdateQuoteStatusInput,
   type QuoteItemInput,
   type QuoteStatus,
-} from './quote'
+} from "./quote";

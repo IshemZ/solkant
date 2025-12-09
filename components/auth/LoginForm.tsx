@@ -3,6 +3,7 @@
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 interface LoginFormProps {
   initialError?: string;
@@ -14,6 +15,7 @@ function LoginFormContent({ initialError }: LoginFormProps) {
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const verified = searchParams.get("verified");
   const errorParam = searchParams.get("error");
+  const resetParam = searchParams.get("reset");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,6 +26,8 @@ function LoginFormContent({ initialError }: LoginFormProps) {
   const successMessage =
     verified === "true"
       ? "✅ Email vérifié ! Vous pouvez maintenant vous connecter."
+      : resetParam === "success"
+      ? "✅ Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter."
       : "";
 
   // Afficher message d'erreur si email non vérifié
@@ -128,6 +132,14 @@ function LoginFormContent({ initialError }: LoginFormProps) {
             placeholder="••••••••"
             disabled={isLoading}
           />
+          <div className="mt-2 text-right">
+            <Link
+              href="/mot-de-passe-oublie"
+              className="text-sm text-primary hover:underline"
+            >
+              Mot de passe oublié ?
+            </Link>
+          </div>
         </div>
 
         <button

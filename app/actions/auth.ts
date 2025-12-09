@@ -326,3 +326,191 @@ export async function checkEmailVerificationStatus(): Promise<{
     return { isVerified: false, email: null };
   }
 }
+
+/**
+ * Génère un code OTP à 6 chiffres et envoie l'email de réinitialisation
+ *
+ * @param email - Email de l'utilisateur
+ * @returns Résultat de l'opération
+ *
+ * @security
+ * - Retourne succès même si email n'existe pas (protection contre l'énumération)
+ * - Token valide 15 minutes
+ * - Invalide les anciens tokens non utilisés
+ *
+ * @example
+ * ```typescript
+ * const result = await requestPasswordReset({ email: 'user@example.com' });
+ * if (result.success) {
+ *   // Email envoyé (ou pas, mais on ne révèle pas l'information)
+ * }
+ * ```
+ */
+export async function requestPasswordReset(input: {
+  email: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { email } = input;
+
+    // Vérifier si l'utilisateur existe
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase().trim() },
+      select: { id: true, email: true, name: true },
+    });
+
+    // IMPORTANT : Retourner succès même si utilisateur n'existe pas
+    // (protection contre l'énumération d'emails)
+    if (!user) {
+      // Simuler un délai pour éviter le timing attack
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      return { success: true };
+    }
+
+    // Invalider tous les anciens tokens non utilisés pour cet email
+    await prisma.passwordResetToken.updateMany({
+      where: {
+        email: user.email,
+        used: false,
+      },
+      data: {
+        used: true,
+      },
+    });
+
+    // Générer un code OTP à 6 chiffres
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Créer le token avec expiration de 15 minutes
+    const expiresAt = new Date();
+    expiresAt.setMinutes(expiresAt.getMinutes() + 15);
+
+    await prisma.passwordResetToken.create({
+      data: {
+        email: user.email,
+        code,
+        expiresAt,
+      },
+    });
+
+    // TODO: Envoyer l'email avec le code OTP
+    // Pour l'instant, logger en développement
+    if (process.env.NODE_ENV === "development") {
+      console.log(
+        `[DEV] Code OTP pour ${user.email}: ${code} (expire dans 15 min)`
+      );
+    }
+
+    // En production, utiliser sendEmail de lib/email.ts
+    // await sendEmail({
+    //   to: user.email,
+    //   subject: "Réinitialisation de votre mot de passe - Solkant",
+    //   html: `Votre code de vérification : <strong>${code}</strong>`,
+    // });
+
+    return { success: true };
+  } catch (error) {
+    console.error("[requestPasswordReset]", error);
+    Sentry.captureException(error, {
+      tags: { action: "requestPasswordReset" },
+      extra: { email: input.email },
+    });
+    return {
+      success: false,
+      error: "Une erreur est survenue. Veuillez réessayer.",
+    };
+  }
+}
+
+/**
+ * Réinitialise le mot de passe avec un code OTP
+ *
+ * @param input - Email, code OTP et nouveau mot de passe
+ * @returns Résultat de l'opération
+ *
+ * @security
+ * - Vérifie la validité temporelle du code (15 min)
+ * - Invalide le code après utilisation
+ * - Hash bcrypt du nouveau mot de passe
+ *
+ * @example
+ * ```typescript
+ * const result = await resetPasswordWithOTP({
+ *   email: 'user@example.com',
+ *   code: '123456',
+ *   newPassword: 'NewPass123',
+ *   confirmPassword: 'NewPass123'
+ * });
+ * ```
+ */
+export async function resetPasswordWithOTP(input: {
+  email: string;
+  code: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<{ success: boolean; error?: string }> {
+  try {
+    const { email, code, newPassword } = input;
+
+    // Récupérer le token valide
+    const token = await prisma.passwordResetToken.findFirst({
+      where: {
+        email: email.toLowerCase().trim(),
+        code,
+        used: false,
+        expiresAt: {
+          gte: new Date(), // Token non expiré
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (!token) {
+      return {
+        success: false,
+        error: "Code invalide ou expiré. Veuillez demander un nouveau code.",
+      };
+    }
+
+    // Récupérer l'utilisateur
+    const user = await prisma.user.findUnique({
+      where: { email: token.email },
+    });
+
+    if (!user) {
+      return {
+        success: false,
+        error: "Utilisateur introuvable.",
+      };
+    }
+
+    // Hasher le nouveau mot de passe
+    const bcrypt = await import("bcryptjs");
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+
+    // Mettre à jour le mot de passe et invalider le token
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: user.id },
+        data: { password: hashedPassword },
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: token.id },
+        data: { used: true },
+      }),
+    ]);
+
+    return { success: true };
+  } catch (error) {
+    console.error("[resetPasswordWithOTP]", error);
+    Sentry.captureException(error, {
+      tags: { action: "resetPasswordWithOTP" },
+      extra: { email: input.email },
+    });
+    return {
+      success: false,
+      error: "Une erreur est survenue. Veuillez réessayer.",
+    };
+  }
+}

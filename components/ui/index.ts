@@ -49,6 +49,16 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
+export {
+  useFormField,
+  Form,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormField as FormFieldRHF,
+  FormMessage,
+} from "./form";
 export { Input } from "./input";
 export { Label } from "./label";
 export {
