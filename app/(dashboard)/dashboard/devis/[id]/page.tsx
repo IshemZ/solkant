@@ -27,9 +27,9 @@ export async function generateMetadata({
     title: `Devis ${quote.quoteNumber} - ${clientName} | Solkant`,
     description: `Devis ${
       quote.quoteNumber
-    } pour ${clientName} - Montant: ${quote.totalAmount.toFixed(
-      2
-    )} € - Statut: ${quote.status}`,
+    } pour ${clientName} - Montant: ${quote.total.toFixed(2)} € - Statut: ${
+      quote.status
+    }`,
   };
 }
 
