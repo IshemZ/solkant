@@ -27,6 +27,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "5 astuces pour optimiser la gestion de vos clients",
+    description:
+      "Organisez votre fichier clients et fidélisez votre clientèle.",
+    images: ["https://solkant.com/images/og/article-gestion-clients.png"],
+  },
   alternates: {
     canonical:
       "https://solkant.com/blog/optimiser-gestion-clients-institut-beaute",

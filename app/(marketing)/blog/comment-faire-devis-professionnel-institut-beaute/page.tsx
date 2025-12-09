@@ -27,6 +27,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Comment faire un devis professionnel pour institut de beauté",
+    description:
+      "Guide complet 2025 : mentions obligatoires, calculs, présentation.",
+    images: ["https://solkant.com/images/og/article-devis.png"],
+  },
   alternates: {
     canonical:
       "https://solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",

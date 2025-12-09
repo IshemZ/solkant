@@ -28,6 +28,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Choisir le bon logiciel de devis pour institut de beauté",
+    description:
+      "8 critères essentiels pour choisir l'outil parfait. Guide complet.",
+    images: ["https://solkant.com/images/og/article-logiciel.png"],
+  },
   alternates: {
     canonical:
       "https://solkant.com/blog/choisir-logiciel-devis-institut-beaute",

@@ -8,6 +8,17 @@ export interface BlogArticle {
   date: string;
   readTime: string;
   category: string;
+  author: {
+    name: string;
+    role?: string;
+  };
+  publishedTime: string; // Format ISO 8601 pour SEO
+  modifiedTime?: string; // Format ISO 8601 pour SEO
+  image: {
+    url: string;
+    alt: string;
+  };
+  keywords?: string[]; // Mots-clés SEO
 }
 
 export const blogArticles: BlogArticle[] = [
@@ -19,6 +30,22 @@ export const blogArticles: BlogArticle[] = [
     date: "2024-12-01",
     readTime: "8 min",
     category: "Guides",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2024-12-01T09:00:00Z",
+    modifiedTime: "2024-12-01T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/article-devis.png",
+      alt: "Comment faire un devis professionnel pour votre institut de beauté",
+    },
+    keywords: [
+      "devis institut beauté",
+      "devis professionnel",
+      "salon esthétique",
+      "mentions obligatoires devis",
+    ],
   },
   {
     slug: "erreurs-eviter-devis-institut-beaute",
@@ -28,6 +55,22 @@ export const blogArticles: BlogArticle[] = [
     date: "2024-12-06",
     readTime: "7 min",
     category: "Conseils",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2024-12-06T10:00:00Z",
+    modifiedTime: "2024-12-06T10:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/article-erreurs-devis.png",
+      alt: "Les erreurs à éviter dans vos devis beauté",
+    },
+    keywords: [
+      "erreurs devis",
+      "devis beauté",
+      "conversion clients",
+      "gestion institut",
+    ],
   },
   {
     slug: "digitaliser-gestion-institut-beaute",
@@ -38,6 +81,22 @@ export const blogArticles: BlogArticle[] = [
     date: "2024-12-06",
     readTime: "9 min",
     category: "Transformation digitale",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2024-12-06T14:00:00Z",
+    modifiedTime: "2024-12-06T14:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/article-digitalisation.png",
+      alt: "Digitaliser la gestion de votre institut de beauté",
+    },
+    keywords: [
+      "digitalisation institut beauté",
+      "transformation digitale",
+      "logiciel gestion salon",
+      "modernisation",
+    ],
   },
   {
     slug: "choisir-logiciel-devis-institut-beaute",
@@ -47,6 +106,22 @@ export const blogArticles: BlogArticle[] = [
     date: "2024-11-28",
     readTime: "6 min",
     category: "Conseils",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2024-11-28T09:00:00Z",
+    modifiedTime: "2024-11-28T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/article-choisir-logiciel.png",
+      alt: "Comment choisir le bon logiciel de devis pour votre institut",
+    },
+    keywords: [
+      "logiciel devis",
+      "choisir logiciel",
+      "institut beauté",
+      "comparatif",
+    ],
   },
   {
     slug: "optimiser-gestion-clients-institut-beaute",
@@ -56,5 +131,21 @@ export const blogArticles: BlogArticle[] = [
     date: "2024-11-25",
     readTime: "5 min",
     category: "Organisation",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2024-11-25T09:00:00Z",
+    modifiedTime: "2024-11-25T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/article-gestion-clients.png",
+      alt: "5 astuces pour optimiser la gestion de vos clients",
+    },
+    keywords: [
+      "gestion clients",
+      "fichier clients",
+      "fidélisation",
+      "organisation institut",
+    ],
   },
 ];

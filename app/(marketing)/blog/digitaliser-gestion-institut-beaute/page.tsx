@@ -27,6 +27,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pourquoi digitaliser votre institut de beauté en 2025",
+    description:
+      "7 raisons essentielles de passer au numérique. Guide complet.",
+    images: ["https://solkant.com/images/og/article-digitalisation.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/blog/digitaliser-gestion-institut-beaute",
   },

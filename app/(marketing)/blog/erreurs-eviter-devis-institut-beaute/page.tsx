@@ -27,6 +27,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "10 erreurs fatales à éviter dans vos devis beauté",
+    description:
+      "Les pièges qui font fuir vos clients et comment les corriger.",
+    images: ["https://solkant.com/images/og/article-erreurs-devis.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
   },

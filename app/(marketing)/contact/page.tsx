@@ -23,6 +23,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Solkant – Nous sommes là pour vous",
+    description:
+      "Contactez notre équipe. Nous répondons rapidement à vos questions.",
+    images: ["https://solkant.com/images/og/contact.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/contact",
   },

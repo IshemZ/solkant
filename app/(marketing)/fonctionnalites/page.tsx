@@ -24,6 +24,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Fonctionnalités Solkant – Outil complet pour institut",
+    description:
+      "Gestion de devis, clients, services, PDF élégants pour votre institut.",
+    images: ["https://solkant.com/images/og/features.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/fonctionnalites",
   },

@@ -25,6 +25,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Blog Solkant – Guides pour instituts de beauté",
+    description:
+      "Conseils d'experts pour optimiser la gestion de votre institut.",
+    images: ["https://solkant.com/images/og/blog.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/blog",
   },

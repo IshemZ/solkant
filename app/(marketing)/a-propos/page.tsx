@@ -23,6 +23,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "À propos de Solkant – Notre mission",
+    description:
+      "Un outil pensé pour simplifier la gestion des instituts de beauté.",
+    images: ["https://solkant.com/images/og/about.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/a-propos",
   },

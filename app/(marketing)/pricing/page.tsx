@@ -24,6 +24,13 @@ export const metadata: Metadata = {
       },
     ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tarifs Solkant – Plans pour instituts de beauté",
+    description:
+      "Plans tarifaires transparents pour votre institut. Commencez gratuitement.",
+    images: ["https://solkant.com/images/og/pricing.png"],
+  },
   alternates: {
     canonical: "https://solkant.com/pricing",
   },
@@ -32,6 +39,58 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background">
+      {/* Schema.org Product JSON-LD */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Product",
+            name: "Solkant - Logiciel de devis pour instituts de beauté",
+            description:
+              "Logiciel SaaS de création de devis pour instituts de beauté, salons d'esthétique et spas. Gestion clients, catalogue de services et génération de PDF professionnels.",
+            image: "https://solkant.com/images/og/pricing.png",
+            brand: {
+              "@type": "Brand",
+              name: "Solkant",
+            },
+            offers: [
+              {
+                "@type": "Offer",
+                name: "Plan Gratuit",
+                price: "0",
+                priceCurrency: "EUR",
+                availability: "https://schema.org/InStock",
+                url: "https://solkant.com/pricing",
+                description:
+                  "Plan gratuit pour découvrir Solkant : jusqu'à 10 devis/mois, gestion clients illimitée, catalogue de services, génération PDF.",
+              },
+              {
+                "@type": "Offer",
+                name: "Plan Pro",
+                price: "19",
+                priceCurrency: "EUR",
+                availability: "https://schema.org/InStock",
+                url: "https://solkant.com/pricing",
+                priceSpecification: {
+                  "@type": "UnitPriceSpecification",
+                  price: "19",
+                  priceCurrency: "EUR",
+                  unitText: "MONTH",
+                },
+                description:
+                  "Plan professionnel pour instituts : devis illimités, personnalisation avancée, statistiques, support prioritaire.",
+              },
+            ],
+            aggregateRating: {
+              "@type": "AggregateRating",
+              ratingValue: "5",
+              ratingCount: "1",
+            },
+          }),
+        }}
+      />
+
       {/* Navigation */}
       <nav className="border-b border-foreground/10">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
