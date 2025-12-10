@@ -132,7 +132,7 @@ model Service {
 
 model Quote {
   id          String      @id @default(cuid())
-  quoteNumber String      @unique
+  quoteNumber String
   status      QuoteStatus @default(DRAFT)
   validUntil  DateTime?
   notes       String?
@@ -148,6 +148,7 @@ model Quote {
   business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
   client      Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
 
+  @@unique([businessId, quoteNumber])
   @@index([businessId])
   @@index([clientId])
   @@map("quotes")

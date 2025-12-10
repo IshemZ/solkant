@@ -95,7 +95,7 @@ async function generateQuoteNumber(businessId: string): Promise<string> {
   const year = new Date().getFullYear();
   const prefix = `DEVIS-${year}-`;
 
-  // Get the last quote number for this year
+  // Get the last quote number for this year AND business (properly ordered numerically)
   const lastQuote = await prisma.quote.findFirst({
     where: {
       businessId,
@@ -104,7 +104,10 @@ async function generateQuoteNumber(businessId: string): Promise<string> {
       },
     },
     orderBy: {
-      quoteNumber: "desc",
+      createdAt: "desc", // Use createdAt for reliable ordering
+    },
+    select: {
+      quoteNumber: true,
     },
   });
 
@@ -115,6 +118,71 @@ async function generateQuoteNumber(businessId: string): Promise<string> {
   }
 
   return `${prefix}${nextNumber.toString().padStart(3, "0")}`;
+}
+
+/**
+ * Create a quote with retry logic to handle race conditions on quoteNumber generation
+ * @param input Quote data
+ * @param businessId Business ID from session
+ * @param maxRetries Maximum number of retry attempts
+ */
+async function createQuoteWithRetry(
+  input: CreateQuoteInput,
+  businessId: string,
+  maxRetries = 3
+): Promise<any> {
+  const { items, ...quoteData } = input;
+
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      // Generate quote number
+      const quoteNumber = await generateQuoteNumber(businessId);
+
+      // Calculate totals
+      const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+      const total = subtotal - (quoteData.discount || 0);
+
+      // Create quote with items in a transaction
+      const quote = await prisma.quote.create({
+        data: {
+          ...quoteData,
+          quoteNumber,
+          subtotal,
+          total,
+          businessId,
+          items: {
+            create: items.map((item) => ({
+              serviceId: item.serviceId,
+              name: item.name,
+              description: item.description,
+              price: item.price,
+              quantity: item.quantity,
+              total: item.total,
+            })),
+          },
+        },
+        include: {
+          client: true,
+          items: true,
+        },
+      });
+
+      return quote;
+    } catch (error: any) {
+      // Si c'est une erreur de contrainte unique ET qu'il reste des tentatives
+      if (error.code === "P2002" && attempt < maxRetries) {
+        // Attendre un délai aléatoire entre 50-200ms avant de réessayer
+        await new Promise((resolve) =>
+          setTimeout(resolve, 50 + Math.random() * 150)
+        );
+        continue;
+      }
+      // Sinon, propager l'erreur
+      throw error;
+    }
+  }
+
+  throw new Error("Failed to create quote after maximum retries");
 }
 
 export async function createQuote(input: CreateQuoteInput) {
@@ -142,39 +210,11 @@ export async function createQuote(input: CreateQuoteInput) {
   }
 
   try {
-    const { items, ...quoteData } = validation.data;
-
-    // Generate quote number
-    const quoteNumber = await generateQuoteNumber(session.user.businessId);
-
-    // Calculate totals
-    const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-    const total = subtotal - (quoteData.discount || 0);
-
-    // Create quote with items in a transaction
-    const quote = await prisma.quote.create({
-      data: {
-        ...quoteData,
-        quoteNumber,
-        subtotal,
-        total,
-        businessId: session.user.businessId,
-        items: {
-          create: items.map((item) => ({
-            serviceId: item.serviceId,
-            name: item.name,
-            description: item.description,
-            price: item.price,
-            quantity: item.quantity,
-            total: item.total,
-          })),
-        },
-      },
-      include: {
-        client: true,
-        items: true,
-      },
-    });
+    // Use retry logic to handle race conditions
+    const quote = await createQuoteWithRetry(
+      validation.data,
+      session.user.businessId
+    );
 
     // Log d'audit pour traçabilité
     await auditLog({
