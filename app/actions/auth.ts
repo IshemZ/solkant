@@ -10,7 +10,7 @@
 import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
-import { sendVerificationEmail } from "@/lib/email";
+import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 import * as Sentry from "@sentry/nextjs";
 
@@ -384,7 +384,7 @@ export async function requestPasswordReset(input: {
     const expiresAt = new Date();
     expiresAt.setMinutes(expiresAt.getMinutes() + 15);
 
-    await prisma.passwordResetToken.create({
+    const createdToken = await prisma.passwordResetToken.create({
       data: {
         email: user.email,
         code,
@@ -392,20 +392,37 @@ export async function requestPasswordReset(input: {
       },
     });
 
-    // TODO: Envoyer l'email avec le code OTP
-    // Pour l'instant, logger en développement
+    // Envoyer l'email avec le code OTP
+    const emailResult = await sendPasswordResetEmail(
+      user.email,
+      user.name || "Utilisateur",
+      code
+    );
+
+    if (!emailResult.success) {
+      // Rollback : invalider le token si l'envoi échoue
+      await prisma.passwordResetToken.update({
+        where: { id: createdToken.id },
+        data: { used: true },
+      });
+
+      Sentry.captureException(new Error("Échec envoi email réinitialisation"), {
+        extra: { email: user.email, emailError: emailResult.error },
+      });
+
+      return {
+        success: false,
+        error:
+          "Impossible d'envoyer l'email de réinitialisation. Veuillez réessayer.",
+      };
+    }
+
+    // Logger en développement pour faciliter le test
     if (process.env.NODE_ENV === "development") {
       console.log(
         `[DEV] Code OTP pour ${user.email}: ${code} (expire dans 15 min)`
       );
     }
-
-    // En production, utiliser sendEmail de lib/email.ts
-    // await sendEmail({
-    //   to: user.email,
-    //   subject: "Réinitialisation de votre mot de passe - Solkant",
-    //   html: `Votre code de vérification : <strong>${code}</strong>`,
-    // });
 
     return { success: true };
   } catch (error) {
