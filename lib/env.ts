@@ -88,6 +88,14 @@ const envSchema = z.object({
     ),
 
   // ===== STRIPE (OPTIONAL) =====
+  ENABLE_PAYMENTS: z
+    .string()
+    .optional()
+    .transform((val) => val === "true")
+    .describe(
+      "Active les fonctionnalités de paiement Stripe (optionnel, défaut: false)"
+    ),
+
   STRIPE_SECRET_KEY: z
     .string()
     .regex(
@@ -338,7 +346,11 @@ export const features = {
   get stripePayments(): boolean {
     if (typeof window !== "undefined") return false; // Côté client
     const env = getEnv();
-    return !!(env.STRIPE_SECRET_KEY && env.STRIPE_PRICE_ID_PRO);
+    return !!(
+      env.ENABLE_PAYMENTS &&
+      env.STRIPE_SECRET_KEY &&
+      env.STRIPE_PRICE_ID_PRO
+    );
   },
 
   /** Rate limiting activé (Upstash Redis) */
@@ -455,6 +467,8 @@ NEXTAUTH_SECRET="" # Générer avec: openssl rand -base64 32
 
 # ===== STRIPE (OPTIONAL) =====
 # Stripe pour les paiements (obtenir sur https://stripe.com)
+# Active les paiements uniquement si ENABLE_PAYMENTS=true
+# ENABLE_PAYMENTS="false" # Passer à "true" pour activer les paiements
 # STRIPE_SECRET_KEY="sk_test_..." # ou sk_live_ pour production
 # STRIPE_PRICE_ID_PRO="price_..." # ID du produit abonnement Pro
 

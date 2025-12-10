@@ -7,6 +7,7 @@ import {
   createCustomerPortalSession,
 } from "@/app/actions/stripe";
 import { toast } from "sonner";
+import { features } from "@/lib/env";
 
 interface SubscriptionCardProps {
   type: "upgrade" | "downgrade" | "manage";
@@ -14,6 +15,7 @@ interface SubscriptionCardProps {
 
 export default function SubscriptionCard({ type }: SubscriptionCardProps) {
   const [loading, setLoading] = useState(false);
+  const paymentsEnabled = features.stripePayments;
 
   const handleAction = async () => {
     try {
@@ -54,6 +56,7 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
 
   const buttonText = () => {
     if (loading) return "Chargement...";
+    if (!paymentsEnabled) return "Bientôt disponible";
     if (type === "upgrade") return "Passer au plan Pro";
     if (type === "manage") return "Gérer l'abonnement";
     return "Rétrograder";
@@ -64,9 +67,14 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
   return (
     <Button
       onClick={handleAction}
-      disabled={loading}
+      disabled={loading || !paymentsEnabled}
       variant={buttonVariant}
       className={type === "upgrade" ? "w-full" : ""}
+      title={
+        !paymentsEnabled
+          ? "Les paiements seront bientôt disponibles"
+          : undefined
+      }
     >
       {buttonText()}
     </Button>
