@@ -1,7 +1,5 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
   createClientSchema,
@@ -13,48 +11,45 @@ import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
 
 export async function getClients() {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   try {
     const clients = await prisma.client.findMany({
-      where: { businessId: session.user.businessId },
+      where: { businessId },
       orderBy: { createdAt: "desc" },
     });
 
     return { data: clients };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "getClients", businessId: session.user.businessId },
+      tags: { action: "getClients", businessId },
     });
-    console.error("Error fetching clients:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching clients:", error);
+    }
+
     return { error: "Erreur lors de la récupération des clients" };
   }
 }
 
 export async function createClient(input: CreateClientInput) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId, userId } = validatedSession;
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -71,15 +66,15 @@ export async function createClient(input: CreateClientInput) {
     const client = await prisma.client.create({
       data: {
         ...validation.data,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.CLIENT_CREATED,
       level: AuditLevel.INFO,
-      userId: session.user.id,
-      businessId: session.user.businessId,
+      userId,
+      businessId,
       resourceId: client.id,
       resourceType: "Client",
       metadata: {
@@ -93,26 +88,26 @@ export async function createClient(input: CreateClientInput) {
     return { data: client };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "createClient", businessId: session.user.businessId },
+      tags: { action: "createClient", businessId },
       extra: { input: sanitized },
     });
-    console.error("Error creating client:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error creating client:", error);
+    }
+
     return { error: "Erreur lors de la création du client" };
   }
 }
 
 export async function updateClient(id: string, input: UpdateClientInput) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -129,7 +124,7 @@ export async function updateClient(id: string, input: UpdateClientInput) {
     const client = await prisma.client.update({
       where: {
         id,
-        businessId: session.user.businessId, // Tenant isolation
+        businessId, // Tenant isolation
       },
       data: validation.data,
     });
@@ -138,27 +133,33 @@ export async function updateClient(id: string, input: UpdateClientInput) {
     return { data: client };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "updateClient", businessId: session.user.businessId },
+      tags: { action: "updateClient", businessId },
       extra: { clientId: id, input: sanitized },
     });
-    console.error("Error updating client:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error updating client:", error);
+    }
+
     return { error: "Erreur lors de la mise à jour du client" };
   }
 }
 
 export async function deleteClient(id: string) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
+
+  const { businessId, userId } = validatedSession;
 
   try {
     // Récupérer les infos avant suppression
     const client = await prisma.client.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       select: { firstName: true, lastName: true, email: true },
     });
@@ -170,15 +171,15 @@ export async function deleteClient(id: string) {
     await prisma.client.delete({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.CLIENT_DELETED,
       level: AuditLevel.CRITICAL,
-      userId: session.user.id,
-      businessId: session.user.businessId,
+      userId,
+      businessId,
       resourceId: id,
       resourceType: "Client",
       metadata: {
@@ -192,10 +193,14 @@ export async function deleteClient(id: string) {
     return { success: true };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "deleteClient", businessId: session.user.businessId },
+      tags: { action: "deleteClient", businessId },
       extra: { clientId: id },
     });
-    console.error("Error deleting client:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error deleting client:", error);
+    }
+
     return { error: "Erreur lors de la suppression du client" };
   }
 }

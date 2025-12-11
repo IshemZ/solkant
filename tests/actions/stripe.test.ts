@@ -25,6 +25,9 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -52,6 +55,23 @@ describe("Stripe Server Actions", () => {
     },
   };
 
+  const mockUser = {
+    id: "user_123",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    city: null,
+    postalCode: null,
+    country: null,
+    tva: null,
+    updatedAt: new Date(),
+  };
+
   const mockBusiness = {
     id: "business_123",
     name: "Mon Institut",
@@ -65,11 +85,16 @@ describe("Stripe Server Actions", () => {
     userId: "user_123",
     stripeCustomerId: null,
     stripeSubscriptionId: null,
+    stripePriceId: null,
     isPro: false,
     subscriptionStatus: "TRIAL" as const,
     subscriptionEndsAt: null,
     trialEndsAt: null,
     createdAt: new Date(),
+    city: null,
+    postalCode: null,
+    country: null,
+    tva: null,
     updatedAt: new Date(),
   };
 
@@ -82,6 +107,7 @@ describe("Stripe Server Actions", () => {
   describe("createCheckoutSession", () => {
     it("should create checkout session for new customer", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
 
       const mockCustomer = { id: "cus_test_123" };
@@ -103,7 +129,7 @@ describe("Stripe Server Actions", () => {
       const result = await createCheckoutSession();
 
       expect(result.url).toBe("https://checkout.stripe.com/session/test");
-      expect(result.error).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       // Verify customer creation
       expect(stripe.customers.create).toHaveBeenCalledWith({
@@ -143,6 +169,7 @@ describe("Stripe Server Actions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(
         businessWithStripeId
       );
@@ -176,7 +203,7 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe("Non authentifié");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(result.url).toBeUndefined();
       expect(stripe.customers.create).not.toHaveBeenCalled();
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
@@ -192,25 +219,36 @@ describe("Stripe Server Actions", () => {
         },
       } as any);
 
+      // Mock user with unverified email
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        ...mockUser,
+        emailVerified: null,
+      });
+
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe("Non authentifié");
-      expect(prisma.business.findUnique).not.toHaveBeenCalled();
+      if ("error" in result) {
+        expect(result.error).toBe("Email non vérifié. Veuillez vérifier votre email.");
+        expect(result.code).toBe("EMAIL_NOT_VERIFIED");
+      }
+      expect(stripe.customers.create).not.toHaveBeenCalled();
     });
 
     it("should return error if business not found", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(null);
 
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe("Business introuvable");
+      if ("error" in result) { expect(result.error).toBe("Business introuvable"); }
       expect(stripe.customers.create).not.toHaveBeenCalled();
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
     });
 
     it("should handle Stripe customer creation error", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
       vi.mocked(stripe.customers.create).mockRejectedValue(
         new Error("Stripe API error")
@@ -218,10 +256,14 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe(
-        "Erreur lors de la création de la session de paiement"
-      );
-      expect(result.url).toBeUndefined();
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Erreur lors de la création de la session de paiement"
+        );
+      }
+      if ("url" in result) {
+        expect(result.url).toBeUndefined();
+      }
     });
 
     it("should handle Stripe checkout session creation error", async () => {
@@ -231,6 +273,7 @@ describe("Stripe Server Actions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(
         businessWithStripeId
       );
@@ -240,10 +283,14 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe(
-        "Erreur lors de la création de la session de paiement"
-      );
-      expect(result.url).toBeUndefined();
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Erreur lors de la création de la session de paiement"
+        );
+      }
+      if ("url" in result) {
+        expect(result.url).toBeUndefined();
+      }
     });
 
     it("should include correct URLs in checkout session", async () => {
@@ -253,6 +300,7 @@ describe("Stripe Server Actions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(
         businessWithStripeId
       );
@@ -284,6 +332,7 @@ describe("Stripe Server Actions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(
         businessWithStripeId
       );
@@ -316,6 +365,7 @@ describe("Stripe Server Actions", () => {
 
     it("should handle database update error when saving customer ID", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
 
       const mockCustomer = { id: "cus_test_123" };
@@ -328,10 +378,14 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.error).toBe(
-        "Erreur lors de la création de la session de paiement"
-      );
-      expect(result.url).toBeUndefined();
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Erreur lors de la création de la session de paiement"
+        );
+      }
+      if ("url" in result) {
+        expect(result.url).toBeUndefined();
+      }
     });
   });
 });

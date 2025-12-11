@@ -25,7 +25,7 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
         // Créer une session de paiement pour upgrade
         const result = await createCheckoutSession();
 
-        if (result.error) {
+        if ("error" in result) {
           toast.error(result.error);
           return;
         }
@@ -37,7 +37,7 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
         // Rediriger vers le portail client Stripe
         const result = await createCustomerPortalSession();
 
-        if (result.error) {
+        if ("error" in result) {
           toast.error(result.error);
           return;
         }

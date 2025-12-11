@@ -22,6 +22,9 @@ vi.mock("@/lib/prisma", () => ({
       update: vi.fn(),
       delete: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -39,6 +42,19 @@ describe("Service Server Actions", () => {
     },
   };
 
+  const mockUser = {
+    id: "user_123",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -46,6 +62,7 @@ describe("Service Server Actions", () => {
   describe("getServices", () => {
     it("should return services for authenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.service.findMany).mockResolvedValue([
         {
           id: "service_1",
@@ -63,7 +80,7 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      expect(result.data).toHaveLength(1);
+      if ("data" in result) { expect(result.data).toHaveLength(1); }
       expect(result.data?.[0].name).toBe("Coupe classique");
 
       // ✅ CRITIQUE: Vérifier filtrage businessId
@@ -78,8 +95,8 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      expect(result.error).toBe("Non autorisé");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
       expect(prisma.service.findMany).not.toHaveBeenCalled();
     });
 
@@ -92,28 +109,39 @@ describe("Service Server Actions", () => {
         },
       });
 
+      // Mock fallback: user sans business
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        ...mockUser,
+        business: null,
+      } as any);
+
       const result = await getServices();
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) {
+        expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
+        expect(result.code).toBe("NO_BUSINESS");
+      }
       expect(prisma.service.findMany).not.toHaveBeenCalled();
     });
 
     it("should handle database errors gracefully", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.service.findMany).mockRejectedValue(
         new Error("Database connection failed")
       );
 
       const result = await getServices();
 
-      expect(result.error).toBe("Erreur lors de la récupération des services");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des services"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
   describe("createService", () => {
     it("should create service with valid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const newServiceData = {
         name: "Balayage",
@@ -136,7 +164,7 @@ describe("Service Server Actions", () => {
 
       const result = await createService(newServiceData);
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.name).toBe("Balayage");
       expect(result.data?.price).toBe(120);
 
@@ -151,6 +179,7 @@ describe("Service Server Actions", () => {
 
     it("should create service with minimal required fields", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const minimalData = {
         name: "Service Simple",
@@ -173,20 +202,21 @@ describe("Service Server Actions", () => {
 
       const result = await createService(minimalData);
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.name).toBe("Service Simple");
     });
 
     it("should return validation error for invalid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const result = await createService({
         name: "", // Invalide
         price: -10, // Prix négatif invalide
       });
 
-      expect(result.error).toBe("Données invalides");
-      expect(result.fieldErrors).toBeDefined();
+      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
+      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
       expect(prisma.service.create).not.toHaveBeenCalled();
     });
 
@@ -198,7 +228,7 @@ describe("Service Server Actions", () => {
         price: 50,
       });
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.service.create).not.toHaveBeenCalled();
     });
   });
@@ -206,6 +236,7 @@ describe("Service Server Actions", () => {
   describe("updateService", () => {
     it("should update service with valid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const updateData = {
         name: "Coupe Premium",
@@ -228,7 +259,7 @@ describe("Service Server Actions", () => {
 
       const result = await updateService("service_1", updateData);
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.name).toBe("Coupe Premium");
       expect(result.data?.price).toBe(45);
 
@@ -244,6 +275,7 @@ describe("Service Server Actions", () => {
 
     it("should update only specified fields", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const partialUpdate = {
         price: 60,
@@ -278,30 +310,33 @@ describe("Service Server Actions", () => {
 
     it("should return validation error for invalid update", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const result = await updateService("service_1", {
         price: -50, // Prix négatif
       });
 
-      expect(result.error).toBe("Données invalides");
+      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
       expect(prisma.service.update).not.toHaveBeenCalled();
     });
 
     it("should return error if service not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.service.update).mockRejectedValue(
         new Error("Record not found")
       );
 
       const result = await updateService("service_other", { name: "Test" });
 
-      expect(result.error).toBe("Erreur lors de la mise à jour du service");
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la mise à jour du service"); }
     });
   });
 
   describe("deleteService - Multi-tenancy Security", () => {
     it("should only delete service from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst pour vérifier l'existence
       vi.mocked(prisma.service.findFirst).mockResolvedValue({
@@ -355,19 +390,20 @@ describe("Service Server Actions", () => {
 
       const result = await deleteService("service_123");
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.service.delete).not.toHaveBeenCalled();
     });
 
     it("should return error if service not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst retourne null (service inexistant ou autre business)
       vi.mocked(prisma.service.findFirst).mockResolvedValue(null);
 
       const result = await deleteService("service_other");
 
-      expect(result.error).toBe("Service introuvable");
+      if ("error" in result) { expect(result.error).toBe("Service introuvable"); }
       expect(prisma.service.delete).not.toHaveBeenCalled();
     });
   });

@@ -63,7 +63,7 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.error).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       // Vérifier que l'utilisateur a été recherché
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
@@ -102,7 +102,7 @@ describe("Password Reset Server Actions", () => {
       // ✅ SÉCURITÉ: Retourner succès même si user n'existe pas
       // (protection contre l'énumération d'emails)
       expect(result.success).toBe(true);
-      expect(result.error).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       // Aucun token ne doit être créé
       expect(prisma.passwordResetToken.create).not.toHaveBeenCalled();
@@ -222,7 +222,7 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer.");
+      if ("error" in result) { expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer."); }
       expect(Sentry.captureException).toHaveBeenCalled();
     });
   });
@@ -263,7 +263,7 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(true);
-      expect(result.error).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       // Vérifier que le token a été recherché correctement
       expect(prisma.passwordResetToken.findFirst).toHaveBeenCalledWith({
@@ -381,7 +381,7 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Utilisateur introuvable.");
+      if ("error" in result) { expect(result.error).toBe("Utilisateur introuvable."); }
     });
 
     it("should hash password with bcrypt before saving", async () => {
@@ -478,7 +478,7 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer.");
+      if ("error" in result) { expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer."); }
       expect(Sentry.captureException).toHaveBeenCalled();
     });
   });

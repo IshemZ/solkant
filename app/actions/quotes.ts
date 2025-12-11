@@ -1,30 +1,25 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { createQuoteSchema, type CreateQuoteInput } from "@/lib/validations";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
 
 export async function getQuotes() {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   try {
     const quotes = await prisma.quote.findMany({
-      where: { businessId: session.user.businessId },
+      where: { businessId },
       include: {
         client: true,
         items: {
@@ -39,31 +34,31 @@ export async function getQuotes() {
     return { data: quotes };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "getQuotes", businessId: session.user.businessId },
+      tags: { action: "getQuotes", businessId },
     });
-    console.error("Error fetching quotes:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching quotes:", error);
+    }
+
     return { error: "Erreur lors de la récupération des devis" };
   }
 }
 
 export async function getQuote(id: string) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   try {
     const quote = await prisma.quote.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       include: {
         client: true,
@@ -83,10 +78,14 @@ export async function getQuote(id: string) {
     return { data: quote };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "getQuote", businessId: session.user.businessId },
+      tags: { action: "getQuote", businessId },
       extra: { quoteId: id },
     });
-    console.error("Error fetching quote:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching quote:", error);
+    }
+
     return { error: "Erreur lors de la récupération du devis" };
   }
 }
@@ -186,17 +185,13 @@ async function createQuoteWithRetry(
 }
 
 export async function createQuote(input: CreateQuoteInput) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId, userId } = validatedSession;
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -211,17 +206,14 @@ export async function createQuote(input: CreateQuoteInput) {
 
   try {
     // Use retry logic to handle race conditions
-    const quote = await createQuoteWithRetry(
-      validation.data,
-      session.user.businessId
-    );
+    const quote = await createQuoteWithRetry(validation.data, businessId);
 
     // Log d'audit pour traçabilité
     await auditLog({
       action: AuditAction.QUOTE_CREATED,
       level: AuditLevel.INFO,
-      userId: session.user.id,
-      businessId: session.user.businessId,
+      userId,
+      businessId,
       resourceId: quote.id,
       resourceType: "Quote",
       metadata: {
@@ -235,27 +227,33 @@ export async function createQuote(input: CreateQuoteInput) {
     return { data: quote };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "createQuote", businessId: session.user.businessId },
+      tags: { action: "createQuote", businessId },
       extra: { input },
     });
-    console.error("Error creating quote:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error creating quote:", error);
+    }
+
     return { error: "Erreur lors de la création du devis" };
   }
 }
 
 export async function deleteQuote(id: string) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
+
+  const { businessId, userId } = validatedSession;
 
   try {
     // Récupérer les infos du devis avant suppression pour l'audit
     const quote = await prisma.quote.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       select: { quoteNumber: true, clientId: true, total: true },
     });
@@ -267,7 +265,7 @@ export async function deleteQuote(id: string) {
     await prisma.quote.delete({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
@@ -275,8 +273,8 @@ export async function deleteQuote(id: string) {
     await auditLog({
       action: AuditAction.QUOTE_DELETED,
       level: AuditLevel.CRITICAL,
-      userId: session.user.id,
-      businessId: session.user.businessId,
+      userId,
+      businessId,
       resourceId: id,
       resourceType: "Quote",
       metadata: {
@@ -290,10 +288,199 @@ export async function deleteQuote(id: string) {
     return { success: true };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "deleteQuote", businessId: session.user.businessId },
+      tags: { action: "deleteQuote", businessId },
       extra: { quoteId: id },
     });
-    console.error("Error deleting quote:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error deleting quote:", error);
+    }
+
     return { error: "Erreur lors de la suppression du devis" };
+  }
+}
+
+/**
+ * Envoie un devis par email au client
+ * Met à jour le statut à SENT et enregistre la date d'envoi
+ */
+export async function sendQuote(id: string) {
+  const validatedSession = await validateSessionWithEmail();
+
+  if ("error" in validatedSession) {
+    return validatedSession;
+  }
+
+  const { userId, businessId } = validatedSession;
+
+  try {
+    // Récupérer le devis complet avec toutes les relations
+    const quote = await prisma.quote.findFirst({
+      where: {
+        id,
+        businessId,
+      },
+      include: {
+        client: true,
+        items: {
+          include: {
+            service: true,
+          },
+        },
+        business: true,
+      },
+    });
+
+    if (!quote) {
+      return { error: "Devis introuvable" };
+    }
+
+    if (!quote.client?.email) {
+      return { error: "Le client n'a pas d'adresse email" };
+    }
+
+    // Vérifier que Resend est configuré
+    const { resend, isResendConfigured } = await import("@/lib/resend");
+    if (!isResendConfigured() || !resend) {
+      // Fallback en développement : simuler l'envoi
+      if (process.env.NODE_ENV === "development") {
+        console.log("\n📧 [SIMULATION] Envoi email devis:");
+        console.log(`   → À: ${quote.client.email}`);
+        console.log(`   → Devis: ${quote.quoteNumber}`);
+        console.log(`   → Client: ${quote.client.firstName} ${quote.client.lastName}`);
+        console.log(`   → Total: ${quote.total.toFixed(2)} €\n`);
+
+        // Mettre à jour le devis même en mode simulation
+        const updatedQuote = await prisma.quote.update({
+          where: { id },
+          data: {
+            status: "SENT",
+            sentAt: new Date(),
+          },
+        });
+
+        await auditLog({
+          action: AuditAction.QUOTE_SENT,
+          level: AuditLevel.INFO,
+          userId,
+          businessId,
+          resourceId: id,
+          resourceType: "Quote",
+          metadata: {
+            quoteNumber: quote.quoteNumber,
+            clientEmail: quote.client.email,
+            simulation: true,
+          },
+        });
+
+        revalidatePath("/dashboard/devis");
+        return { data: updatedQuote };
+      }
+
+      return {
+        error:
+          "Service d'envoi d'emails non configuré. Veuillez ajouter RESEND_API_KEY dans .env",
+      };
+    }
+
+    // Générer le contenu de l'email
+    const {
+      generateQuoteEmail,
+      generateQuoteEmailSubject,
+    } = await import("@/lib/emails/quote-email");
+
+    const emailHtml = generateQuoteEmail({
+      quoteNumber: quote.quoteNumber,
+      businessName: quote.business.name,
+      businessEmail: quote.business.email || "",
+      businessPhone: quote.business.phone || "",
+      businessAddress: quote.business.address || "",
+      clientName: `${quote.client.firstName} ${quote.client.lastName}`,
+      validUntil: quote.validUntil
+        ? new Date(quote.validUntil).toLocaleDateString("fr-FR", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })
+        : "Non spécifié",
+      items: quote.items.map((item) => ({
+        name: item.name,
+        description: item.description || undefined,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.total,
+      })),
+      subtotal: quote.subtotal,
+      discount: quote.discount,
+      total: quote.total,
+      notes: quote.notes || undefined,
+    });
+
+    const subject = generateQuoteEmailSubject(
+      quote.quoteNumber,
+      quote.business.name
+    );
+
+    // Envoyer l'email via Resend
+    const { EMAIL_CONFIG } = await import("@/lib/resend");
+    const { data: emailData, error: emailError } = await resend.emails.send({
+      from: EMAIL_CONFIG.from,
+      to: quote.client.email,
+      subject,
+      html: emailHtml,
+    });
+
+    if (emailError) {
+      Sentry.captureException(emailError, {
+        tags: { action: "sendQuote", businessId },
+        extra: { quoteId: id, clientEmail: quote.client.email },
+      });
+
+      return {
+        error: "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
+      };
+    }
+
+    // Mettre à jour le devis avec le statut SENT et la date d'envoi
+    const updatedQuote = await prisma.quote.update({
+      where: { id },
+      data: {
+        status: "SENT",
+        sentAt: new Date(),
+      },
+      include: {
+        client: true,
+        items: true,
+      },
+    });
+
+    // Log d'audit pour traçabilité
+    await auditLog({
+      action: AuditAction.QUOTE_SENT,
+      level: AuditLevel.INFO,
+      userId,
+      businessId,
+      resourceId: id,
+      resourceType: "Quote",
+      metadata: {
+        quoteNumber: quote.quoteNumber,
+        clientEmail: quote.client.email,
+        emailId: emailData?.id,
+      },
+    });
+
+    revalidatePath("/dashboard/devis");
+    return { data: updatedQuote };
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { action: "sendQuote", businessId },
+      extra: { quoteId: id },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error sending quote:", error);
+    }
+
+    return { error: "Erreur lors de l'envoi du devis" };
   }
 }

@@ -14,12 +14,16 @@ vi.mock("next-auth");
 // Mock Prisma avec des fonctions vi.fn()
 const mockFindFirst = vi.fn();
 const mockCreate = vi.fn();
+const mockUserFindUnique = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
   default: {
     quote: {
       findFirst: mockFindFirst,
       create: mockCreate,
+    },
+    user: {
+      findUnique: mockUserFindUnique,
     },
   },
 }));
@@ -42,6 +46,19 @@ vi.mock("@/lib/audit-logger", () => ({
 const { createQuote } = await import("@/app/actions/quotes");
 
 describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
+  const mockUser = {
+    id: "clxxx111111111111111",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const mockSession = {
     user: {
       id: "clxxx111111111111111", // Format CUID
@@ -70,6 +87,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(getServerSession).mockResolvedValue(mockSession);
+    mockUserFindUnique.mockResolvedValue(mockUser);
   });
 
   describe("✅ Correction contrainte unique par Business", () => {
@@ -109,7 +127,9 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       } as any);
 
       const result1 = await createQuote(validQuoteInput);
-      expect(result1.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`); // Business 2 crée AUSSI DEVIS-2025-001 (différent businessId)
+      if ("data" in result1) {
+        expect(result1.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`); // Business 2 crée AUSSI DEVIS-2025-001 (différent businessId)
+      }
       vi.mocked(getServerSession).mockResolvedValueOnce({
         user: {
           id: "clxxx777777777777777",
@@ -153,9 +173,13 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result2 = await createQuote(validQuoteInput);
 
       // Les deux quotes ont le même numéro MAIS des businessId différents
-      expect(result2.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
-      expect(result1.data?.businessId).toBe("clxxx222222222222222");
-      expect(result2.data?.businessId).toBe("clxxx555555555555555");
+      if ("data" in result2) {
+        expect(result2.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
+        expect(result2.data?.businessId).toBe("clxxx555555555555555");
+      }
+      if ("data" in result1) {
+        expect(result1.data?.businessId).toBe("clxxx222222222222222");
+      }
     });
 
     it("filtre correctement par businessId lors de la recherche du dernier numéro", async () => {
@@ -258,8 +282,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ Le retry a fonctionné
-      expect(result.data).toBeDefined();
-      expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
+      if ("data" in result) {
+        expect(result.data).toBeDefined();
+        expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
+      }
 
       // Vérifie qu'il y a eu 2 appels à create (1 échec + 1 succès)
       expect(mockCreate).toHaveBeenCalledTimes(2);
@@ -277,8 +303,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ L'erreur est retournée après max retries
-      expect(result.error).toBeDefined();
-      expect(result.error).toBe("Erreur lors de la création du devis");
+      if ("error" in result) { expect(result.error).toBeDefined(); }
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la création du devis"); }
 
       // Vérifie qu'il y a eu exactement 4 tentatives
       expect(mockCreate).toHaveBeenCalledTimes(4);
@@ -295,7 +321,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ Échec immédiat sans retry
-      expect(result.error).toBeDefined();
+      if ("error" in result) { expect(result.error).toBeDefined(); }
       expect(mockCreate).toHaveBeenCalledTimes(1); // Une seule tentative
     });
   });
@@ -338,8 +364,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
 
       const result = await createQuote(validQuoteInput);
 
-      expect(result.data?.quoteNumber).toBe(expectedNumber);
-      expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
+      if ("data" in result) {
+        expect(result.data?.quoteNumber).toBe(expectedNumber);
+        expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
+      }
     });
 
     it("incrémente correctement le numéro", async () => {
@@ -395,7 +423,9 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
 
       const result = await createQuote(validQuoteInput);
 
-      expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-006`);
+      if ("data" in result) {
+        expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-006`);
+      }
     });
   });
 });

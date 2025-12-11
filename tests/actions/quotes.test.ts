@@ -21,6 +21,9 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
       delete: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -38,6 +41,19 @@ describe("Quote Server Actions", () => {
     },
   };
 
+  const mockUser = {
+    id: "user_123",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   const mockClientId = "clxxx333333333333333";
   const mockServiceId = "clxxx444444444444444";
 
@@ -48,6 +64,7 @@ describe("Quote Server Actions", () => {
   describe("getQuotes", () => {
     it("should return quotes with client and items", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findMany).mockResolvedValue([
         {
           id: "quote_1",
@@ -106,7 +123,7 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuotes();
 
-      expect(result.data).toHaveLength(1);
+      if ("data" in result) { expect(result.data).toHaveLength(1); }
       expect(result.data?.[0].quoteNumber).toBe("DEVIS-2024-001");
       expect(result.data?.[0].client.firstName).toBe("Marie");
       expect(result.data?.[0].items).toHaveLength(1);
@@ -131,25 +148,27 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuotes();
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.quote.findMany).not.toHaveBeenCalled();
     });
 
     it("should handle database errors gracefully", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findMany).mockRejectedValue(
         new Error("Database error")
       );
 
       const result = await getQuotes();
 
-      expect(result.error).toBe("Erreur lors de la récupération des devis");
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des devis"); }
     });
   });
 
   describe("getQuote", () => {
     it("should return single quote with full details", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
         id: "quote_1",
         quoteNumber: "DEVIS-2024-001",
@@ -220,7 +239,7 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuote("quote_1");
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.quoteNumber).toBe("DEVIS-2024-001");
       expect(result.data?.business.name).toBe("Mon Salon");
 
@@ -244,11 +263,12 @@ describe("Quote Server Actions", () => {
 
     it("should return error if quote not found", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const result = await getQuote("quote_not_found");
 
-      expect(result.error).toBe("Devis introuvable");
+      if ("error" in result) { expect(result.error).toBe("Devis introuvable"); }
     });
 
     it("should return error if not authenticated", async () => {
@@ -256,7 +276,7 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuote("quote_1");
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.quote.findFirst).not.toHaveBeenCalled();
     });
   });
@@ -264,6 +284,7 @@ describe("Quote Server Actions", () => {
   describe("createQuote - Quote Number Generation", () => {
     it("should generate first quote number DEVIS-2024-001", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock: aucun devis existant pour cette année
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
@@ -332,12 +353,13 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
     });
 
     it("should increment quote number correctly", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock: dernier devis = DEVIS-2024-042
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
@@ -422,6 +444,7 @@ describe("Quote Server Actions", () => {
   describe("createQuote - Total Calculations", () => {
     it("should calculate subtotal from items", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -499,6 +522,7 @@ describe("Quote Server Actions", () => {
 
     it("should apply discount correctly", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -562,6 +586,7 @@ describe("Quote Server Actions", () => {
 
     it("should handle multiple quantities", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -628,6 +653,7 @@ describe("Quote Server Actions", () => {
   describe("createQuote - Validation", () => {
     it("should return validation error for invalid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const result = await createQuote({
         clientId: "", // Invalide
@@ -637,8 +663,8 @@ describe("Quote Server Actions", () => {
         items: [],
       });
 
-      expect(result.error).toBe("Données invalides");
-      expect(result.fieldErrors).toBeDefined();
+      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
+      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
       expect(prisma.quote.create).not.toHaveBeenCalled();
     });
 
@@ -662,7 +688,7 @@ describe("Quote Server Actions", () => {
         ],
       });
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.quote.create).not.toHaveBeenCalled();
     });
   });
@@ -670,6 +696,7 @@ describe("Quote Server Actions", () => {
   describe("deleteQuote - Multi-tenancy Security", () => {
     it("should only delete quote from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst pour vérifier l'existence
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
@@ -729,19 +756,20 @@ describe("Quote Server Actions", () => {
 
       const result = await deleteQuote("quote_123");
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.quote.delete).not.toHaveBeenCalled();
     });
 
     it("should return error if quote not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst retourne null (quote inexistant ou autre business)
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const result = await deleteQuote("quote_other");
 
-      expect(result.error).toBe("Devis introuvable");
+      if ("error" in result) { expect(result.error).toBe("Devis introuvable"); }
       expect(prisma.quote.delete).not.toHaveBeenCalled();
     });
   });

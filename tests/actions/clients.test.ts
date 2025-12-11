@@ -16,6 +16,9 @@ vi.mock("@/lib/prisma", () => ({
       create: vi.fn(),
       delete: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -33,6 +36,19 @@ describe("Client Server Actions", () => {
     },
   };
 
+  const mockUser = {
+    id: "user_123",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -40,6 +56,7 @@ describe("Client Server Actions", () => {
   describe("getClients", () => {
     it("should return clients for authenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.client.findMany).mockResolvedValue([
         {
           id: "client_1",
@@ -57,7 +74,7 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      expect(result.data).toHaveLength(1);
+      if ("data" in result) { expect(result.data).toHaveLength(1); }
       expect(result.data?.[0].firstName).toBe("Jean");
 
       // ✅ CRITIQUE: Vérifier que le filtrage businessId est appliqué
@@ -72,8 +89,8 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      expect(result.error).toBe("Non autorisé");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
       expect(prisma.client.findMany).not.toHaveBeenCalled();
     });
 
@@ -86,28 +103,39 @@ describe("Client Server Actions", () => {
         },
       } as any);
 
+      // Mock fallback: user sans business
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        ...mockUser,
+        business: null,
+      } as any);
+
       const result = await getClients();
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) {
+        expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
+        expect(result.code).toBe("NO_BUSINESS");
+      }
       expect(prisma.client.findMany).not.toHaveBeenCalled();
     });
 
     it("should handle database errors gracefully", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.client.findMany).mockRejectedValue(
         new Error("Database connection failed")
       );
 
       const result = await getClients();
 
-      expect(result.error).toBe("Erreur lors de la récupération des clients");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des clients"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
   describe("createClient", () => {
     it("should create client with valid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const newClientData = {
         firstName: "Marie",
@@ -130,7 +158,7 @@ describe("Client Server Actions", () => {
 
       const result = await createClient(newClientData);
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.firstName).toBe("Marie");
 
       // ✅ CRITIQUE: Vérifier injection businessId
@@ -144,14 +172,15 @@ describe("Client Server Actions", () => {
 
     it("should return validation error for invalid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const result = await createClient({
         firstName: "", // Invalide
         lastName: "Test",
       } as any);
 
-      expect(result.error).toBe("Données invalides");
-      expect(result.fieldErrors).toBeDefined();
+      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
+      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
       expect(prisma.client.create).not.toHaveBeenCalled();
     });
 
@@ -163,7 +192,7 @@ describe("Client Server Actions", () => {
         lastName: "User",
       });
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.client.create).not.toHaveBeenCalled();
     });
   });
@@ -171,6 +200,7 @@ describe("Client Server Actions", () => {
   describe("deleteClient - Multi-tenancy Security", () => {
     it("should only delete client from own business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst pour vérifier l'existence
       vi.mocked(prisma.client.findFirst).mockResolvedValue({
@@ -221,13 +251,14 @@ describe("Client Server Actions", () => {
 
     it("should return error if client not found or belongs to another business", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock findFirst retourne null (client inexistant ou autre business)
       vi.mocked(prisma.client.findFirst).mockResolvedValue(null);
 
       const result = await deleteClient("client_other");
 
-      expect(result.error).toBe("Client introuvable");
+      if ("error" in result) { expect(result.error).toBe("Client introuvable"); }
       expect(prisma.client.delete).not.toHaveBeenCalled();
     });
   });

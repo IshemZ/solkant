@@ -43,7 +43,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
     if (result.error) {
       setError(result.error);
       toast.error("Erreur lors de la création du service");
-    } else if (result.data) {
+    } else if ("data" in result) {
       setServices([result.data, ...services]);
       setShowForm(false);
       e.currentTarget.reset();

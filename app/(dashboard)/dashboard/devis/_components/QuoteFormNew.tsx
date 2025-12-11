@@ -142,7 +142,7 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
       setError(result.error);
       toast.error("Erreur lors de la création du devis");
       setIsLoading(false);
-    } else if (result.data) {
+    } else if ("data" in result) {
       toast.success(`Devis ${result.data.quoteNumber} créé avec succès`);
       router.push(`/dashboard/devis/${result.data.id}`);
     }

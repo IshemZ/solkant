@@ -23,6 +23,9 @@ vi.mock("next-auth", () => ({
 
 vi.mock("@/lib/prisma", () => ({
   default: {
+    user: {
+      findUnique: vi.fn(),
+    },
     client: {
       findMany: vi.fn(),
       create: vi.fn(),
@@ -54,8 +57,23 @@ vi.mock("next/cache", () => ({
 describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
   const sessions = createMultiTenantSessions();
 
+  const mockUser = {
+    id: "user_tenant1",
+    email: "tenant1@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Tenant 1 User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
+    // Mock user.findUnique pour valider l'email
+    vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
   });
 
   describe("Client Isolation", () => {

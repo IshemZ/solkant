@@ -1,7 +1,5 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
   createServiceSchema,
@@ -13,48 +11,45 @@ import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
 
 export async function getServices() {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   try {
     const services = await prisma.service.findMany({
-      where: { businessId: session.user.businessId },
+      where: { businessId },
       orderBy: { createdAt: "desc" },
     });
 
     return { data: services };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "getServices", businessId: session.user.businessId },
+      tags: { action: "getServices", businessId },
     });
-    console.error("Error fetching services:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching services:", error);
+    }
+
     return { error: "Erreur lors de la récupération des services" };
   }
 }
 
 export async function createService(input: CreateServiceInput) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId, userId } = validatedSession;
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -71,7 +66,21 @@ export async function createService(input: CreateServiceInput) {
     const service = await prisma.service.create({
       data: {
         ...validation.data,
-        businessId: session.user.businessId,
+        businessId,
+      },
+    });
+
+    // Audit log pour cohérence avec createClient et createQuote
+    await auditLog({
+      action: AuditAction.SERVICE_CREATED,
+      level: AuditLevel.INFO,
+      userId,
+      businessId,
+      resourceId: service.id,
+      resourceType: "Service",
+      metadata: {
+        name: service.name,
+        price: service.price,
       },
     });
 
@@ -79,26 +88,26 @@ export async function createService(input: CreateServiceInput) {
     return { data: service };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "createService", businessId: session.user.businessId },
+      tags: { action: "createService", businessId },
       extra: { input },
     });
-    console.error("Error creating service:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error creating service:", error);
+    }
+
     return { error: "Erreur lors de la création du service" };
   }
 }
 
 export async function updateService(id: string, input: UpdateServiceInput) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
 
-  // Ajouter contexte Sentry pour traçabilité
-  Sentry.setContext("business", {
-    businessId: session.user.businessId,
-    userId: session.user.id,
-  });
+  const { businessId } = validatedSession;
 
   // Sanitize input before validation
   const sanitized = sanitizeObject(input);
@@ -115,7 +124,7 @@ export async function updateService(id: string, input: UpdateServiceInput) {
     const service = await prisma.service.update({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       data: validation.data,
     });
@@ -124,27 +133,33 @@ export async function updateService(id: string, input: UpdateServiceInput) {
     return { data: service };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "updateService", businessId: session.user.businessId },
+      tags: { action: "updateService", businessId },
       extra: { serviceId: id, input },
     });
-    console.error("Error updating service:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error updating service:", error);
+    }
+
     return { error: "Erreur lors de la mise à jour du service" };
   }
 }
 
 export async function deleteService(id: string) {
-  const session = await getServerSession(authOptions);
+  const validatedSession = await validateSessionWithEmail();
 
-  if (!session?.user?.businessId) {
-    return { error: "Non autorisé" };
+  if ("error" in validatedSession) {
+    return validatedSession;
   }
+
+  const { businessId, userId } = validatedSession;
 
   try {
     // Récupérer les infos avant suppression
     const service = await prisma.service.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       select: { name: true, price: true },
     });
@@ -156,15 +171,15 @@ export async function deleteService(id: string) {
     await prisma.service.delete({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.SERVICE_DELETED,
       level: AuditLevel.CRITICAL,
-      userId: session.user.id,
-      businessId: session.user.businessId,
+      userId,
+      businessId,
       resourceId: id,
       resourceType: "Service",
       metadata: {
@@ -177,10 +192,14 @@ export async function deleteService(id: string) {
     return { success: true };
   } catch (error) {
     Sentry.captureException(error, {
-      tags: { action: "deleteService", businessId: session.user.businessId },
+      tags: { action: "deleteService", businessId },
       extra: { serviceId: id },
     });
-    console.error("Error deleting service:", error);
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error deleting service:", error);
+    }
+
     return { error: "Erreur lors de la suppression du service" };
   }
 }

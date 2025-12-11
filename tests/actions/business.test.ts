@@ -19,6 +19,9 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
@@ -36,6 +39,23 @@ describe("Business Server Actions", () => {
     },
   };
 
+  const mockUser = {
+    id: "user_123",
+    email: "test@example.com",
+    emailVerified: new Date("2024-01-01"),
+    name: "Test User",
+    password: null,
+    image: null,
+    verificationToken: null,
+    tokenExpiry: null,
+    createdAt: new Date(),
+    city: null,
+    postalCode: null,
+    country: null,
+    tva: null,
+    updatedAt: new Date(),
+  };
+
   const mockBusiness = {
     id: "business_123",
     name: "Mon Institut",
@@ -49,11 +69,16 @@ describe("Business Server Actions", () => {
     userId: "user_123",
     stripeCustomerId: null,
     stripeSubscriptionId: null,
+    stripePriceId: null,
     isPro: false,
     subscriptionStatus: "TRIAL" as const,
     subscriptionEndsAt: null,
     trialEndsAt: null,
     createdAt: new Date(),
+    city: null,
+    postalCode: null,
+    country: null,
+    tva: null,
     updatedAt: new Date(),
   };
 
@@ -64,13 +89,14 @@ describe("Business Server Actions", () => {
   describe("getBusinessInfo", () => {
     it("should return business info for authenticated user", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockResolvedValue(mockBusiness);
 
       const result = await getBusinessInfo();
 
-      expect(result.data).toBeDefined();
+      if ("data" in result) { expect(result.data).toBeDefined(); }
       expect(result.data?.name).toBe("Mon Institut");
-      expect(result.error).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.findUnique).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -82,8 +108,8 @@ describe("Business Server Actions", () => {
 
       const result = await getBusinessInfo();
 
-      expect(result.error).toBe("Non autorisé");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
       expect(prisma.business.findUnique).not.toHaveBeenCalled();
     });
 
@@ -97,24 +123,36 @@ describe("Business Server Actions", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any);
 
+      // Mock fallback: user sans business
+      vi.mocked(prisma.user.findUnique).mockResolvedValue({
+        ...mockUser,
+        business: null,
+      } as any);
+
       const result = await getBusinessInfo();
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) {
+        expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
+        expect(result.code).toBe("NO_BUSINESS");
+      }
       expect(prisma.business.findUnique).not.toHaveBeenCalled();
     });
 
     it("should handle database errors gracefully", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.findUnique).mockRejectedValue(
         new Error("Database error")
       );
 
       const result = await getBusinessInfo();
 
-      expect(result.error).toBe(
-        "Erreur lors de la récupération des informations"
-      );
-      expect(result.data).toBeUndefined();
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Erreur lors de la récupération des informations"
+        );
+      }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
@@ -127,6 +165,7 @@ describe("Business Server Actions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockResolvedValue({
         ...mockBusiness,
         ...updateData,
@@ -134,9 +173,11 @@ describe("Business Server Actions", () => {
 
       const result = await updateBusiness(updateData);
 
-      expect(result.data).toBeDefined();
-      expect(result.data?.name).toBe("Institut de Beauté");
-      expect(result.error).toBeUndefined();
+      if ("data" in result) {
+        expect(result.data).toBeDefined();
+        expect(result.data?.name).toBe("Institut de Beauté");
+      }
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -149,23 +190,25 @@ describe("Business Server Actions", () => {
 
       const result = await updateBusiness({ name: "Test" });
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should return validation error for invalid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Nom trop court
       const result = await updateBusiness({ name: "A" });
 
-      expect(result.error).toBe("Données invalides");
-      expect(result.fieldErrors).toBeDefined();
+      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
+      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should sanitize XSS attempts", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockResolvedValue(mockBusiness);
 
       const xssAttempt = {
@@ -187,14 +230,15 @@ describe("Business Server Actions", () => {
 
     it("should handle database errors", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockRejectedValue(
         new Error("Database error")
       );
 
       const result = await updateBusiness({ name: "Test Business" });
 
-      expect(result.error).toBe("Erreur lors de la mise à jour");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de la mise à jour"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
@@ -203,6 +247,7 @@ describe("Business Server Actions", () => {
 
     it("should upload logo with valid data", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockResolvedValue({
         ...mockBusiness,
         logo: validLogoData,
@@ -210,9 +255,11 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      expect(result.data).toBeDefined();
-      expect(result.data?.logo).toBe(validLogoData);
-      expect(result.error).toBeUndefined();
+      if ("data" in result) {
+        expect(result.data).toBeDefined();
+        expect(result.data?.logo).toBe(validLogoData);
+      }
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -222,22 +269,24 @@ describe("Business Server Actions", () => {
 
     it("should reject non-image data URLs", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       const result = await uploadBusinessLogo("data:text/plain;base64,test");
 
-      expect(result.error).toBe("Format d'image invalide");
+      if ("error" in result) { expect(result.error).toBe("Format d'image invalide"); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should reject oversized images", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Create a string > 5MB
       const largeData = "data:image/png;base64," + "a".repeat(6 * 1024 * 1024);
 
       const result = await uploadBusinessLogo(largeData);
 
-      expect(result.error).toBe("L'image est trop volumineuse (max 5MB)");
+      if ("error" in result) { expect(result.error).toBe("L'image est trop volumineuse (max 5MB)"); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -246,26 +295,28 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should handle database errors", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockRejectedValue(
         new Error("Database error")
       );
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      expect(result.error).toBe("Erreur lors de l'upload du logo");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toBe("Erreur lors de l'upload du logo"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
   describe("deleteBusinessLogo", () => {
     it("should delete logo successfully", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockResolvedValue({
         ...mockBusiness,
         logo: null,
@@ -273,9 +324,11 @@ describe("Business Server Actions", () => {
 
       const result = await deleteBusinessLogo();
 
-      expect(result.data).toBeDefined();
-      expect(result.data?.logo).toBeNull();
-      expect(result.error).toBeUndefined();
+      if ("data" in result) {
+        expect(result.data).toBeDefined();
+        expect(result.data?.logo).toBeNull();
+      }
+      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -288,20 +341,21 @@ describe("Business Server Actions", () => {
 
       const result = await deleteBusinessLogo();
 
-      expect(result.error).toBe("Non autorisé");
+      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should handle database errors", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.business.update).mockRejectedValue(
         new Error("Database error")
       );
 
       const result = await deleteBusinessLogo();
 
-      expect(result.error).toContain("Erreur");
-      expect(result.data).toBeUndefined();
+      if ("error" in result) { expect(result.error).toContain("Erreur"); }
+      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 });

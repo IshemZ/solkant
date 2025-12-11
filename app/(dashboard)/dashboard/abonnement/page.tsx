@@ -13,7 +13,7 @@ export default async function AbonnementPage() {
 
   const result = await getSubscriptionStatus();
 
-  if (result.error) {
+  if ("error" in result) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-red-50 p-4 text-red-800">

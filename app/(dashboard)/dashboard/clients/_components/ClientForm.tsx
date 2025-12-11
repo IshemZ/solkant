@@ -56,9 +56,9 @@ export default function ClientForm({
           ? await updateClient(client.id, data)
           : await createClient(data);
 
-      if (result.error) {
+      if ("error" in result) {
         toast.error(result.error);
-        if (result.fieldErrors) {
+        if ("fieldErrors" in result && result.fieldErrors) {
           Object.entries(result.fieldErrors).forEach(([key, value]) => {
             if (Array.isArray(value) && value.length > 0) {
               setError(key as keyof CreateClientInput, {

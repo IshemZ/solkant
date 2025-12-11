@@ -1,22 +1,25 @@
 "use server";
 
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { stripe, STRIPE_PRICE_ID_PRO } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
+import * as Sentry from "@sentry/nextjs";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
 
 export async function createCheckoutSession() {
   try {
-    // 1. Vérifier l'authentification
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      return { error: "Non authentifié" };
+    // 1. Vérifier l'authentification ET email vérifié
+    const validatedSession = await validateSessionWithEmail();
+
+    if ("error" in validatedSession) {
+      return validatedSession;
     }
+
+    const { businessId, userId, userEmail } = validatedSession;
 
     // 2. Récupérer le Business
     const business = await prisma.business.findUnique({
-      where: { userId: session.user.id },
+      where: { id: businessId },
     });
 
     if (!business) {
@@ -28,18 +31,18 @@ export async function createCheckoutSession() {
 
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
-        email: session.user.email,
+        email: userEmail,
         name: business.name,
         metadata: {
-          businessId: business.id,
-          userId: session.user.id,
+          businessId,
+          userId,
         },
       });
       stripeCustomerId = customer.id;
 
       // Sauvegarder le customerId
       await prisma.business.update({
-        where: { id: business.id },
+        where: { id: businessId },
         data: { stripeCustomerId: customer.id } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
       });
     }
@@ -64,13 +67,13 @@ export async function createCheckoutSession() {
       success_url: `${baseUrl}/dashboard/abonnement?checkout=success`,
       cancel_url: `${baseUrl}/dashboard/abonnement?checkout=cancel`,
       metadata: {
-        businessId: business.id,
-        userId: session.user.id,
+        businessId,
+        userId,
       },
       subscription_data: {
         metadata: {
-          businessId: business.id,
-          userId: session.user.id,
+          businessId,
+          userId,
         },
       },
     });
@@ -81,20 +84,30 @@ export async function createCheckoutSession() {
 
     return { url: checkoutSession.url };
   } catch (error) {
-    console.error("Erreur création session Checkout:", error);
+    Sentry.captureException(error, {
+      tags: { action: "createCheckoutSession" },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Erreur création session Checkout:", error);
+    }
+
     return { error: "Erreur lors de la création de la session de paiement" };
   }
 }
 
 export async function getSubscriptionStatus() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return { error: "Non authentifié" };
+    const validatedSession = await validateSessionWithEmail();
+
+    if ("error" in validatedSession) {
+      return validatedSession;
     }
 
+    const { businessId } = validatedSession;
+
     const business = await prisma.business.findUnique({
-      where: { userId: session.user.id },
+      where: { id: businessId },
     });
 
     if (!business) {
@@ -141,20 +154,30 @@ export async function getSubscriptionStatus() {
       },
     };
   } catch (error) {
-    console.error("Erreur récupération abonnement:", error);
+    Sentry.captureException(error, {
+      tags: { action: "getSubscriptionStatus" },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Erreur récupération abonnement:", error);
+    }
+
     return { error: "Erreur lors de la récupération de l'abonnement" };
   }
 }
 
 export async function createCustomerPortalSession() {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.id) {
-      return { error: "Non authentifié" };
+    const validatedSession = await validateSessionWithEmail();
+
+    if ("error" in validatedSession) {
+      return validatedSession;
     }
 
+    const { businessId } = validatedSession;
+
     const business = await prisma.business.findUnique({
-      where: { userId: session.user.id },
+      where: { id: businessId },
     });
 
     if (!business) {
@@ -182,7 +205,14 @@ export async function createCustomerPortalSession() {
 
     return { url: portalSession.url };
   } catch (error) {
-    console.error("Erreur création portail client:", error);
+    Sentry.captureException(error, {
+      tags: { action: "createCustomerPortalSession" },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Erreur création portail client:", error);
+    }
+
     return { error: "Erreur lors de la création du portail client" };
   }
 }

@@ -41,7 +41,7 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
     if (result.error) {
       setError(result.error);
       toast.error("Erreur lors de la création du client");
-    } else if (result.data) {
+    } else if ("data" in result) {
       setClients([result.data, ...clients]);
       setShowForm(false);
       e.currentTarget.reset();
