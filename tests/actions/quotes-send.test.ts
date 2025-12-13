@@ -176,12 +176,11 @@ describe("sendQuote - Envoi d'emails", () => {
       const result = await sendQuote("quote_123");
 
       // Vérifier succès
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.status).toBe("SENT");
-        expect(result.data?.sentAt).toBeDefined();
-      } else {
-        throw new Error("Expected success result");
+        expect(result.data.status).toBe("SENT");
+        expect(result.data.sentAt).toBeDefined();
       }
 
       // Vérifier que findFirst a été appelé avec le bon businessId
@@ -230,10 +229,9 @@ describe("sendQuote - Envoi d'emails", () => {
 
       const result = await sendQuote("quote_123");
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Non autorisé");
-      } else {
-        throw new Error("Expected error result");
       }
 
       expect(prisma.quote.findFirst).not.toHaveBeenCalled();
@@ -245,7 +243,8 @@ describe("sendQuote - Envoi d'emails", () => {
 
       const result = await sendQuote("quote_999");
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Devis introuvable");
       }
 
@@ -267,7 +266,8 @@ describe("sendQuote - Envoi d'emails", () => {
 
       const result = await sendQuote("quote_123");
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Le client n'a pas d'adresse email");
       }
 
@@ -285,7 +285,8 @@ describe("sendQuote - Envoi d'emails", () => {
 
       const result = await sendQuote("quote_123");
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe(
           "Erreur lors de l'envoi de l'email. Veuillez réessayer."
         );
@@ -319,7 +320,8 @@ describe("sendQuote - Envoi d'emails", () => {
 
       const result = await sendQuote("quote_other_business");
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Devis introuvable");
       }
 
@@ -350,11 +352,10 @@ describe("sendQuote - Envoi d'emails", () => {
       const result = await sendQuote("quote_123");
 
       // Devrait réussir en mode simulation
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.status).toBe("SENT");
-      } else {
-        throw new Error("Expected success in dev mode");
+        expect(result.data.status).toBe("SENT");
       }
 
       // Vérifier que console.log a été appelé pour la simulation

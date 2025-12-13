@@ -12,12 +12,14 @@ import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import type { Service } from "@prisma/client";
 
-export async function getServices() {
+export async function getServices(): Promise<ActionResult<Service[]>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -28,7 +30,7 @@ export async function getServices() {
       orderBy: { createdAt: "desc" },
     });
 
-    return { data: services };
+    return successResult(services);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getServices", businessId },
@@ -38,15 +40,15 @@ export async function getServices() {
       console.error("Error fetching services:", error);
     }
 
-    return { error: "Erreur lors de la récupération des services" };
+    return errorResult("Erreur lors de la récupération des services");
   }
 }
 
-export async function createService(input: CreateServiceInput) {
+export async function createService(input: CreateServiceInput): Promise<ActionResult<Service>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId, userId } = validatedSession;
@@ -56,10 +58,7 @@ export async function createService(input: CreateServiceInput) {
 
   const validation = createServiceSchema.safeParse(sanitized);
   if (!validation.success) {
-    return {
-      error: "Données invalides",
-      fieldErrors: validation.error.flatten().fieldErrors,
-    };
+    return errorResult("Données invalides", "VALIDATION_ERROR");
   }
 
   try {
@@ -85,7 +84,7 @@ export async function createService(input: CreateServiceInput) {
     });
 
     revalidatePath("/dashboard/services");
-    return { data: service };
+    return successResult(service);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createService", businessId },
@@ -96,15 +95,15 @@ export async function createService(input: CreateServiceInput) {
       console.error("Error creating service:", error);
     }
 
-    return { error: "Erreur lors de la création du service" };
+    return errorResult("Erreur lors de la création du service");
   }
 }
 
-export async function updateService(id: string, input: UpdateServiceInput) {
+export async function updateService(id: string, input: UpdateServiceInput): Promise<ActionResult<Service>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -114,10 +113,7 @@ export async function updateService(id: string, input: UpdateServiceInput) {
 
   const validation = updateServiceSchema.safeParse(sanitized);
   if (!validation.success) {
-    return {
-      error: "Données invalides",
-      fieldErrors: validation.error.flatten().fieldErrors,
-    };
+    return errorResult("Données invalides", "VALIDATION_ERROR");
   }
 
   try {
@@ -130,7 +126,7 @@ export async function updateService(id: string, input: UpdateServiceInput) {
     });
 
     revalidatePath("/dashboard/services");
-    return { data: service };
+    return successResult(service);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "updateService", businessId },
@@ -141,15 +137,15 @@ export async function updateService(id: string, input: UpdateServiceInput) {
       console.error("Error updating service:", error);
     }
 
-    return { error: "Erreur lors de la mise à jour du service" };
+    return errorResult("Erreur lors de la mise à jour du service");
   }
 }
 
-export async function deleteService(id: string) {
+export async function deleteService(id: string): Promise<ActionResult<void>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId, userId } = validatedSession;
@@ -165,7 +161,7 @@ export async function deleteService(id: string) {
     });
 
     if (!service) {
-      return { error: "Service introuvable" };
+      return errorResult("Service introuvable", "NOT_FOUND");
     }
 
     await prisma.service.delete({
@@ -189,7 +185,7 @@ export async function deleteService(id: string) {
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true };
+    return successResult(undefined);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "deleteService", businessId },
@@ -200,6 +196,6 @@ export async function deleteService(id: string) {
       console.error("Error deleting service:", error);
     }
 
-    return { error: "Erreur lors de la suppression du service" };
+    return errorResult("Erreur lors de la suppression du service");
   }
 }

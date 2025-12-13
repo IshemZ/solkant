@@ -5,14 +5,25 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import * as Sentry from "@sentry/nextjs";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 
-export async function createCheckoutSession() {
+// Types pour les résultats Stripe
+type CheckoutSessionResult = { url: string };
+type SubscriptionStatus = {
+  plan: "free" | "pro";
+  status: string;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd?: boolean;
+};
+type CustomerPortalResult = { url: string };
+
+export async function createCheckoutSession(): Promise<ActionResult<CheckoutSessionResult>> {
   try {
     // 1. Vérifier l'authentification ET email vérifié
     const validatedSession = await validateSessionWithEmail();
 
     if ("error" in validatedSession) {
-      return validatedSession;
+      return errorResult(validatedSession.error);
     }
 
     const { businessId, userId, userEmail } = validatedSession;
@@ -23,7 +34,7 @@ export async function createCheckoutSession() {
     });
 
     if (!business) {
-      return { error: "Business introuvable" };
+      return errorResult("Business introuvable", "NOT_FOUND");
     }
 
     // 3. Créer ou récupérer le customer Stripe
@@ -79,10 +90,10 @@ export async function createCheckoutSession() {
     });
 
     if (!checkoutSession.url) {
-      return { error: "URL de session Checkout invalide" };
+      return errorResult("URL de session Checkout invalide", "INVALID_CHECKOUT_URL");
     }
 
-    return { url: checkoutSession.url };
+    return successResult({ url: checkoutSession.url });
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createCheckoutSession" },
@@ -92,16 +103,16 @@ export async function createCheckoutSession() {
       console.error("Erreur création session Checkout:", error);
     }
 
-    return { error: "Erreur lors de la création de la session de paiement" };
+    return errorResult("Erreur lors de la création de la session de paiement");
   }
 }
 
-export async function getSubscriptionStatus() {
+export async function getSubscriptionStatus(): Promise<ActionResult<SubscriptionStatus>> {
   try {
     const validatedSession = await validateSessionWithEmail();
 
     if ("error" in validatedSession) {
-      return validatedSession;
+      return errorResult(validatedSession.error);
     }
 
     const { businessId } = validatedSession;
@@ -111,7 +122,7 @@ export async function getSubscriptionStatus() {
     });
 
     if (!business) {
-      return { error: "Business introuvable" };
+      return errorResult("Business introuvable", "NOT_FOUND");
     }
 
     // Récupérer les informations de l'abonnement
@@ -122,13 +133,11 @@ export async function getSubscriptionStatus() {
     ).stripeSubscriptionId;
 
     if (!stripeSubscriptionId) {
-      return {
-        data: {
-          plan: "free",
-          status: "active",
-          currentPeriodEnd: null,
-        },
-      };
+      return successResult({
+        plan: "free" as const,
+        status: "active",
+        currentPeriodEnd: null,
+      });
     }
 
     // Récupérer l'abonnement depuis Stripe
@@ -143,16 +152,14 @@ export async function getSubscriptionStatus() {
       cancel_at_period_end: boolean;
     };
 
-    return {
-      data: {
-        plan: "pro",
-        status: subData.status,
-        currentPeriodEnd: new Date(
-          subData.current_period_end * 1000
-        ).toISOString(),
-        cancelAtPeriodEnd: subData.cancel_at_period_end,
-      },
-    };
+    return successResult({
+      plan: "pro" as const,
+      status: subData.status,
+      currentPeriodEnd: new Date(
+        subData.current_period_end * 1000
+      ).toISOString(),
+      cancelAtPeriodEnd: subData.cancel_at_period_end,
+    });
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getSubscriptionStatus" },
@@ -162,16 +169,16 @@ export async function getSubscriptionStatus() {
       console.error("Erreur récupération abonnement:", error);
     }
 
-    return { error: "Erreur lors de la récupération de l'abonnement" };
+    return errorResult("Erreur lors de la récupération de l'abonnement");
   }
 }
 
-export async function createCustomerPortalSession() {
+export async function createCustomerPortalSession(): Promise<ActionResult<CustomerPortalResult>> {
   try {
     const validatedSession = await validateSessionWithEmail();
 
     if ("error" in validatedSession) {
-      return validatedSession;
+      return errorResult(validatedSession.error);
     }
 
     const { businessId } = validatedSession;
@@ -181,14 +188,14 @@ export async function createCustomerPortalSession() {
     });
 
     if (!business) {
-      return { error: "Business introuvable" };
+      return errorResult("Business introuvable", "NOT_FOUND");
     }
 
     const stripeCustomerId = (business as { stripeCustomerId?: string | null })
       .stripeCustomerId;
 
     if (!stripeCustomerId) {
-      return { error: "Aucun compte Stripe trouvé" };
+      return errorResult("Aucun compte Stripe trouvé", "NO_STRIPE_CUSTOMER");
     }
 
     // Obtenir l'URL de base
@@ -203,7 +210,7 @@ export async function createCustomerPortalSession() {
       return_url: `${baseUrl}/dashboard/abonnement`,
     });
 
-    return { url: portalSession.url };
+    return successResult({ url: portalSession.url });
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createCustomerPortalSession" },
@@ -213,6 +220,6 @@ export async function createCustomerPortalSession() {
       console.error("Erreur création portail client:", error);
     }
 
-    return { error: "Erreur lors de la création du portail client" };
+    return errorResult("Erreur lors de la création du portail client");
   }
 }

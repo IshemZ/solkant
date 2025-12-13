@@ -13,7 +13,7 @@ export async function generateMetadata({
   const { id } = await params;
   const result = await getQuote(id);
 
-  if (result.error || !result.data) {
+  if (!result.success) {
     return {
       title: "Devis introuvable | Solkant",
       description: "Ce devis n'existe pas ou n'est plus accessible.",
@@ -39,7 +39,7 @@ export default async function QuotePage({ params }: QuotePageProps) {
   const { id } = await params;
   const result = await getQuote(id);
 
-  if (result.error || !result.data) {
+  if (!result.success) {
     redirect("/dashboard/devis");
   }
 

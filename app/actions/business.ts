@@ -9,12 +9,14 @@ import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import type { Business } from "@prisma/client";
 
-export async function getBusinessInfo() {
+export async function getBusinessInfo(): Promise<ActionResult<Business | null>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -24,7 +26,7 @@ export async function getBusinessInfo() {
       where: { id: businessId },
     });
 
-    return { data: business };
+    return successResult(business);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getBusinessInfo", businessId },
@@ -34,15 +36,15 @@ export async function getBusinessInfo() {
       console.error("Error fetching business:", error);
     }
 
-    return { error: "Erreur lors de la récupération des informations" };
+    return errorResult("Erreur lors de la récupération des informations");
   }
 }
 
-export async function updateBusiness(input: UpdateBusinessInput) {
+export async function updateBusiness(input: UpdateBusinessInput): Promise<ActionResult<Business>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -57,10 +59,7 @@ export async function updateBusiness(input: UpdateBusinessInput) {
       console.error("Validation error:", validation.error.flatten());
     }
 
-    return {
-      error: "Données invalides",
-      fieldErrors: validation.error.flatten().fieldErrors,
-    };
+    return errorResult("Données invalides", "VALIDATION_ERROR");
   }
 
   try {
@@ -70,7 +69,7 @@ export async function updateBusiness(input: UpdateBusinessInput) {
     });
 
     revalidatePath("/dashboard/parametres");
-    return { data: business };
+    return successResult(business);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "updateBusiness", businessId },
@@ -81,27 +80,27 @@ export async function updateBusiness(input: UpdateBusinessInput) {
       console.error("Error updating business:", error);
     }
 
-    return { error: "Erreur lors de la mise à jour" };
+    return errorResult("Erreur lors de la mise à jour");
   }
 }
 
-export async function uploadBusinessLogo(logoData: string) {
+export async function uploadBusinessLogo(logoData: string): Promise<ActionResult<Business>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
 
   // Valider que c'est bien une data URL d'image
   if (!logoData.startsWith("data:image/")) {
-    return { error: "Format d'image invalide" };
+    return errorResult("Format d'image invalide", "INVALID_FORMAT");
   }
 
   // Limiter la taille (5MB en base64 ≈ 3.75MB original)
   if (logoData.length > 5 * 1024 * 1024) {
-    return { error: "L'image est trop volumineuse (max 5MB)" };
+    return errorResult("L'image est trop volumineuse (max 5MB)", "FILE_TOO_LARGE");
   }
 
   try {
@@ -111,7 +110,7 @@ export async function uploadBusinessLogo(logoData: string) {
     });
 
     revalidatePath("/dashboard/parametres");
-    return { data: business };
+    return successResult(business);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "uploadBusinessLogo", businessId },
@@ -121,15 +120,15 @@ export async function uploadBusinessLogo(logoData: string) {
       console.error("Error uploading logo:", error);
     }
 
-    return { error: "Erreur lors de l'upload du logo" };
+    return errorResult("Erreur lors de l'upload du logo");
   }
 }
 
-export async function deleteBusinessLogo() {
+export async function deleteBusinessLogo(): Promise<ActionResult<Business>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -141,7 +140,7 @@ export async function deleteBusinessLogo() {
     });
 
     revalidatePath("/dashboard/parametres");
-    return { data: business };
+    return successResult(business);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "deleteBusinessLogo", businessId },
@@ -151,6 +150,6 @@ export async function deleteBusinessLogo() {
       console.error("Error deleting logo:", error);
     }
 
-    return { error: "Erreur lors de la suppression du logo" };
+    return errorResult("Erreur lors de la suppression du logo");
   }
 }

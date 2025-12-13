@@ -56,18 +56,8 @@ export default function ClientForm({
           ? await updateClient(client.id, data)
           : await createClient(data);
 
-      if ("error" in result) {
+      if (!result.success) {
         toast.error(result.error);
-        if ("fieldErrors" in result && result.fieldErrors) {
-          Object.entries(result.fieldErrors).forEach(([key, value]) => {
-            if (Array.isArray(value) && value.length > 0) {
-              setError(key as keyof CreateClientInput, {
-                type: "server",
-                message: value[0],
-              });
-            }
-          });
-        }
       } else {
         toast.success(
           isEdit ? "Client modifié avec succès" : "Client créé avec succès"

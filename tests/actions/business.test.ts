@@ -94,9 +94,11 @@ describe("Business Server Actions", () => {
 
       const result = await getBusinessInfo();
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.name).toBe("Mon Institut");
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.name).toBe("Mon Institut");
+      }
 
       expect(prisma.business.findUnique).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -108,8 +110,10 @@ describe("Business Server Actions", () => {
 
       const result = await getBusinessInfo();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.business.findUnique).not.toHaveBeenCalled();
     });
 
@@ -131,9 +135,12 @@ describe("Business Server Actions", () => {
 
       const result = await getBusinessInfo();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
-        expect(result.code).toBe("NO_BUSINESS");
+        if ("code" in result) {
+          expect(result.code).toBe("NO_BUSINESS");
+        }
       }
       expect(prisma.business.findUnique).not.toHaveBeenCalled();
     });
@@ -147,12 +154,12 @@ describe("Business Server Actions", () => {
 
       const result = await getBusinessInfo();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe(
           "Erreur lors de la récupération des informations"
         );
       }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
     });
   });
 
@@ -173,11 +180,11 @@ describe("Business Server Actions", () => {
 
       const result = await updateBusiness(updateData);
 
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.name).toBe("Institut de Beauté");
+        expect(result.data.name).toBe("Institut de Beauté");
       }
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -190,7 +197,10 @@ describe("Business Server Actions", () => {
 
       const result = await updateBusiness({ name: "Test" });
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -201,8 +211,11 @@ describe("Business Server Actions", () => {
       // Nom trop court
       const result = await updateBusiness({ name: "A" });
 
-      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
-      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success && "fieldErrors" in result) {
+        expect(result.error).toBe("Données invalides");
+        expect(result.fieldErrors).toBeDefined();
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -237,8 +250,10 @@ describe("Business Server Actions", () => {
 
       const result = await updateBusiness({ name: "Test Business" });
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la mise à jour"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de la mise à jour");
+      }
     });
   });
 
@@ -255,11 +270,11 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.logo).toBe(validLogoData);
+        expect(result.data.logo).toBe(validLogoData);
       }
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -273,7 +288,10 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo("data:text/plain;base64,test");
 
-      if ("error" in result) { expect(result.error).toBe("Format d'image invalide"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Format d'image invalide");
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -286,7 +304,10 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(largeData);
 
-      if ("error" in result) { expect(result.error).toBe("L'image est trop volumineuse (max 5MB)"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("L'image est trop volumineuse (max 5MB)");
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -295,7 +316,10 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -308,8 +332,10 @@ describe("Business Server Actions", () => {
 
       const result = await uploadBusinessLogo(validLogoData);
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de l'upload du logo"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de l'upload du logo");
+      }
     });
   });
 
@@ -324,11 +350,11 @@ describe("Business Server Actions", () => {
 
       const result = await deleteBusinessLogo();
 
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.logo).toBeNull();
+        expect(result.data.logo).toBeNull();
       }
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
 
       expect(prisma.business.update).toHaveBeenCalledWith({
         where: { id: "business_123" },
@@ -341,7 +367,10 @@ describe("Business Server Actions", () => {
 
       const result = await deleteBusinessLogo();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
@@ -354,8 +383,10 @@ describe("Business Server Actions", () => {
 
       const result = await deleteBusinessLogo();
 
-      if ("error" in result) { expect(result.error).toContain("Erreur"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("Erreur");
+      }
     });
   });
 });

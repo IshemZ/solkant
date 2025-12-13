@@ -25,25 +25,25 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
         // Créer une session de paiement pour upgrade
         const result = await createCheckoutSession();
 
-        if ("error" in result) {
+        if (!result.success) {
           toast.error(result.error);
           return;
         }
 
-        if (result.url) {
-          window.location.href = result.url;
+        if (result.data.url) {
+          window.location.href = result.data.url;
         }
       } else if (type === "manage" || type === "downgrade") {
         // Rediriger vers le portail client Stripe
         const result = await createCustomerPortalSession();
 
-        if ("error" in result) {
+        if (!result.success) {
           toast.error(result.error);
           return;
         }
 
-        if (result.url) {
-          window.location.href = result.url;
+        if (result.data.url) {
+          window.location.href = result.data.url;
         }
       }
     } catch (error) {

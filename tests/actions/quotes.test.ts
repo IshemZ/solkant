@@ -123,10 +123,13 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuotes();
 
-      if ("data" in result) { expect(result.data).toHaveLength(1); }
-      expect(result.data?.[0].quoteNumber).toBe("DEVIS-2024-001");
-      expect(result.data?.[0].client.firstName).toBe("Marie");
-      expect(result.data?.[0].items).toHaveLength(1);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toHaveLength(1);
+        expect(result.data[0].quoteNumber).toBe("DEVIS-2024-001");
+        expect(result.data[0].client.firstName).toBe("Marie");
+        expect(result.data[0].items).toHaveLength(1);
+      }
 
       // ✅ CRITIQUE: Vérifier filtrage businessId
       expect(prisma.quote.findMany).toHaveBeenCalledWith({
@@ -148,7 +151,10 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuotes();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.quote.findMany).not.toHaveBeenCalled();
     });
 
@@ -161,7 +167,10 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuotes();
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des devis"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de la récupération des devis");
+      }
     });
   });
 
@@ -239,9 +248,12 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuote("quote_1");
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.quoteNumber).toBe("DEVIS-2024-001");
-      expect(result.data?.business.name).toBe("Mon Salon");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.quoteNumber).toBe("DEVIS-2024-001");
+        expect(result.data.business.name).toBe("Mon Salon");
+      }
 
       // ✅ CRITIQUE: Vérifier filtrage businessId
       expect(prisma.quote.findFirst).toHaveBeenCalledWith({
@@ -268,7 +280,10 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuote("quote_not_found");
 
-      if ("error" in result) { expect(result.error).toBe("Devis introuvable"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Devis introuvable");
+      }
     });
 
     it("should return error if not authenticated", async () => {
@@ -276,7 +291,10 @@ describe("Quote Server Actions", () => {
 
       const result = await getQuote("quote_1");
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.quote.findFirst).not.toHaveBeenCalled();
     });
   });
@@ -353,8 +371,11 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
+      }
     });
 
     it("should increment quote number correctly", async () => {
@@ -437,7 +458,10 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      expect(result.data?.quoteNumber).toBe("DEVIS-2024-043");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.quoteNumber).toBe("DEVIS-2024-043");
+      }
     });
   });
 
@@ -516,8 +540,11 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      expect(result.data?.subtotal).toBe(130);
-      expect(result.data?.total).toBe(130);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.subtotal).toBe(130);
+        expect(result.data.total).toBe(130);
+      }
     });
 
     it("should apply discount correctly", async () => {
@@ -580,8 +607,11 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      expect(result.data?.subtotal).toBe(100);
-      expect(result.data?.total).toBe(80);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.subtotal).toBe(100);
+        expect(result.data.total).toBe(80);
+      }
     });
 
     it("should handle multiple quantities", async () => {
@@ -644,9 +674,12 @@ describe("Quote Server Actions", () => {
 
       const result = await createQuote(quoteInput);
 
-      expect(result.data?.items[0].quantity).toBe(3);
-      expect(result.data?.items[0].total).toBe(150);
-      expect(result.data?.subtotal).toBe(150);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.items[0].quantity).toBe(3);
+        expect(result.data.items[0].total).toBe(150);
+        expect(result.data.subtotal).toBe(150);
+      }
     });
   });
 
@@ -663,8 +696,13 @@ describe("Quote Server Actions", () => {
         items: [],
       });
 
-      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
-      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Données invalides");
+        if ("fieldErrors" in result) {
+          expect(result.fieldErrors).toBeDefined();
+        }
+      }
       expect(prisma.quote.create).not.toHaveBeenCalled();
     });
 
@@ -688,7 +726,10 @@ describe("Quote Server Actions", () => {
         ],
       });
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.quote.create).not.toHaveBeenCalled();
     });
   });
@@ -756,7 +797,10 @@ describe("Quote Server Actions", () => {
 
       const result = await deleteQuote("quote_123");
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.quote.delete).not.toHaveBeenCalled();
     });
 
@@ -769,7 +813,10 @@ describe("Quote Server Actions", () => {
 
       const result = await deleteQuote("quote_other");
 
-      if ("error" in result) { expect(result.error).toBe("Devis introuvable"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Devis introuvable");
+      }
       expect(prisma.quote.delete).not.toHaveBeenCalled();
     });
   });

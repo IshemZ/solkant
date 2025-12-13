@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function ParametresPage() {
   const result = await getBusinessInfo();
 
-  if (result.error || !result.data) {
+  if (!result.success || !result.data) {
     redirect("/dashboard");
   }
 

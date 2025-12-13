@@ -7,12 +7,26 @@ import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
 
-export async function getQuotes() {
+// Types pour les quotes avec relations
+type QuoteWithRelations = Quote & {
+  client: Client | null;
+  items: (QuoteItem & { service: Service | null })[];
+};
+
+type QuoteWithFullRelations = Quote & {
+  client: Client | null;
+  business: Business;
+  items: (QuoteItem & { service: Service | null })[];
+};
+
+export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -31,7 +45,7 @@ export async function getQuotes() {
       orderBy: { createdAt: "desc" },
     });
 
-    return { data: quotes };
+    return successResult(quotes);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getQuotes", businessId },
@@ -41,15 +55,15 @@ export async function getQuotes() {
       console.error("Error fetching quotes:", error);
     }
 
-    return { error: "Erreur lors de la récupération des devis" };
+    return errorResult("Erreur lors de la récupération des devis");
   }
 }
 
-export async function getQuote(id: string) {
+export async function getQuote(id: string): Promise<ActionResult<QuoteWithFullRelations>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId } = validatedSession;
@@ -72,10 +86,10 @@ export async function getQuote(id: string) {
     });
 
     if (!quote) {
-      return { error: "Devis introuvable" };
+      return errorResult("Devis introuvable", "NOT_FOUND");
     }
 
-    return { data: quote };
+    return successResult(quote);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getQuote", businessId },
@@ -86,7 +100,7 @@ export async function getQuote(id: string) {
       console.error("Error fetching quote:", error);
     }
 
-    return { error: "Erreur lors de la récupération du devis" };
+    return errorResult("Erreur lors de la récupération du devis");
   }
 }
 
@@ -184,11 +198,11 @@ async function createQuoteWithRetry(
   throw new Error("Failed to create quote after maximum retries");
 }
 
-export async function createQuote(input: CreateQuoteInput) {
+export async function createQuote(input: CreateQuoteInput): Promise<ActionResult<QuoteWithRelations>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId, userId } = validatedSession;
@@ -198,10 +212,7 @@ export async function createQuote(input: CreateQuoteInput) {
 
   const validation = createQuoteSchema.safeParse(sanitized);
   if (!validation.success) {
-    return {
-      error: "Données invalides",
-      fieldErrors: validation.error.flatten().fieldErrors,
-    };
+    return errorResult("Données invalides", "VALIDATION_ERROR");
   }
 
   try {
@@ -224,7 +235,7 @@ export async function createQuote(input: CreateQuoteInput) {
     });
 
     revalidatePath("/dashboard/devis");
-    return { data: quote };
+    return successResult(quote);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createQuote", businessId },
@@ -235,15 +246,15 @@ export async function createQuote(input: CreateQuoteInput) {
       console.error("Error creating quote:", error);
     }
 
-    return { error: "Erreur lors de la création du devis" };
+    return errorResult("Erreur lors de la création du devis");
   }
 }
 
-export async function deleteQuote(id: string) {
+export async function deleteQuote(id: string): Promise<ActionResult<void>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { businessId, userId } = validatedSession;
@@ -259,7 +270,7 @@ export async function deleteQuote(id: string) {
     });
 
     if (!quote) {
-      return { error: "Devis introuvable" };
+      return errorResult("Devis introuvable", "NOT_FOUND");
     }
 
     await prisma.quote.delete({
@@ -285,7 +296,7 @@ export async function deleteQuote(id: string) {
     });
 
     revalidatePath("/dashboard/devis");
-    return { success: true };
+    return successResult(undefined);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "deleteQuote", businessId },
@@ -296,7 +307,7 @@ export async function deleteQuote(id: string) {
       console.error("Error deleting quote:", error);
     }
 
-    return { error: "Erreur lors de la suppression du devis" };
+    return errorResult("Erreur lors de la suppression du devis");
   }
 }
 
@@ -304,11 +315,11 @@ export async function deleteQuote(id: string) {
  * Envoie un devis par email au client
  * Met à jour le statut à SENT et enregistre la date d'envoi
  */
-export async function sendQuote(id: string) {
+export async function sendQuote(id: string): Promise<ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>> {
   const validatedSession = await validateSessionWithEmail();
 
   if ("error" in validatedSession) {
-    return validatedSession;
+    return errorResult(validatedSession.error);
   }
 
   const { userId, businessId } = validatedSession;
@@ -332,11 +343,11 @@ export async function sendQuote(id: string) {
     });
 
     if (!quote) {
-      return { error: "Devis introuvable" };
+      return errorResult("Devis introuvable", "NOT_FOUND");
     }
 
     if (!quote.client?.email) {
-      return { error: "Le client n'a pas d'adresse email" };
+      return errorResult("Le client n'a pas d'adresse email", "INVALID_CLIENT");
     }
 
     // Vérifier que Resend est configuré
@@ -351,7 +362,7 @@ export async function sendQuote(id: string) {
         console.log(`   → Total: ${quote.total.toFixed(2)} €\n`);
 
         // Mettre à jour le devis même en mode simulation
-        const updatedQuote = await prisma.quote.update({
+        await prisma.quote.update({
           where: { id },
           data: {
             status: "SENT",
@@ -374,13 +385,18 @@ export async function sendQuote(id: string) {
         });
 
         revalidatePath("/dashboard/devis");
-        return { data: updatedQuote };
+        // Retourner le quote avec les relations mis à jour
+        return successResult({
+          ...quote,
+          status: "SENT" as const,
+          sentAt: new Date(),
+        });
       }
 
-      return {
-        error:
-          "Service d'envoi d'emails non configuré. Veuillez ajouter RESEND_API_KEY dans .env",
-      };
+      return errorResult(
+        "Service d'envoi d'emails non configuré. Veuillez ajouter RESEND_API_KEY dans .env",
+        "EMAIL_NOT_CONFIGURED"
+      );
     }
 
     // Générer le contenu de l'email
@@ -436,9 +452,10 @@ export async function sendQuote(id: string) {
         extra: { quoteId: id, clientEmail: quote.client.email },
       });
 
-      return {
-        error: "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
-      };
+      return errorResult(
+        "Erreur lors de l'envoi de l'email. Veuillez réessayer.",
+        "EMAIL_SEND_ERROR"
+      );
     }
 
     // Mettre à jour le devis avec le statut SENT et la date d'envoi
@@ -470,7 +487,7 @@ export async function sendQuote(id: string) {
     });
 
     revalidatePath("/dashboard/devis");
-    return { data: updatedQuote };
+    return successResult(updatedQuote);
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "sendQuote", businessId },
@@ -481,6 +498,6 @@ export async function sendQuote(id: string) {
       console.error("Error sending quote:", error);
     }
 
-    return { error: "Erreur lors de l'envoi du devis" };
+    return errorResult("Erreur lors de l'envoi du devis");
   }
 }

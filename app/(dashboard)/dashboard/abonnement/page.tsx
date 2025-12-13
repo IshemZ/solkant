@@ -13,7 +13,7 @@ export default async function AbonnementPage() {
 
   const result = await getSubscriptionStatus();
 
-  if ("error" in result) {
+  if (!result.success) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
         <div className="rounded-lg bg-red-50 p-4 text-red-800">
@@ -23,7 +23,7 @@ export default async function AbonnementPage() {
     );
   }
 
-  const subscription = result.data!;
+  const subscription = result.data;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">

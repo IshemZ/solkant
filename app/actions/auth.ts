@@ -13,6 +13,11 @@ import { authOptions } from "@/lib/auth";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 import * as Sentry from "@sentry/nextjs";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+
+// Types spécifiques pour auth
+type VerifyEmailResult = { userId: string };
+type CheckEmailVerificationResult = { isVerified: boolean; email: string | null };
 
 /**
  * Configuration des tokens de vérification
@@ -59,7 +64,7 @@ function getTokenExpiry(): Date {
  */
 export async function generateVerificationToken(
   userId: string
-): Promise<{ success: boolean; error?: string }> {
+): Promise<ActionResult<void>> {
   try {
     // Récupérer l'utilisateur
     const user = await prisma.user.findUnique({
@@ -73,11 +78,11 @@ export async function generateVerificationToken(
     });
 
     if (!user) {
-      return { success: false, error: "Utilisateur introuvable" };
+      return errorResult("Utilisateur introuvable", "NOT_FOUND");
     }
 
     if (user.emailVerified) {
-      return { success: false, error: "Email déjà vérifié" };
+      return errorResult("Email déjà vérifié", "ALREADY_VERIFIED");
     }
 
     // Générer nouveau token
@@ -114,21 +119,17 @@ export async function generateVerificationToken(
         extra: { userId, emailError: emailResult.error },
       });
 
-      return {
-        success: false,
-        error:
-          "Impossible d'envoyer l'email de vérification. Veuillez réessayer.",
-      };
+      return errorResult(
+        "Impossible d'envoyer l'email de vérification. Veuillez réessayer.",
+        "EMAIL_SEND_ERROR"
+      );
     }
 
-    return { success: true };
+    return successResult(undefined);
   } catch (error) {
     console.error("[generateVerificationToken]", error);
     Sentry.captureException(error);
-    return {
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer.",
-    };
+    return errorResult("Une erreur est survenue. Veuillez réessayer.");
   }
 }
 
@@ -151,14 +152,10 @@ export async function generateVerificationToken(
  * }
  * ```
  */
-export async function verifyEmailToken(token: string): Promise<{
-  success: boolean;
-  error?: string;
-  userId?: string;
-}> {
+export async function verifyEmailToken(token: string): Promise<ActionResult<VerifyEmailResult>> {
   try {
     if (!token || token.length !== 64) {
-      return { success: false, error: "Token invalide" };
+      return errorResult("Token invalide", "INVALID_TOKEN");
     }
 
     // Rechercher l'utilisateur avec ce token
@@ -176,27 +173,23 @@ export async function verifyEmailToken(token: string): Promise<{
     });
 
     if (!user) {
-      return {
-        success: false,
-        error: "Token invalide ou déjà utilisé",
-      };
+      return errorResult("Token invalide ou déjà utilisé", "INVALID_TOKEN");
     }
 
     // Vérifier si déjà vérifié
     if (user.emailVerified) {
-      return {
-        success: false,
-        error: "Email déjà vérifié. Vous pouvez vous connecter.",
-      };
+      return errorResult(
+        "Email déjà vérifié. Vous pouvez vous connecter.",
+        "ALREADY_VERIFIED"
+      );
     }
 
     // Vérifier l'expiration
     if (!user.tokenExpiry || user.tokenExpiry < new Date()) {
-      return {
-        success: false,
-        error:
-          "Ce lien a expiré. Veuillez demander un nouveau lien de vérification.",
-      };
+      return errorResult(
+        "Ce lien a expiré. Veuillez demander un nouveau lien de vérification.",
+        "TOKEN_EXPIRED"
+      );
     }
 
     // ✅ Token valide : marquer l'email comme vérifié
@@ -211,17 +204,11 @@ export async function verifyEmailToken(token: string): Promise<{
 
     console.log(`✅ Email vérifié pour utilisateur: ${user.id}`);
 
-    return {
-      success: true,
-      userId: user.id,
-    };
+    return successResult({ userId: user.id });
   } catch (error) {
     console.error("[verifyEmailToken]", error);
     Sentry.captureException(error);
-    return {
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer.",
-    };
+    return errorResult("Une erreur est survenue. Veuillez réessayer.");
   }
 }
 
@@ -233,15 +220,12 @@ export async function verifyEmailToken(token: string): Promise<{
  *
  * @returns Résultat de l'opération
  */
-export async function resendVerificationEmail(): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+export async function resendVerificationEmail(): Promise<ActionResult<void>> {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.email) {
-      return { success: false, error: "Non authentifié" };
+      return errorResult("Non authentifié", "UNAUTHORIZED");
     }
 
     // Récupérer l'utilisateur
@@ -257,11 +241,11 @@ export async function resendVerificationEmail(): Promise<{
     });
 
     if (!user) {
-      return { success: false, error: "Utilisateur introuvable" };
+      return errorResult("Utilisateur introuvable", "NOT_FOUND");
     }
 
     if (user.emailVerified) {
-      return { success: false, error: "Email déjà vérifié" };
+      return errorResult("Email déjà vérifié", "ALREADY_VERIFIED");
     }
 
     // Rate limiting basique : vérifier si un token récent existe déjà
@@ -273,10 +257,10 @@ export async function resendVerificationEmail(): Promise<{
       // Permettre renvoi seulement si le dernier token expire dans plus de 23h
       // (donc envoyé il y a plus de 1h)
       if (minutesRemaining > 23 * 60) {
-        return {
-          success: false,
-          error: `Veuillez patienter avant de renvoyer un email. Un lien valide a déjà été envoyé.`,
-        };
+        return errorResult(
+          `Veuillez patienter avant de renvoyer un email. Un lien valide a déjà été envoyé.`,
+          "RATE_LIMIT"
+        );
       }
     }
 
@@ -285,10 +269,7 @@ export async function resendVerificationEmail(): Promise<{
   } catch (error) {
     console.error("[resendVerificationEmail]", error);
     Sentry.captureException(error);
-    return {
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer.",
-    };
+    return errorResult("Une erreur est survenue. Veuillez réessayer.");
   }
 }
 
@@ -348,7 +329,7 @@ export async function checkEmailVerificationStatus(): Promise<{
  */
 export async function requestPasswordReset(input: {
   email: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<ActionResult<void>> {
   try {
     const { email } = input;
 
@@ -363,7 +344,7 @@ export async function requestPasswordReset(input: {
     if (!user) {
       // Simuler un délai pour éviter le timing attack
       await new Promise((resolve) => setTimeout(resolve, 500));
-      return { success: true };
+      return successResult(undefined);
     }
 
     // Invalider tous les anciens tokens non utilisés pour cet email
@@ -410,11 +391,10 @@ export async function requestPasswordReset(input: {
         extra: { email: user.email, emailError: emailResult.error },
       });
 
-      return {
-        success: false,
-        error:
-          "Impossible d'envoyer l'email de réinitialisation. Veuillez réessayer.",
-      };
+      return errorResult(
+        "Impossible d'envoyer l'email de réinitialisation. Veuillez réessayer.",
+        "EMAIL_SEND_ERROR"
+      );
     }
 
     // Logger en développement pour faciliter le test
@@ -424,17 +404,14 @@ export async function requestPasswordReset(input: {
       );
     }
 
-    return { success: true };
+    return successResult(undefined);
   } catch (error) {
     console.error("[requestPasswordReset]", error);
     Sentry.captureException(error, {
       tags: { action: "requestPasswordReset" },
       extra: { email: input.email },
     });
-    return {
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer.",
-    };
+    return errorResult("Une erreur est survenue. Veuillez réessayer.");
   }
 }
 
@@ -464,7 +441,7 @@ export async function resetPasswordWithOTP(input: {
   code: string;
   newPassword: string;
   confirmPassword: string;
-}): Promise<{ success: boolean; error?: string }> {
+}): Promise<ActionResult<void>> {
   try {
     const { email, code, newPassword } = input;
 
@@ -484,10 +461,10 @@ export async function resetPasswordWithOTP(input: {
     });
 
     if (!token) {
-      return {
-        success: false,
-        error: "Code invalide ou expiré. Veuillez demander un nouveau code.",
-      };
+      return errorResult(
+        "Code invalide ou expiré. Veuillez demander un nouveau code.",
+        "INVALID_OR_EXPIRED_TOKEN"
+      );
     }
 
     // Récupérer l'utilisateur
@@ -496,10 +473,7 @@ export async function resetPasswordWithOTP(input: {
     });
 
     if (!user) {
-      return {
-        success: false,
-        error: "Utilisateur introuvable.",
-      };
+      return errorResult("Utilisateur introuvable.", "NOT_FOUND");
     }
 
     // Hasher le nouveau mot de passe
@@ -518,16 +492,13 @@ export async function resetPasswordWithOTP(input: {
       }),
     ]);
 
-    return { success: true };
+    return successResult(undefined);
   } catch (error) {
     console.error("[resetPasswordWithOTP]", error);
     Sentry.captureException(error, {
       tags: { action: "resetPasswordWithOTP" },
       extra: { email: input.email },
     });
-    return {
-      success: false,
-      error: "Une erreur est survenue. Veuillez réessayer.",
-    };
+    return errorResult("Une erreur est survenue. Veuillez réessayer.");
   }
 }

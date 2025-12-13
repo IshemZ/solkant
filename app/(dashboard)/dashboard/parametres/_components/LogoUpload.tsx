@@ -51,7 +51,7 @@ export default function LogoUpload({
         // Upload
         const result = await uploadBusinessLogo(base64String);
 
-        if (result.error) {
+        if (!result.success) {
           toast.error(result.error);
           setPreviewUrl(currentLogo);
         } else {
@@ -80,7 +80,7 @@ export default function LogoUpload({
     setIsUploading(true);
     const result = await deleteBusinessLogo();
 
-    if (result.error) {
+    if (!result.success) {
       toast.error(result.error);
     } else {
       toast.success("Logo supprimé");

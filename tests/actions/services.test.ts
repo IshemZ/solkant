@@ -80,8 +80,11 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      if ("data" in result) { expect(result.data).toHaveLength(1); }
-      expect(result.data?.[0].name).toBe("Coupe classique");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toHaveLength(1);
+        expect(result.data[0].name).toBe("Coupe classique");
+      }
 
       // ✅ CRITIQUE: Vérifier filtrage businessId
       expect(prisma.service.findMany).toHaveBeenCalledWith({
@@ -95,8 +98,10 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.service.findMany).not.toHaveBeenCalled();
     });
 
@@ -117,7 +122,8 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
         expect(result.code).toBe("NO_BUSINESS");
       }
@@ -133,8 +139,10 @@ describe("Service Server Actions", () => {
 
       const result = await getServices();
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des services"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de la récupération des services");
+      }
     });
   });
 
@@ -164,9 +172,12 @@ describe("Service Server Actions", () => {
 
       const result = await createService(newServiceData);
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.name).toBe("Balayage");
-      expect(result.data?.price).toBe(120);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.name).toBe("Balayage");
+        expect(result.data.price).toBe(120);
+      }
 
       // ✅ CRITIQUE: Vérifier injection businessId
       expect(prisma.service.create).toHaveBeenCalledWith({
@@ -202,8 +213,11 @@ describe("Service Server Actions", () => {
 
       const result = await createService(minimalData);
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.name).toBe("Service Simple");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.name).toBe("Service Simple");
+      }
     });
 
     it("should return validation error for invalid data", async () => {
@@ -215,8 +229,13 @@ describe("Service Server Actions", () => {
         price: -10, // Prix négatif invalide
       });
 
-      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
-      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Données invalides");
+        if ("fieldErrors" in result) {
+          expect(result.fieldErrors).toBeDefined();
+        }
+      }
       expect(prisma.service.create).not.toHaveBeenCalled();
     });
 
@@ -228,7 +247,10 @@ describe("Service Server Actions", () => {
         price: 50,
       });
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.service.create).not.toHaveBeenCalled();
     });
   });
@@ -259,9 +281,12 @@ describe("Service Server Actions", () => {
 
       const result = await updateService("service_1", updateData);
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.name).toBe("Coupe Premium");
-      expect(result.data?.price).toBe(45);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.name).toBe("Coupe Premium");
+        expect(result.data.price).toBe(45);
+      }
 
       // ✅ CRITIQUE: Vérifier filtrage businessId dans update
       expect(prisma.service.update).toHaveBeenCalledWith({
@@ -298,7 +323,10 @@ describe("Service Server Actions", () => {
 
       const result = await updateService("service_1", partialUpdate);
 
-      expect(result.data?.price).toBe(60);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.price).toBe(60);
+      }
       expect(prisma.service.update).toHaveBeenCalledWith({
         where: {
           id: "service_1",
@@ -316,7 +344,10 @@ describe("Service Server Actions", () => {
         price: -50, // Prix négatif
       });
 
-      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Données invalides");
+      }
       expect(prisma.service.update).not.toHaveBeenCalled();
     });
 
@@ -329,7 +360,10 @@ describe("Service Server Actions", () => {
 
       const result = await updateService("service_other", { name: "Test" });
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la mise à jour du service"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de la mise à jour du service");
+      }
     });
   });
 
@@ -390,7 +424,10 @@ describe("Service Server Actions", () => {
 
       const result = await deleteService("service_123");
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.service.delete).not.toHaveBeenCalled();
     });
 
@@ -403,7 +440,10 @@ describe("Service Server Actions", () => {
 
       const result = await deleteService("service_other");
 
-      if ("error" in result) { expect(result.error).toBe("Service introuvable"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Service introuvable");
+      }
       expect(prisma.service.delete).not.toHaveBeenCalled();
     });
   });

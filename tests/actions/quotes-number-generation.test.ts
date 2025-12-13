@@ -127,8 +127,9 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       } as any);
 
       const result1 = await createQuote(validQuoteInput);
-      if ("data" in result1) {
-        expect(result1.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`); // Business 2 crée AUSSI DEVIS-2025-001 (différent businessId)
+      expect(result1.success).toBe(true);
+      if (result1.success) {
+        expect(result1.data.quoteNumber).toBe(`DEVIS-${currentYear}-001`); // Business 2 crée AUSSI DEVIS-2025-001 (différent businessId)
       }
       vi.mocked(getServerSession).mockResolvedValueOnce({
         user: {
@@ -173,12 +174,13 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result2 = await createQuote(validQuoteInput);
 
       // Les deux quotes ont le même numéro MAIS des businessId différents
-      if ("data" in result2) {
-        expect(result2.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
-        expect(result2.data?.businessId).toBe("clxxx555555555555555");
+      expect(result2.success).toBe(true);
+      if (result2.success) {
+        expect(result2.data.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
+        expect(result2.data.businessId).toBe("clxxx555555555555555");
       }
-      if ("data" in result1) {
-        expect(result1.data?.businessId).toBe("clxxx222222222222222");
+      if (result1.success) {
+        expect(result1.data.businessId).toBe("clxxx222222222222222");
       }
     });
 
@@ -282,9 +284,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ Le retry a fonctionné
-      if ("data" in result) {
+      expect(result.success).toBe(true);
+      if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
+        expect(result.data.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
       }
 
       // Vérifie qu'il y a eu 2 appels à create (1 échec + 1 succès)
@@ -303,8 +306,11 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ L'erreur est retournée après max retries
-      if ("error" in result) { expect(result.error).toBeDefined(); }
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la création du devis"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeDefined();
+        expect(result.error).toBe("Erreur lors de la création du devis");
+      }
 
       // Vérifie qu'il y a eu exactement 4 tentatives
       expect(mockCreate).toHaveBeenCalledTimes(4);
@@ -321,7 +327,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       const result = await createQuote(validQuoteInput);
 
       // ✅ Échec immédiat sans retry
-      if ("error" in result) { expect(result.error).toBeDefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBeDefined();
+      }
       expect(mockCreate).toHaveBeenCalledTimes(1); // Une seule tentative
     });
   });
@@ -364,9 +373,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
 
       const result = await createQuote(validQuoteInput);
 
-      if ("data" in result) {
-        expect(result.data?.quoteNumber).toBe(expectedNumber);
-        expect(result.data?.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.quoteNumber).toBe(expectedNumber);
+        expect(result.data.quoteNumber).toMatch(/^DEVIS-\d{4}-\d{3}$/);
       }
     });
 
@@ -423,8 +433,9 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
 
       const result = await createQuote(validQuoteInput);
 
-      if ("data" in result) {
-        expect(result.data?.quoteNumber).toBe(`DEVIS-${currentYear}-006`);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.quoteNumber).toBe(`DEVIS-${currentYear}-006`);
       }
     });
   });

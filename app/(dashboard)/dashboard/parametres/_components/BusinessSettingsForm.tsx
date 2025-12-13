@@ -39,9 +39,9 @@ export default function BusinessSettingsForm({
 
     const result = await updateBusiness(data);
 
-    if ("error" in result) {
+    if (!result.success) {
       setError(result.error || null);
-      if ("fieldErrors" in result && result.fieldErrors) {
+      if (result.fieldErrors) {
         setFieldErrors(result.fieldErrors as Record<string, string[]>);
       }
       toast.error("Erreur lors de la mise à jour");

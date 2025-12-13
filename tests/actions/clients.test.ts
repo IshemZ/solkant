@@ -74,8 +74,11 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      if ("data" in result) { expect(result.data).toHaveLength(1); }
-      expect(result.data?.[0].firstName).toBe("Jean");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toHaveLength(1);
+        expect(result.data[0].firstName).toBe("Jean");
+      }
 
       // ✅ CRITIQUE: Vérifier que le filtrage businessId est appliqué
       expect(prisma.client.findMany).toHaveBeenCalledWith({
@@ -89,8 +92,10 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.client.findMany).not.toHaveBeenCalled();
     });
 
@@ -111,7 +116,8 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
         expect(result.code).toBe("NO_BUSINESS");
       }
@@ -127,8 +133,10 @@ describe("Client Server Actions", () => {
 
       const result = await getClients();
 
-      if ("error" in result) { expect(result.error).toBe("Erreur lors de la récupération des clients"); }
-      if ("data" in result) { expect(result.data).toBeUndefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Erreur lors de la récupération des clients");
+      }
     });
   });
 
@@ -158,8 +166,11 @@ describe("Client Server Actions", () => {
 
       const result = await createClient(newClientData);
 
-      if ("data" in result) { expect(result.data).toBeDefined(); }
-      expect(result.data?.firstName).toBe("Marie");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.firstName).toBe("Marie");
+      }
 
       // ✅ CRITIQUE: Vérifier injection businessId
       expect(prisma.client.create).toHaveBeenCalledWith({
@@ -179,8 +190,13 @@ describe("Client Server Actions", () => {
         lastName: "Test",
       } as any);
 
-      if ("error" in result) { expect(result.error).toBe("Données invalides"); }
-      if ("fieldErrors" in result) { expect(result.fieldErrors).toBeDefined(); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Données invalides");
+        if ("fieldErrors" in result) {
+          expect(result.fieldErrors).toBeDefined();
+        }
+      }
       expect(prisma.client.create).not.toHaveBeenCalled();
     });
 
@@ -192,7 +208,10 @@ describe("Client Server Actions", () => {
         lastName: "User",
       });
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(prisma.client.create).not.toHaveBeenCalled();
     });
   });
@@ -258,7 +277,10 @@ describe("Client Server Actions", () => {
 
       const result = await deleteClient("client_other");
 
-      if ("error" in result) { expect(result.error).toBe("Client introuvable"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Client introuvable");
+      }
       expect(prisma.client.delete).not.toHaveBeenCalled();
     });
   });

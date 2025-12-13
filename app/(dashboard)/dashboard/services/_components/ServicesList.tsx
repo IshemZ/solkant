@@ -40,10 +40,10 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
 
     const result = await createService(data);
 
-    if (result.error) {
+    if (!result.success) {
       setError(result.error);
       toast.error("Erreur lors de la création du service");
-    } else if ("data" in result) {
+    } else {
       setServices([result.data, ...services]);
       setShowForm(false);
       e.currentTarget.reset();

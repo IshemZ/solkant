@@ -38,15 +38,16 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
 
     const result = await createClient(data);
 
-    if (result.error) {
+    if (!result.success) {
       setError(result.error);
       toast.error("Erreur lors de la création du client");
-    } else if ("data" in result) {
-      setClients([result.data, ...clients]);
+    } else {
+      const client = result.data;
+      setClients([client, ...clients]);
       setShowForm(false);
       e.currentTarget.reset();
       toast.success(
-        `Client ${result.data.firstName} ${result.data.lastName} créé avec succès`
+        `Client ${client.firstName} ${client.lastName} créé avec succès`
       );
     }
 
@@ -62,11 +63,11 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
     if (!clientToDelete) return;
 
     const result = await deleteClient(clientToDelete);
-    if (result.success) {
+    if (!result.success) {
+      toast.error("Erreur lors de la suppression du client");
+    } else {
       setClients(clients.filter((c) => c.id !== clientToDelete));
       toast.success("Client supprimé avec succès");
-    } else {
-      toast.error("Erreur lors de la suppression du client");
     }
     setClientToDelete(null);
   }

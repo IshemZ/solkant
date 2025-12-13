@@ -75,9 +75,9 @@ export default function ServiceForm({
           ? await updateService(service.id, data as CreateServiceInput)
           : await createService(data as CreateServiceInput);
 
-      if ("error" in result) {
+      if (!result.success) {
         toast.error(result.error);
-        if ("fieldErrors" in result && result.fieldErrors) {
+        if (result.fieldErrors) {
           Object.entries(result.fieldErrors).forEach(([key, value]) => {
             if (Array.isArray(value) && value.length > 0) {
               setError(key as keyof ServiceInput, {

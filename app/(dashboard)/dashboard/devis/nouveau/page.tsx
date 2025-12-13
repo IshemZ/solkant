@@ -17,12 +17,12 @@ export default async function NewQuotePage() {
     getServices(),
   ]);
 
-  if (clientsResult.error || servicesResult.error) {
+  if (!clientsResult.success || !servicesResult.success) {
     redirect("/dashboard");
   }
 
-  const clients = clientsResult.data || [];
-  const services = servicesResult.data || [];
+  const clients = clientsResult.data;
+  const services = servicesResult.data;
 
   return (
     <div className="mx-auto max-w-5xl py-8">

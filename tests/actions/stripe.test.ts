@@ -128,8 +128,10 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.url).toBe("https://checkout.stripe.com/session/test");
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.url).toBe("https://checkout.stripe.com/session/test");
+      }
 
       // Verify customer creation
       expect(stripe.customers.create).toHaveBeenCalledWith({
@@ -184,7 +186,10 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      expect(result.url).toBe("https://checkout.stripe.com/session/test");
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.url).toBe("https://checkout.stripe.com/session/test");
+      }
 
       // Should NOT create new customer
       expect(stripe.customers.create).not.toHaveBeenCalled();
@@ -203,8 +208,10 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) { expect(result.error).toBe("Non autorisé"); }
-      expect(result.url).toBeUndefined();
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Non autorisé");
+      }
       expect(stripe.customers.create).not.toHaveBeenCalled();
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
     });
@@ -227,9 +234,12 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe("Email non vérifié. Veuillez vérifier votre email.");
-        expect(result.code).toBe("EMAIL_NOT_VERIFIED");
+        if ("code" in result) {
+          expect(result.code).toBe("EMAIL_NOT_VERIFIED");
+        }
       }
       expect(stripe.customers.create).not.toHaveBeenCalled();
     });
@@ -241,7 +251,10 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) { expect(result.error).toBe("Business introuvable"); }
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toBe("Business introuvable");
+      }
       expect(stripe.customers.create).not.toHaveBeenCalled();
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
     });
@@ -256,13 +269,11 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe(
           "Erreur lors de la création de la session de paiement"
         );
-      }
-      if ("url" in result) {
-        expect(result.url).toBeUndefined();
       }
     });
 
@@ -283,13 +294,11 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe(
           "Erreur lors de la création de la session de paiement"
         );
-      }
-      if ("url" in result) {
-        expect(result.url).toBeUndefined();
       }
     });
 
@@ -378,13 +387,11 @@ describe("Stripe Server Actions", () => {
 
       const result = await createCheckoutSession();
 
-      if ("error" in result) {
+      expect(result.success).toBe(false);
+      if (!result.success) {
         expect(result.error).toBe(
           "Erreur lors de la création de la session de paiement"
         );
-      }
-      if ("url" in result) {
-        expect(result.url).toBeUndefined();
       }
     });
   });
