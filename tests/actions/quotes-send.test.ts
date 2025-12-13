@@ -3,7 +3,7 @@
  * Teste sendQuote() avec Resend
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { sendQuote } from "@/app/actions/quotes";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
@@ -154,6 +154,13 @@ describe("sendQuote - Envoi d'emails", () => {
     vi.clearAllMocks();
     vi.mocked(getServerSession).mockResolvedValue(mockSession);
     vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+    // Mock RESEND_FROM_EMAIL pour les tests
+    process.env.RESEND_FROM_EMAIL = "Solkant <noreply@solkant.com>";
+  });
+
+  afterEach(() => {
+    // Nettoyer les variables d'environnement mockées
+    delete process.env.RESEND_FROM_EMAIL;
   });
 
   describe("✅ Cas de succès", () => {
@@ -202,7 +209,7 @@ describe("sendQuote - Envoi d'emails", () => {
 
       // Vérifier que l'email a été envoyé
       expect(mockResendSend).toHaveBeenCalledWith({
-        from: "Solkant <noreply@solkant.com>",
+        from: RESEND_FROM_EMAIL,
         to: "jean@example.com",
         subject: "Devis DEVIS-2025-001 de Mon Institut",
         html: "<html>Mock Email HTML</html>",
@@ -347,7 +354,9 @@ describe("sendQuote - Envoi d'emails", () => {
       };
       vi.mocked(prisma.quote.update).mockResolvedValue(updatedQuote as any);
 
-      const consoleLogSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+      const consoleLogSpy = vi
+        .spyOn(console, "log")
+        .mockImplementation(() => {});
 
       const result = await sendQuote("quote_123");
 
