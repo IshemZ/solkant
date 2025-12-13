@@ -26,11 +26,14 @@ function getResendClient(): Resend {
   return resendClient;
 }
 
+// Lire l'adresse from depuis .env
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
+
 /**
  * Configuration des emails
  */
 const EMAIL_CONFIG = {
-  from: "Solkant <noreply@solkant.com>", // ⚠️ Remplacer par votre domaine vérifié
+  from: RESEND_FROM_EMAIL || "Solkant <noreply@solkant.com>", // ⚠️ Remplacer par votre domaine vérifié
   replyTo: "support@solkant.com",
   verificationTokenExpiry: 24 * 60 * 60 * 1000, // 24 heures en ms
 } as const;

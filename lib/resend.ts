@@ -7,6 +7,7 @@ import { Resend } from "resend";
 
 // Initialiser le client Resend uniquement si la clé API est configurée
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const RESEND_FROM_EMAIL = process.env.RESEND_FROM_EMAIL;
 
 export const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
 
@@ -14,7 +15,7 @@ export const resend = RESEND_API_KEY ? new Resend(RESEND_API_KEY) : null;
  * Configuration par défaut pour les emails
  */
 export const EMAIL_CONFIG = {
-  from: "Solkant <noreply@solkant.com>", // À personnaliser avec votre domaine vérifié
+  from: RESEND_FROM_EMAIL || "Solkant <noreply@solkant.com>", // À personnaliser avec votre domaine vérifié
   replyTo: "support@solkant.com", // À personnaliser
 } as const;
 
