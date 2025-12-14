@@ -104,7 +104,7 @@ export async function createPackage(
     if (!validation.success) {
       return {
         success: false,
-        error: validation.error.errors[0]?.message || "Données invalides",
+        error: validation.error.issues[0]?.message || "Données invalides",
       };
     }
 
@@ -164,7 +164,7 @@ export async function updatePackage(
     if (!validation.success) {
       return {
         success: false,
-        error: validation.error.errors[0]?.message || "Données invalides",
+        error: validation.error.issues[0]?.message || "Données invalides",
       };
     }
 
@@ -191,7 +191,7 @@ export async function updatePackage(
         const services = await tx.service.findMany({
           where: {
             id: { in: serviceIds },
-            businessId: session.user.businessId,
+            businessId: session.user.businessId!,
             isActive: true,
           },
         });
