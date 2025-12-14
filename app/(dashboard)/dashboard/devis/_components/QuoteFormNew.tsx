@@ -1,9 +1,9 @@
 "use client";
-/** #TODO: Ajouter une feature pour ajouter les forfaits da la partie Articles, propose moi des options sur comment présenter l'ajout de forfaits */
+
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { X, Plus, AlertCircle } from "lucide-react";
+import { X, Plus, AlertCircle, Package as PackageIcon } from "lucide-react";
 import {
   Button,
   Input,
@@ -29,15 +29,21 @@ import {
   AlertDescription,
 } from "@/components/ui";
 import { createQuote } from "@/app/actions/quotes";
-import type { Client, Service } from "@prisma/client";
+import type { Client, Service, Package, PackageItem } from "@prisma/client";
+
+interface PackageWithRelations extends Package {
+  items: (PackageItem & { service: Service | null })[];
+}
 
 interface QuoteFormProps {
   clients: Client[];
   services: Service[];
+  packages: PackageWithRelations[];
 }
 
 interface QuoteItem {
   serviceId?: string;
+  packageId?: string;
   name: string;
   description?: string;
   price: number;
@@ -45,7 +51,11 @@ interface QuoteItem {
   total: number;
 }
 
-export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
+export default function QuoteFormNew({
+  clients,
+  services,
+  packages,
+}: QuoteFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -86,6 +96,49 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
       price: service.price,
       quantity: 1,
       total: service.price,
+    };
+
+    setItems([...items, newItem]);
+  }
+
+  function addPackageItem(packageId: string) {
+    const pkg = packages.find((p) => p.id === packageId);
+    if (!pkg) return;
+
+    // Calculate base price from all services in the package
+    const basePrice = pkg.items.reduce((sum, item) => {
+      const price = item.service?.price || 0;
+      return sum + price * item.quantity;
+    }, 0);
+
+    // Apply discount
+    let finalPrice = basePrice;
+    if (pkg.discountType === "PERCENTAGE") {
+      const discountValue = Number(pkg.discountValue);
+      finalPrice = basePrice * (1 - discountValue / 100);
+    } else if (pkg.discountType === "FIXED") {
+      finalPrice = basePrice - Number(pkg.discountValue);
+    }
+
+    // Create description with included services
+    const servicesDescription = pkg.items
+      .map((item) => `${item.service?.name} × ${item.quantity}`)
+      .join(", ");
+
+    const discountText =
+      pkg.discountType === "PERCENTAGE"
+        ? ` (Réduction: -${pkg.discountValue}%)`
+        : pkg.discountType === "FIXED"
+        ? ` (Réduction: -${Number(pkg.discountValue).toFixed(2)} €)`
+        : "";
+
+    const newItem: QuoteItem = {
+      packageId: pkg.id,
+      name: pkg.name,
+      description: `${servicesDescription}${discountText}`,
+      price: finalPrice,
+      quantity: 1,
+      total: finalPrice,
     };
 
     setItems([...items, newItem]);
@@ -214,22 +267,63 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
             <div>
               <CardTitle>Articles</CardTitle>
               <CardDescription>
-                Ajoutez les services à inclure dans le devis
+                Ajoutez des services ou des forfaits à inclure dans le devis
               </CardDescription>
             </div>
-            <Select onValueChange={addServiceItem}>
-              <SelectTrigger className="w-[200px]">
-                <Plus className="h-4 w-4 mr-2" />
-                <SelectValue placeholder="Ajouter un service" />
-              </SelectTrigger>
-              <SelectContent>
-                {services.map((service) => (
-                  <SelectItem key={service.id} value={service.id}>
-                    {service.name} • {service.price.toFixed(2)} €
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select onValueChange={addServiceItem}>
+                <SelectTrigger className="w-[200px]">
+                  <Plus className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Ajouter un service" />
+                </SelectTrigger>
+                <SelectContent>
+                  {services.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Aucun service disponible
+                    </div>
+                  ) : (
+                    services.map((service) => (
+                      <SelectItem key={service.id} value={service.id}>
+                        {service.name} • {service.price.toFixed(2)} €
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+              <Select onValueChange={addPackageItem}>
+                <SelectTrigger className="w-[200px]">
+                  <PackageIcon className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Ajouter un forfait" />
+                </SelectTrigger>
+                <SelectContent>
+                  {packages.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Aucun forfait disponible
+                    </div>
+                  ) : (
+                    packages.map((pkg) => {
+                      // Calculate display price
+                      const basePrice = pkg.items.reduce((sum, item) => {
+                        const price = item.service?.price || 0;
+                        return sum + price * item.quantity;
+                      }, 0);
+                      let finalPrice = basePrice;
+                      if (pkg.discountType === "PERCENTAGE") {
+                        finalPrice =
+                          basePrice * (1 - Number(pkg.discountValue) / 100);
+                      } else if (pkg.discountType === "FIXED") {
+                        finalPrice = basePrice - Number(pkg.discountValue);
+                      }
+                      return (
+                        <SelectItem key={pkg.id} value={pkg.id}>
+                          {pkg.name} • {finalPrice.toFixed(2)} €
+                        </SelectItem>
+                      );
+                    })
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -239,7 +333,8 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
                 Aucun article ajouté
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Utilisez le bouton ci-dessus pour ajouter des services
+                Utilisez les boutons ci-dessus pour ajouter des services ou des
+                forfaits
               </p>
             </div>
           ) : (
@@ -386,6 +481,8 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-sm">
+                {" "}
+                {/* BUG:attention les réductions ne doivent apparaitre que dans la partie remise avant total global, Les totaux dans la partie Article doit afficher le prix sans remise */}
                 <span className="text-muted-foreground">Remise</span>
                 <span className="font-medium text-destructive">
                   -{discount.toFixed(2)} €
