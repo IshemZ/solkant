@@ -30,4 +30,4 @@ export default async function ParametresPage() {
     </div>
   );
 }
-// TODO :Ajouter une section pour afficher ou non la mention "Si paiement en plusieurs fois" sur les devis
+// TODO :Ajouter une feature pour laisser le choix à l'utilisateur d'afficher ou non la mention "Si paiement en plusieurs fois" sur les devis

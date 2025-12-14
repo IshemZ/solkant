@@ -30,7 +30,9 @@ export default function BusinessSettingsForm({
     // Convertir les chaînes vides en null pour les champs optionnels
     const data = {
       name: formData.get("name") as string,
-      address: (formData.get("address") as string) || null,
+      address:
+        (formData.get("address") as string) ||
+        null /* TODO: Séparer l'adresse en plusieurs champs (rue, ville, code postal) */,
       phone: (formData.get("phone") as string) || null,
       email: (formData.get("email") as string) || null,
       siret: (formData.get("siret") as string) || null,

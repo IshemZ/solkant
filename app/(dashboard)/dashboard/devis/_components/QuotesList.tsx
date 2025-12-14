@@ -9,6 +9,7 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FileText } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
+import { util } from "zod";
 
 interface QuoteWithRelations extends Quote {
   client: Client | null;
@@ -18,6 +19,7 @@ interface QuoteWithRelations extends Quote {
 interface QuotesListProps {
   initialQuotes: QuoteWithRelations[];
 }
+/** #TODO : Les labels status sont utiliser, il faut enlever cette feature inutile**/
 
 const statusLabels: Record<string, string> = {
   DRAFT: "Brouillon",

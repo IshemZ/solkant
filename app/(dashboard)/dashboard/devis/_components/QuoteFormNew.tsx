@@ -1,5 +1,5 @@
 "use client";
-
+/** #TODO: Ajouter une feature pour ajouter les forfaits da la partie Articles, propose moi des options sur comment présenter l'ajout de forfaits */
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -156,6 +156,7 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+      {/* #TODO: Mettre en valeur la sélection du client au lieu de la barre de recherche, mais garder la recherche*/}
 
       {/* Client Selection */}
       <Card>
@@ -348,7 +349,7 @@ export default function QuoteFormNew({ clients, services }: QuoteFormProps) {
                 onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
               />
             </FormField>
-
+            {/* TODO: Pas utile de mettre la case "Valable jusqu'au" Car la mention de validité est gérée autrement : la date de création s'affiche en haut du devis et valable 30 jours mentionné en bas de page */}
             <FormField
               label="Valable jusqu'au"
               id="validUntil"

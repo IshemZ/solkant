@@ -16,12 +16,38 @@ type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
 };
 
-type ActionResult<T> = { success: true; data: T } | { success: false; error: string };
+type ActionResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+// Convert Prisma Decimal fields to plain numbers for safe serialization
+function serializePackage(
+  pkg: Package & { items: (PackageItem & { service: Service | null })[] }
+) {
+  const items = pkg.items || [];
+  return {
+    ...pkg,
+    // Prisma Decimal -> number
+    discountValue: Number((pkg as any).discountValue),
+    // Ensure nested service price is a number (should already be number for Float)
+    items: items.map((item) => ({
+      ...item,
+      service: item.service
+        ? {
+            ...item.service,
+            price: Number((item.service as any).price),
+          }
+        : null,
+    })),
+  } as unknown as PackageWithRelations;
+}
 
 /**
  * Get all active packages for the current business
  */
-export async function getPackages(): Promise<ActionResult<PackageWithRelations[]>> {
+export async function getPackages(): Promise<
+  ActionResult<PackageWithRelations[]>
+> {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
@@ -43,7 +69,8 @@ export async function getPackages(): Promise<ActionResult<PackageWithRelations[]
       orderBy: { createdAt: "desc" },
     });
 
-    return { success: true, data: packages };
+    const serialized = packages.map((p) => serializePackage(p));
+    return { success: true, data: serialized };
   } catch (error) {
     console.error("Error fetching packages:", error);
     return { success: false, error: "Erreur lors du chargement des forfaits" };
@@ -80,7 +107,7 @@ export async function getPackageById(
       return { success: false, error: "Forfait introuvable" };
     }
 
-    return { success: true, data: packageData };
+    return { success: true, data: serializePackage(packageData) };
   } catch (error) {
     console.error("Error fetching package:", error);
     return { success: false, error: "Erreur lors du chargement du forfait" };
@@ -136,10 +163,17 @@ export async function createPackage(
           create: items,
         },
       },
+      include: {
+        items: {
+          include: {
+            service: true,
+          },
+        },
+      },
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true, data: newPackage };
+    return { success: true, data: serializePackage(newPackage) };
   } catch (error) {
     console.error("Error creating package:", error);
     return { success: false, error: "Erreur lors de la création du forfait" };
@@ -197,7 +231,9 @@ export async function updatePackage(
         });
 
         if (services.length !== serviceIds.length) {
-          throw new Error("Un ou plusieurs services sont invalides ou inactifs");
+          throw new Error(
+            "Un ou plusieurs services sont invalides ou inactifs"
+          );
         }
 
         // Delete existing items
@@ -218,15 +254,24 @@ export async function updatePackage(
       return tx.package.update({
         where: { id },
         data: packageData,
+        include: {
+          items: {
+            include: {
+              service: true,
+            },
+          },
+        },
       });
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true, data: updatedPackage };
+    return { success: true, data: serializePackage(updatedPackage) };
   } catch (error) {
     console.error("Error updating package:", error);
     const message =
-      error instanceof Error ? error.message : "Erreur lors de la mise à jour du forfait";
+      error instanceof Error
+        ? error.message
+        : "Erreur lors de la mise à jour du forfait";
     return { success: false, error: message };
   }
 }
@@ -234,7 +279,9 @@ export async function updatePackage(
 /**
  * Soft delete a package
  */
-export async function deletePackage(id: string): Promise<ActionResult<{ id: string }>> {
+export async function deletePackage(
+  id: string
+): Promise<ActionResult<{ id: string }>> {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
@@ -266,6 +313,9 @@ export async function deletePackage(id: string): Promise<ActionResult<{ id: stri
     return { success: true, data: { id } };
   } catch (error) {
     console.error("Error deleting package:", error);
-    return { success: false, error: "Erreur lors de la suppression du forfait" };
+    return {
+      success: false,
+      error: "Erreur lors de la suppression du forfait",
+    };
   }
 }

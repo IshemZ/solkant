@@ -43,7 +43,9 @@ export default function ClientForm({
       lastName: client?.lastName || "",
       email: client?.email || null,
       phone: client?.phone || null,
-      address: client?.address || null,
+      address:
+        client?.address ||
+        null /* TODO: Séparer l'adresse en plusieurs champs (rue, ville, code postal) */,
       notes: client?.notes || null,
     },
     mode: "onChange", // Validation en temps réel
