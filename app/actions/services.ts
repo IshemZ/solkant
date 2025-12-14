@@ -26,7 +26,10 @@ export async function getServices(): Promise<ActionResult<Service[]>> {
 
   try {
     const services = await prisma.service.findMany({
-      where: { businessId },
+      where: {
+        businessId,
+        isActive: true,
+      },
       orderBy: { createdAt: "desc" },
     });
 
@@ -164,10 +167,14 @@ export async function deleteService(id: string): Promise<ActionResult<void>> {
       return errorResult("Service introuvable", "NOT_FOUND");
     }
 
-    await prisma.service.delete({
+    await prisma.service.update({
       where: {
         id,
         businessId,
+      },
+      data: {
+        isActive: false,
+        deletedAt: new Date(),
       },
     });
 
