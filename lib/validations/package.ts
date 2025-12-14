@@ -1,15 +1,21 @@
 import { z } from "zod";
 
+/**
+ * Schema for a package item (service + quantity)
+ */
 export const packageItemSchema = z.object({
   serviceId: z.string().cuid("ID de service invalide"),
   quantity: z.number().int().min(1, "La quantité doit être au moins 1"),
 });
 
+/**
+ * Schema for creating a new package
+ */
 export const createPackageSchema = z.object({
-  name: z.string().min(1, "Le nom est requis"),
-  description: z.string().optional(),
+  name: z.string().trim().min(1, "Le nom est requis"),
+  description: z.string().trim().nullable().optional(),
   discountType: z.enum(["NONE", "PERCENTAGE", "FIXED"], {
-    errorMap: () => ({ message: "Type de réduction invalide" }),
+    message: "Type de réduction invalide",
   }),
   discountValue: z.number().min(0, "La réduction ne peut pas être négative"),
   items: z
@@ -28,6 +34,9 @@ export const createPackageSchema = z.object({
   }
 );
 
+/**
+ * Schema for updating an existing package
+ */
 export const updatePackageSchema = createPackageSchema.partial().extend({
   items: z
     .array(packageItemSchema)
