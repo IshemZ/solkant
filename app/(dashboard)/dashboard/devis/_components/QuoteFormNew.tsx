@@ -63,7 +63,6 @@ export default function QuoteFormNew({
   const [items, setItems] = useState<QuoteItem[]>([]);
   const [discount, setDiscount] = useState(0);
   const [notes, setNotes] = useState("");
-  const [validUntil, setValidUntil] = useState("");
   const [clientSearch, setClientSearch] = useState("");
 
   // Filtered clients for search
@@ -184,7 +183,6 @@ export default function QuoteFormNew({
       items,
       discount,
       notes: notes || undefined,
-      validUntil: validUntil ? new Date(validUntil) : undefined,
     };
 
     const result = await createQuote(quoteData);
@@ -419,36 +417,21 @@ export default function QuoteFormNew({
           <CardTitle>Options et total</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField
-              label="Remise (€)"
+          <FormField
+            label="Remise (€)"
+            id="discount"
+            hint="Montant de la réduction"
+          >
+            <Input
               id="discount"
-              hint="Montant de la réduction"
-            >
-              <Input
-                id="discount"
-                type="number"
-                step="0.01"
-                min="0"
-                max={subtotal}
-                value={discount}
-                onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-              />
-            </FormField>
-            {/* TODO: Pas utile de mettre la case "Valable jusqu'au" Car la mention de validité est gérée autrement : la date de création s'affiche en haut du devis et valable 30 jours mentionné en bas de page */}
-            <FormField
-              label="Valable jusqu'au"
-              id="validUntil"
-              hint="Date limite de validité du devis"
-            >
-              <Input
-                id="validUntil"
-                type="date"
-                value={validUntil}
-                onChange={(e) => setValidUntil(e.target.value)}
-              />
-            </FormField>
-          </div>
+              type="number"
+              step="0.01"
+              min="0"
+              max={subtotal}
+              value={discount}
+              onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+            />
+          </FormField>
 
           <FormField
             label="Notes"
