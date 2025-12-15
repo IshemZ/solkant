@@ -238,6 +238,17 @@ export const updateBusinessSchema = z.object({
     )
     .optional(),
   showInstallmentPayment: z.boolean().default(false).optional(),
+  pdfFileNamePrefix: z
+    .union([
+      z
+        .string()
+        .max(25, "Le nom générique ne peut pas dépasser 25 caractères")
+        .trim(),
+      z.literal(""),
+      z.null(),
+    ])
+    .transform((val) => (val === "" || !val ? null : val))
+    .optional(),
 });
 
 /**
