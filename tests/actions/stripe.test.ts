@@ -237,7 +237,7 @@ describe("Stripe Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error).toBe("Email non vérifié. Veuillez vérifier votre email.");
-        if ("code" in result) {
+        if ("code" in result && result.code) {
           expect(result.code).toBe("EMAIL_NOT_VERIFIED");
         }
       }

@@ -54,3 +54,33 @@ export async function getBusinessId(): Promise<string> {
 
   return session.user.businessId!;
 }
+
+/**
+ * Format an address from structured fields or legacy field
+ * Returns a multi-line string suitable for display in PDFs, emails, etc.
+ *
+ * @param entity - Object with address fields (Business or Client)
+ * @returns Formatted address string with newlines, or empty string if no address
+ */
+export function formatAddress(entity: {
+  rue?: string | null;
+  complement?: string | null;
+  codePostal?: string | null;
+  ville?: string | null;
+  address?: string | null; // legacy fallback
+}): string {
+  // Use new structured fields if available
+  if (entity.rue || entity.codePostal || entity.ville) {
+    const parts = [
+      entity.rue,
+      entity.complement,
+      entity.codePostal && entity.ville
+        ? `${entity.codePostal} ${entity.ville}`
+        : null,
+    ].filter(Boolean);
+    return parts.join("\n");
+  }
+
+  // Fallback to legacy address
+  return entity.address || "";
+}

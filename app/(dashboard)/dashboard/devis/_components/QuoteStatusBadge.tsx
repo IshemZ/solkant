@@ -12,19 +12,6 @@ const statusConfig: Record<QuoteStatus, { label: string; className: string }> =
       label: "Envoyé",
       className: "bg-primary/10 text-primary hover:bg-primary/20",
     },
-    ACCEPTED: {
-      label: "Accepté",
-      className:
-        "bg-green-100 text-green-800 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400",
-    },
-    REJECTED: {
-      label: "Refusé",
-      className: "bg-destructive/10 text-destructive hover:bg-destructive/20",
-    },
-    EXPIRED: {
-      label: "Expiré",
-      className: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    },
   };
 
 interface QuoteStatusBadgeProps {

@@ -9,6 +9,7 @@ import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
+import { formatAddress } from "@/lib/utils";
 
 // Types pour les quotes avec relations
 type QuoteWithRelations = Quote & {
@@ -410,7 +411,7 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
       businessName: quote.business.name,
       businessEmail: quote.business.email || "",
       businessPhone: quote.business.phone || "",
-      businessAddress: quote.business.address || "",
+      businessAddress: formatAddress(quote.business),
       clientName: `${quote.client.firstName} ${quote.client.lastName}`,
       validUntil: quote.validUntil
         ? new Date(quote.validUntil).toLocaleDateString("fr-FR", {

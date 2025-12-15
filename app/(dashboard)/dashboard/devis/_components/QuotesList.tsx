@@ -9,7 +9,7 @@ import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FileText } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
-import { util } from "zod";
+import { QuoteStatusBadge } from "./QuoteStatusBadge";
 
 interface QuoteWithRelations extends Quote {
   client: Client | null;
@@ -19,23 +19,6 @@ interface QuoteWithRelations extends Quote {
 interface QuotesListProps {
   initialQuotes: QuoteWithRelations[];
 }
-/** #TODO : Les labels status sont utiliser, il faut enlever cette feature inutile**/
-
-const statusLabels: Record<string, string> = {
-  DRAFT: "Brouillon",
-  SENT: "Envoyé",
-  ACCEPTED: "Accepté",
-  REJECTED: "Refusé",
-  EXPIRED: "Expiré",
-};
-
-const statusColors: Record<string, string> = {
-  DRAFT: "bg-gray-100 text-gray-800",
-  SENT: "bg-blue-100 text-blue-800",
-  ACCEPTED: "bg-green-100 text-green-800",
-  REJECTED: "bg-red-100 text-red-800",
-  EXPIRED: "bg-orange-100 text-orange-800",
-};
 
 export default function QuotesList({ initialQuotes }: QuotesListProps) {
   const [quotes, setQuotes] = useState(initialQuotes);
@@ -138,13 +121,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                       {formatDate(quote.createdAt)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">
-                      <span
-                        className={`inline-flex rounded-full px-2 py-1 text-xs font-semibold ${
-                          statusColors[quote.status]
-                        }`}
-                      >
-                        {statusLabels[quote.status]}
-                      </span>
+                      <QuoteStatusBadge status={quote.status} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-foreground">
                       {quote.total.toFixed(2)} €

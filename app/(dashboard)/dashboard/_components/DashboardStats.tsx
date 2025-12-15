@@ -44,7 +44,7 @@ async function RevenueTotal() {
   const result = await prisma.quote.aggregate({
     where: {
       businessId: session.user.businessId,
-      status: "ACCEPTED",
+      status: "SENT",
     },
     _sum: {
       total: true,

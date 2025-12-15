@@ -292,4 +292,123 @@ describe("Client Validation Schema", () => {
       expect(result.success).toBe(false);
     });
   });
+
+  describe("Structured Address Fields", () => {
+    it("should validate structured address with all fields", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        rue: "123 Rue de Rivoli",
+        complement: "Appartement 4B",
+        codePostal: "75001",
+        ville: "Paris",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.rue).toBe("123 Rue de Rivoli");
+        expect(result.data.complement).toBe("Appartement 4B");
+        expect(result.data.codePostal).toBe("75001");
+        expect(result.data.ville).toBe("Paris");
+      }
+    });
+
+    it("should accept structured address without complement", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        rue: "123 Rue de Rivoli",
+        codePostal: "75001",
+        ville: "Paris",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.complement).toBeUndefined();
+      }
+    });
+
+    it("should reject invalid postal code format", () => {
+      const invalidCodes = ["1234", "123456", "ABCDE", "7500a"];
+
+      invalidCodes.forEach((code) => {
+        const data = {
+          firstName: "Jean",
+          lastName: "Dupont",
+          rue: "123 Rue de Rivoli",
+          codePostal: code,
+          ville: "Paris",
+        };
+
+        const result = createClientSchema.safeParse(data);
+        expect(result.success).toBe(false);
+        if (!result.success) {
+          const error = result.error.issues.find(
+            (issue) => issue.path[0] === "codePostal"
+          );
+          expect(error?.message).toMatch(/5 chiffres/);
+        }
+      });
+    });
+
+    it("should accept valid French postal codes", () => {
+      const validCodes = ["75001", "13001", "69001", "33000"];
+
+      validCodes.forEach((code) => {
+        const data = {
+          firstName: "Jean",
+          lastName: "Dupont",
+          rue: "123 Rue Example",
+          codePostal: code,
+          ville: "Paris",
+        };
+
+        const result = createClientSchema.safeParse(data);
+        expect(result.success).toBe(true);
+      });
+    });
+
+    it("should trim whitespace from address fields", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        rue: "  123 Rue de Rivoli  ",
+        complement: "  Appartement 4B  ",
+        codePostal: "  75001  ",
+        ville: "  Paris  ",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.rue).toBe("123 Rue de Rivoli");
+        expect(result.data.complement).toBe("Appartement 4B");
+        expect(result.data.codePostal).toBe("75001");
+        expect(result.data.ville).toBe("Paris");
+      }
+    });
+
+    it("should enforce maximum length on address fields", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        rue: "A".repeat(256), // Plus de 255 caractères
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const error = result.error.issues.find(
+          (issue) => issue.path[0] === "rue"
+        );
+        expect(error?.message).toContain("255 caractères");
+      }
+    });
+  });
 });

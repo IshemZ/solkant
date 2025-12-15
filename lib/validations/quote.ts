@@ -3,7 +3,7 @@ import { z } from 'zod'
 /**
  * Enum pour le statut d'un devis
  */
-export const quoteStatusEnum = z.enum(['DRAFT', 'SENT', 'ACCEPTED', 'REJECTED', 'EXPIRED'])
+export const quoteStatusEnum = z.enum(['DRAFT', 'SENT'])
 
 /**
  * Type pour le statut d'un devis

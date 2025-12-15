@@ -67,7 +67,11 @@ model VerificationToken {
 model Business {
   id                   String             @id @default(cuid())
   name                 String
-  address              String?
+  address              String?            // OLD - kept temporarily for legacy data
+  rue                  String?            // NEW - street address
+  complement           String?            // NEW - optional address line 2
+  codePostal           String?            // NEW - postal code
+  ville                String?            // NEW - city
   phone                String?
   email                String?
   logo                 String?
@@ -101,7 +105,11 @@ model Client {
   lastName   String
   email      String?
   phone      String?
-  address    String?
+  address    String?  // OLD - kept temporarily for legacy data
+  rue        String?  // NEW - street address
+  complement String?  // NEW - optional address line 2
+  codePostal String?  // NEW - postal code
+  ville      String?  // NEW - city
   notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -213,9 +221,6 @@ model QuoteItem {
 enum QuoteStatus {
   DRAFT
   SENT
-  ACCEPTED
-  REJECTED
-  EXPIRED
 }
 
 enum SubscriptionStatus {

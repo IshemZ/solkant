@@ -30,9 +30,11 @@ export default function BusinessSettingsForm({
     // Convertir les chaînes vides en null pour les champs optionnels
     const data = {
       name: formData.get("name") as string,
-      address:
-        (formData.get("address") as string) ||
-        null /* TODO: Séparer l'adresse en plusieurs champs (rue, ville, code postal) */,
+      address: (formData.get("address") as string) || null, // Legacy field
+      rue: (formData.get("rue") as string) || null,
+      complement: (formData.get("complement") as string) || null,
+      codePostal: (formData.get("codePostal") as string) || null,
+      ville: (formData.get("ville") as string) || null,
       phone: (formData.get("phone") as string) || null,
       email: (formData.get("email") as string) || null,
       siret: (formData.get("siret") as string) || null,
@@ -130,20 +132,110 @@ export default function BusinessSettingsForm({
         )}
       </div>
 
-      <div>
-        <label
-          htmlFor="address"
-          className="block text-sm font-medium text-foreground"
-        >
-          Adresse complète
-        </label>
-        <textarea
-          id="address"
-          name="address"
-          rows={3}
-          defaultValue={business.address || ""}
-          className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-        />
+      {/* Legacy Address Display */}
+      {business.address && !business.rue && (
+        <div className="rounded-md bg-muted p-3 text-sm">
+          <p className="font-medium">Ancienne adresse :</p>
+          <p className="text-muted-foreground">{business.address}</p>
+        </div>
+      )}
+
+      {/* Structured Address Fields */}
+      <div className="space-y-4">
+        <div>
+          <label
+            htmlFor="rue"
+            className="block text-sm font-medium text-foreground"
+          >
+            Rue *
+          </label>
+          <input
+            type="text"
+            id="rue"
+            name="rue"
+            defaultValue={business.rue || ""}
+            required
+            placeholder="123 Rue de Rivoli"
+            className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+          />
+          {fieldErrors.rue && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              {fieldErrors.rue[0]}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <label
+            htmlFor="complement"
+            className="block text-sm font-medium text-foreground"
+          >
+            Complément d&apos;adresse
+          </label>
+          <input
+            type="text"
+            id="complement"
+            name="complement"
+            defaultValue={business.complement || ""}
+            placeholder="Bâtiment, appartement, étage (optionnel)"
+            className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+          />
+          {fieldErrors.complement && (
+            <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+              {fieldErrors.complement[0]}
+            </p>
+          )}
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label
+              htmlFor="codePostal"
+              className="block text-sm font-medium text-foreground"
+            >
+              Code postal *
+            </label>
+            <input
+              type="text"
+              id="codePostal"
+              name="codePostal"
+              defaultValue={business.codePostal || ""}
+              required
+              placeholder="75001"
+              maxLength={5}
+              pattern="\d{5}"
+              className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+            />
+            {fieldErrors.codePostal && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {fieldErrors.codePostal[0]}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="ville"
+              className="block text-sm font-medium text-foreground"
+            >
+              Ville *
+            </label>
+            <input
+              type="text"
+              id="ville"
+              name="ville"
+              defaultValue={business.ville || ""}
+              required
+              placeholder="Paris"
+              className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+            />
+            {fieldErrors.ville && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {fieldErrors.ville[0]}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
       <div>

@@ -140,7 +140,7 @@ test.describe("Flow Complet - Création de Devis", () => {
     if (await firstQuote.isVisible()) {
       // Vérifier que le statut est affiché
       await expect(
-        firstQuote.locator("text=/DRAFT|SENT|ACCEPTED|REJECTED/i")
+        firstQuote.locator("text=/DRAFT|SENT/i")
       ).toBeVisible();
     }
   });

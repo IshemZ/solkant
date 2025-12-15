@@ -16,6 +16,33 @@ export const createBusinessSchema = z.object({
     .trim()
     .optional()
     .nullable(),
+  // NEW - structured address fields
+  rue: z
+    .string()
+    .min(1, "La rue est requise")
+    .max(255, "La rue ne peut pas dépasser 255 caractères")
+    .trim()
+    .optional()
+    .nullable(),
+  complement: z
+    .string()
+    .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
+    .trim()
+    .optional()
+    .nullable(),
+  codePostal: z
+    .string()
+    .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+    .trim()
+    .optional()
+    .nullable(),
+  ville: z
+    .string()
+    .min(1, "La ville est requise")
+    .max(100, "La ville ne peut pas dépasser 100 caractères")
+    .trim()
+    .optional()
+    .nullable(),
   phone: z
     .string()
     .regex(
@@ -89,6 +116,53 @@ export const updateBusinessSchema = z.object({
       z
         .string()
         .max(255, "L'adresse ne peut pas dépasser 255 caractères")
+        .trim(),
+      z.literal(""),
+      z.null(),
+    ])
+    .transform((val) => (val === "" || !val ? null : val))
+    .optional(),
+  // NEW - structured address fields
+  rue: z
+    .union([
+      z
+        .string()
+        .min(1, "La rue est requise")
+        .max(255, "La rue ne peut pas dépasser 255 caractères")
+        .trim(),
+      z.literal(""),
+      z.null(),
+    ])
+    .transform((val) => (val === "" || !val ? null : val))
+    .optional(),
+  complement: z
+    .union([
+      z
+        .string()
+        .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
+        .trim(),
+      z.literal(""),
+      z.null(),
+    ])
+    .transform((val) => (val === "" || !val ? null : val))
+    .optional(),
+  codePostal: z
+    .union([
+      z
+        .string()
+        .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+        .trim(),
+      z.literal(""),
+      z.null(),
+    ])
+    .transform((val) => (val === "" || !val ? null : val))
+    .optional(),
+  ville: z
+    .union([
+      z
+        .string()
+        .min(1, "La ville est requise")
+        .max(100, "La ville ne peut pas dépasser 100 caractères")
         .trim(),
       z.literal(""),
       z.null(),

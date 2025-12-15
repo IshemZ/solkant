@@ -282,7 +282,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(screen.getByLabelText(/Rechercher un client/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Client/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Remise/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Valable jusqu'au/)).toBeInTheDocument();
+      // Note: "Valable jusqu'au" field was removed from the form
       expect(screen.getByLabelText(/Notes/)).toBeInTheDocument();
     });
   });

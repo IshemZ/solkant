@@ -15,6 +15,7 @@ import type {
   Service,
 } from "@prisma/client";
 import { formatDate } from "@/lib/date-utils";
+import { formatAddress } from "@/lib/utils";
 
 interface QuoteWithRelations extends Quote {
   client: Client | null;
@@ -268,9 +269,13 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
         <View style={styles.row}>
           <View style={styles.column}>
             <Text style={styles.businessName}>{quote.business.name}</Text>
-            {quote.business.address && (
-              <Text style={styles.text}>{quote.business.address}</Text>
-            )}
+            {formatAddress(quote.business)
+              .split("\n")
+              .map((line, i) => (
+                <Text key={i} style={styles.text}>
+                  {line}
+                </Text>
+              ))}
             {quote.business.phone && (
               <Text style={styles.text}>{quote.business.phone}</Text>
             )}
@@ -291,9 +296,13 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
                 <Text style={styles.businessName}>
                   {quote.client.firstName} {quote.client.lastName}
                 </Text>
-                {quote.client.address && (
-                  <Text style={styles.text}>{quote.client.address}</Text>
-                )}
+                {formatAddress(quote.client)
+                  .split("\n")
+                  .map((line, i) => (
+                    <Text key={i} style={styles.text}>
+                      {line}
+                    </Text>
+                  ))}
                 {quote.client.phone && (
                   <Text style={styles.text}>{quote.client.phone}</Text>
                 )}

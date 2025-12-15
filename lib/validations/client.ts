@@ -38,6 +38,33 @@ export const createClientSchema = z.object({
     .max(255, "L'adresse ne peut pas dépasser 255 caractères")
     .optional()
     .nullable(),
+  // NEW - structured address fields
+  rue: z
+    .string()
+    .trim()
+    .min(1, "La rue est requise")
+    .max(255, "La rue ne peut pas dépasser 255 caractères")
+    .optional()
+    .nullable(),
+  complement: z
+    .string()
+    .trim()
+    .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
+    .optional()
+    .nullable(),
+  codePostal: z
+    .string()
+    .trim()
+    .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+    .optional()
+    .nullable(),
+  ville: z
+    .string()
+    .trim()
+    .min(1, "La ville est requise")
+    .max(100, "La ville ne peut pas dépasser 100 caractères")
+    .optional()
+    .nullable(),
   notes: z
     .string()
     .trim()
@@ -83,6 +110,33 @@ export const updateClientSchema = z.object({
     .string()
     .trim()
     .max(255, "L'adresse ne peut pas dépasser 255 caractères")
+    .optional()
+    .nullable(),
+  // NEW - structured address fields
+  rue: z
+    .string()
+    .trim()
+    .min(1, "La rue est requise")
+    .max(255, "La rue ne peut pas dépasser 255 caractères")
+    .optional()
+    .nullable(),
+  complement: z
+    .string()
+    .trim()
+    .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
+    .optional()
+    .nullable(),
+  codePostal: z
+    .string()
+    .trim()
+    .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+    .optional()
+    .nullable(),
+  ville: z
+    .string()
+    .trim()
+    .min(1, "La ville est requise")
+    .max(100, "La ville ne peut pas dépasser 100 caractères")
     .optional()
     .nullable(),
   notes: z

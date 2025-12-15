@@ -43,9 +43,11 @@ export default function ClientForm({
       lastName: client?.lastName || "",
       email: client?.email || null,
       phone: client?.phone || null,
-      address:
-        client?.address ||
-        null /* TODO: Séparer l'adresse en plusieurs champs (rue, ville, code postal) */,
+      address: client?.address || null, // Legacy field
+      rue: client?.rue || null,
+      complement: client?.complement || null,
+      codePostal: client?.codePostal || null,
+      ville: client?.ville || null,
       notes: client?.notes || null,
     },
     mode: "onChange", // Validation en temps réel
@@ -156,20 +158,85 @@ export default function ClientForm({
             </FormField>
           </div>
 
-          {/* Adresse */}
-          <FormField
-            label="Adresse"
-            id="address"
-            error={errors.address?.message}
-          >
-            <Input
-              id="address"
-              {...register("address")}
-              placeholder="123 Rue Exemple, 75001 Paris"
-              aria-invalid={!!errors.address}
-              aria-describedby={errors.address ? "address-error" : undefined}
-            />
-          </FormField>
+          {/* Legacy Address Display */}
+          {client?.address && !client?.rue && (
+            <div className="rounded-md bg-muted p-3 text-sm">
+              <p className="font-medium">Ancienne adresse :</p>
+              <p className="text-muted-foreground">{client.address}</p>
+            </div>
+          )}
+
+          {/* Structured Address Fields */}
+          <div className="space-y-4">
+            <FormField
+              label="Rue"
+              id="rue"
+              required
+              error={errors.rue?.message}
+            >
+              <Input
+                id="rue"
+                {...register("rue")}
+                placeholder="123 Rue de Rivoli"
+                aria-invalid={!!errors.rue}
+                aria-describedby={errors.rue ? "rue-error" : undefined}
+              />
+            </FormField>
+
+            <FormField
+              label="Complément d'adresse"
+              id="complement"
+              error={errors.complement?.message}
+              hint="Bâtiment, appartement, étage (optionnel)"
+            >
+              <Input
+                id="complement"
+                {...register("complement")}
+                placeholder="Appartement 4B"
+                aria-invalid={!!errors.complement}
+                aria-describedby={
+                  errors.complement ? "complement-error" : "complement-hint"
+                }
+              />
+            </FormField>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                label="Code postal"
+                id="codePostal"
+                required
+                error={errors.codePostal?.message}
+                hint="5 chiffres"
+              >
+                <Input
+                  id="codePostal"
+                  {...register("codePostal")}
+                  placeholder="75001"
+                  maxLength={5}
+                  pattern="\d{5}"
+                  aria-invalid={!!errors.codePostal}
+                  aria-describedby={
+                    errors.codePostal ? "codePostal-error" : "codePostal-hint"
+                  }
+                />
+              </FormField>
+
+              <FormField
+                label="Ville"
+                id="ville"
+                required
+                error={errors.ville?.message}
+              >
+                <Input
+                  id="ville"
+                  {...register("ville")}
+                  placeholder="Paris"
+                  aria-invalid={!!errors.ville}
+                  aria-describedby={errors.ville ? "ville-error" : undefined}
+                />
+              </FormField>
+            </div>
+          </div>
 
           {/* Notes */}
           <FormField

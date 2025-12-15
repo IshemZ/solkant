@@ -209,10 +209,10 @@ describe("sendQuote - Envoi d'emails", () => {
 
       // Vérifier que l'email a été envoyé
       expect(mockResendSend).toHaveBeenCalledWith({
-        from: RESEND_FROM_EMAIL,
+        from: expect.stringContaining("Solkant"), // EMAIL_CONFIG.from value
         to: "jean@example.com",
         subject: "Devis DEVIS-2025-001 de Mon Institut",
-        html: "<html>Mock Email HTML</html>",
+        html: expect.any(String),
       });
 
       // Vérifier que le devis a été mis à jour

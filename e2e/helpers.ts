@@ -83,7 +83,11 @@ export async function fillClientForm(
     lastName: string;
     email: string;
     phone: string;
-    address?: string;
+    // New structured address fields
+    rue?: string;
+    complement?: string;
+    codePostal?: string;
+    ville?: string;
   }
 ): Promise<void> {
   await page.fill('input[name="firstName"]', client.firstName);
@@ -91,8 +95,18 @@ export async function fillClientForm(
   await page.fill('input[name="email"]', client.email);
   await page.fill('input[name="phone"]', client.phone);
 
-  if (client.address) {
-    await page.fill('textarea[name="address"]', client.address);
+  // Fill structured address fields if provided
+  if (client.rue) {
+    await page.fill('input[name="rue"]', client.rue);
+  }
+  if (client.complement) {
+    await page.fill('input[name="complement"]', client.complement);
+  }
+  if (client.codePostal) {
+    await page.fill('input[name="codePostal"]', client.codePostal);
+  }
+  if (client.ville) {
+    await page.fill('input[name="ville"]', client.ville);
   }
 }
 

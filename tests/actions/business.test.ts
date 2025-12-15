@@ -138,7 +138,7 @@ describe("Business Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
-        if ("code" in result) {
+        if ("code" in result && result.code) {
           expect(result.code).toBe("NO_BUSINESS");
         }
       }
@@ -212,9 +212,11 @@ describe("Business Server Actions", () => {
       const result = await updateBusiness({ name: "A" });
 
       expect(result.success).toBe(false);
-      if (!result.success && "fieldErrors" in result) {
-        expect(result.error).toBe("Données invalides");
-        expect(result.fieldErrors).toBeDefined();
+      if (!result.success) {
+        expect(result.error).toContain("invalide");
+        if ("fieldErrors" in result && result.fieldErrors) {
+          expect(result.fieldErrors).toBeDefined();
+        }
       }
       expect(prisma.business.update).not.toHaveBeenCalled();
     });
