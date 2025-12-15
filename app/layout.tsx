@@ -21,7 +21,65 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Solkant",
+  metadataBase: new URL("https://solkant.com"),
+  title: {
+    default: "Solkant – Logiciel de devis pour instituts de beauté",
+    template: "%s | Solkant",
+  },
+  description:
+    "Créez des devis professionnels pour votre institut de beauté en quelques clics. Gestion clients, catalogue de services, PDF personnalisés. Essai gratuit sans carte bancaire.",
+  keywords: [
+    "logiciel devis institut beauté",
+    "logiciel devis esthéticienne",
+    "gestion institut beauté",
+    "devis PDF professionnel",
+    "logiciel salon esthétique",
+    "gestion clients beauté",
+    "devis spa",
+  ],
+  authors: [{ name: "Solkant" }],
+  creator: "Solkant",
+  publisher: "Solkant",
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: "https://solkant.com",
+    siteName: "Solkant",
+    title: "Solkant – Logiciel de devis pour instituts de beauté",
+    description:
+      "Simplifiez la création de devis pour votre institut avec Solkant. Interface simple, PDF élégants, gain de temps garanti.",
+    images: [
+      {
+        url: "/images/og/home.png",
+        width: 1200,
+        height: 630,
+        alt: "Solkant - Créez des devis élégants pour votre institut de beauté",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Solkant – Logiciel de devis pour instituts de beauté",
+    description:
+      "Créez des devis professionnels pour votre institut en quelques clics.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    // À remplir après inscription dans Search Console
+    google: "", // Google Search Console verification code
+    // yandex: "", // Si vous ciblez les marchés russes
+    // bing: "", // Bing Webmaster Tools
+  },
 };
 
 // Audit A11y en développement uniquement - DÉSACTIVÉ temporairement

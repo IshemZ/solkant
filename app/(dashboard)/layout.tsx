@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
@@ -15,6 +16,16 @@ import prisma from "@/lib/prisma";
  * déclenchant la validation des env vars avant que l'app soit lancée.
  */
 export const dynamic = "force-dynamic";
+
+// Métadonnées pour toutes les pages dashboard
+// Ces pages ne doivent PAS être indexées par les moteurs de recherche (espace membre privé)
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+  },
+};
 
 export default async function DashboardLayout({
   children,
