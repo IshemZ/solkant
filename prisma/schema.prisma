@@ -89,6 +89,7 @@ model Business {
   trialEndsAt          DateTime?
   isPro                Boolean            @default(false)
   showInstallmentPayment Boolean          @default(false)
+  pdfFileNamePrefix    String?            // NEW - Nom générique pour les PDF
   user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   clients              Client[]
   quotes               Quote[]
