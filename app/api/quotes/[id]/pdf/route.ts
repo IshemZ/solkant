@@ -10,6 +10,27 @@ import {
   AuditLevel,
   extractRequestInfo,
 } from "@/lib/audit-logger";
+import type { Quote, Client, Business, QuoteItem, Service } from "@prisma/client";
+
+interface QuoteWithRelations extends Quote {
+  client: Client | null;
+  business: Business;
+  items: (QuoteItem & { service: Service | null })[];
+}
+
+function generatePdfFileName(quote: QuoteWithRelations): string {
+  const { pdfFileNamePrefix } = quote.business;
+  const client = quote.client;
+
+  // Si pas de préfixe OU pas de client, utiliser le numéro de devis
+  if (!pdfFileNamePrefix || !client) {
+    return `${quote.quoteNumber}.pdf`;
+  }
+
+  // Sinon, utiliser le format personnalisé
+  const clientName = `${client.lastName} ${client.firstName}`;
+  return `${pdfFileNamePrefix} - ${clientName}.pdf`;
+}
 
 export async function GET(
   request: NextRequest,
@@ -50,7 +71,7 @@ export async function GET(
     return new NextResponse(stream as unknown as BodyInit, {
       headers: {
         "Content-Type": "application/pdf",
-        "Content-Disposition": `attachment; filename="${result.data.quoteNumber}.pdf"`,
+        "Content-Disposition": `attachment; filename="${generatePdfFileName(result.data)}"`,
       },
     });
   } catch (error) {
