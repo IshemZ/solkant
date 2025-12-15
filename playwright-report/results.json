@@ -1,0 +1,529 @@
+{
+  "config": {
+    "configFile": "/Users/ishemz/myprogramfiles/devisio/playwright.config.ts",
+    "rootDir": "/Users/ishemz/myprogramfiles/devisio/e2e",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "playwright-report/results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/Users/ishemz/myprogramfiles/devisio/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 4
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/Users/ishemz/myprogramfiles/devisio/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.57.0",
+    "workers": 4,
+    "webServer": {
+      "command": "npm run dev",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true,
+      "timeout": 120000
+    }
+  },
+  "suites": [
+    {
+      "title": "pdf-filename-customization.spec.ts",
+      "file": "pdf-filename-customization.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "PDF Filename Customization",
+          "file": "pdf-filename-customization.spec.ts",
+          "line": 10,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Scenario 1: Validation - 25 character limit",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.944Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-997ec7afc18dd2f1538e",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 107,
+              "column": 7
+            },
+            {
+              "title": "Scenario 2: Validation - Accepts exactly 25 characters",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-aaea9187fa5b7a9d60d4",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 122,
+              "column": 7
+            },
+            {
+              "title": "Scenario 3: Validation - Accepts empty/null value",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-14ac933761aa9014becf",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 140,
+              "column": 7
+            },
+            {
+              "title": "Scenario 4: PDF Generation - Full happy path with prefix",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-affb553ad7f7d2c7cfbb",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 158,
+              "column": 7
+            },
+            {
+              "title": "Scenario 5: PDF Generation - No prefix (fallback)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-fd2ee90438a147fdd696",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 184,
+              "column": 7
+            },
+            {
+              "title": "Scenario 6: PDF Generation - Special characters (accents)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-e2ecac099d22630c5d43",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 208,
+              "column": 7
+            },
+            {
+              "title": "Scenario 7: Persistence - Value survives page refresh",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-7c6220ca3abed9c89694",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 234,
+              "column": 7
+            },
+            {
+              "title": "Scenario 8: Regression - Other business settings still save",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                      "location": {
+                        "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                        "line": 16,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-12-15T21:52:45.945Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "description": "TEST_USER_EMAIL non défini - skip tests E2E",
+                          "location": {
+                            "file": "/Users/ishemz/myprogramfiles/devisio/e2e/pdf-filename-customization.spec.ts",
+                            "line": 16,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b742ecc04ba8bc986082-db572bcc7240b4177336",
+              "file": "pdf-filename-customization.spec.ts",
+              "line": 252,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-12-15T21:52:45.583Z",
+    "duration": 362.41999999999996,
+    "expected": 0,
+    "skipped": 8,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

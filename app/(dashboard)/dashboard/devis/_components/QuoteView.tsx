@@ -31,11 +31,22 @@ export default function QuoteView({ quote }: QuoteViewProps) {
       const response = await fetch(`/api/quotes/${quote.id}/pdf`);
       if (!response.ok) throw new Error("Failed to generate PDF");
 
+      // Extraire le nom du fichier depuis le header Content-Disposition
+      const contentDisposition = response.headers.get("Content-Disposition");
+      let filename = `${quote.quoteNumber}.pdf`; // Fallback par défaut
+
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = filenameMatch[1];
+        }
+      }
+
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${quote.quoteNumber}.pdf`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

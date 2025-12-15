@@ -38,7 +38,7 @@ export default function BusinessSettingsForm({
       phone: (formData.get("phone") as string) || null,
       email: (formData.get("email") as string) || null,
       siret: (formData.get("siret") as string) || null,
-      logo: null, // Pas encore implémenté dans le formulaire
+      // Logo géré séparément par le composant LogoUpload
       showInstallmentPayment: formData.get("showInstallmentPayment") === "on",
       pdfFileNamePrefix: (formData.get("pdfFileNamePrefix") as string) || null,
     };

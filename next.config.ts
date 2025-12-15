@@ -1,8 +1,13 @@
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   productionBrowserSourceMaps: true,
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '8mb', // Permet l'upload de logos jusqu'à 5MB (+ marge pour base64)
+    },
+  },
   async headers() {
     return [
       {

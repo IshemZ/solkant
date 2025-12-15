@@ -325,6 +325,40 @@ describe("Business Server Actions", () => {
         expect(result.error).toBe("Erreur lors de la mise à jour");
       }
     });
+
+    it("should preserve existing logo when updating other fields", async () => {
+      const existingLogo = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUg==";
+      const updateData = {
+        name: "Institut Mis à Jour",
+        phone: "0987654321",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.business.update).mockResolvedValue({
+        ...mockBusiness,
+        ...updateData,
+        logo: existingLogo, // Logo préservé
+      });
+
+      const result = await updateBusiness(updateData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.name).toBe("Institut Mis à Jour");
+        // Le logo devrait être préservé car il n'est pas dans updateData
+        expect(result.data.logo).toBe(existingLogo);
+      }
+
+      // Vérifier que le logo n'a PAS été envoyé dans l'update
+      expect(prisma.business.update).toHaveBeenCalledWith({
+        where: { id: "business_123" },
+        data: expect.not.objectContaining({
+          logo: expect.anything(),
+        }),
+      });
+    });
   });
 
   describe("uploadBusinessLogo", () => {
