@@ -60,6 +60,10 @@ describe("Business Server Actions", () => {
     id: "business_123",
     name: "Mon Institut",
     address: "1 rue de Paris",
+    rue: "1 rue de Paris",
+    complement: null,
+    codePostal: "75001",
+    ville: "Paris",
     phone: "0123456789",
     email: "contact@institut.fr",
     logo: null,
@@ -74,11 +78,9 @@ describe("Business Server Actions", () => {
     subscriptionStatus: "TRIAL" as const,
     subscriptionEndsAt: null,
     trialEndsAt: null,
+    showInstallmentPayment: false,
+    pdfFileNamePrefix: null,
     createdAt: new Date(),
-    city: null,
-    postalCode: null,
-    country: null,
-    tva: null,
     updatedAt: new Date(),
   };
 
@@ -190,6 +192,72 @@ describe("Business Server Actions", () => {
         where: { id: "business_123" },
         data: expect.objectContaining(updateData),
       });
+    });
+
+    it("should update business with pdfFileNamePrefix", async () => {
+      const updateData = {
+        name: "Institut de Beauté",
+        pdfFileNamePrefix: "DEVIS_CLIENT",
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.business.update).mockResolvedValue({
+        ...mockBusiness,
+        ...updateData,
+      });
+
+      const result = await updateBusiness(updateData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.pdfFileNamePrefix).toBe("DEVIS_CLIENT");
+      }
+
+      expect(prisma.business.update).toHaveBeenCalledWith({
+        where: { id: "business_123" },
+        data: expect.objectContaining({
+          pdfFileNamePrefix: "DEVIS_CLIENT",
+        }),
+      });
+    });
+
+    it("should accept null pdfFileNamePrefix", async () => {
+      const updateData = {
+        pdfFileNamePrefix: null,
+      };
+
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.business.update).mockResolvedValue({
+        ...mockBusiness,
+        pdfFileNamePrefix: null,
+      });
+
+      const result = await updateBusiness(updateData);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data).toBeDefined();
+        expect(result.data.pdfFileNamePrefix).toBeNull();
+      }
+    });
+
+    it("should reject pdfFileNamePrefix exceeding max length", async () => {
+      vi.mocked(getServerSession).mockResolvedValue(mockSession);
+      vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+
+      // String longer than 25 characters
+      const result = await updateBusiness({
+        pdfFileNamePrefix: "THIS_IS_A_VERY_LONG_PREFIX_THAT_EXCEEDS_LIMIT",
+      });
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        expect(result.error).toContain("invalide");
+      }
+      expect(prisma.business.update).not.toHaveBeenCalled();
     });
 
     it("should return error for unauthenticated user", async () => {
