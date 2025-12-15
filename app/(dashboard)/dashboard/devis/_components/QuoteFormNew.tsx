@@ -111,37 +111,35 @@ export default function QuoteFormNew({
       return sum + price * item.quantity;
     }, 0);
 
-    // Apply discount
-    let finalPrice = basePrice;
+    // Calculate discount amount to add to global discount
+    let packageDiscountAmount = 0;
     if (pkg.discountType === "PERCENTAGE") {
       const discountValue = Number(pkg.discountValue);
-      finalPrice = basePrice * (1 - discountValue / 100);
+      packageDiscountAmount = basePrice * (discountValue / 100);
     } else if (pkg.discountType === "FIXED") {
-      finalPrice = basePrice - Number(pkg.discountValue);
+      packageDiscountAmount = Number(pkg.discountValue);
     }
 
-    // Create description with included services
+    // Create description with included services (NO discount text)
     const servicesDescription = pkg.items
       .map((item) => `${item.service?.name} × ${item.quantity}`)
       .join(", ");
 
-    const discountText =
-      pkg.discountType === "PERCENTAGE"
-        ? ` (Réduction: -${pkg.discountValue}%)`
-        : pkg.discountType === "FIXED"
-        ? ` (Réduction: -${Number(pkg.discountValue).toFixed(2)} €)`
-        : "";
-
     const newItem: QuoteItem = {
       packageId: pkg.id,
       name: pkg.name,
-      description: `${servicesDescription}${discountText}`,
-      price: finalPrice,
+      description: servicesDescription,
+      price: basePrice, // Use base price, not discounted price
       quantity: 1,
-      total: finalPrice,
+      total: basePrice,
     };
 
     setItems([...items, newItem]);
+
+    // Add package discount to global discount field
+    if (packageDiscountAmount > 0) {
+      setDiscount(discount + packageDiscountAmount);
+    }
   }
 
   function updateItem(
@@ -302,21 +300,14 @@ export default function QuoteFormNew({
                     </div>
                   ) : (
                     packages.map((pkg) => {
-                      // Calculate display price
+                      // Calculate base price (without discount)
                       const basePrice = pkg.items.reduce((sum, item) => {
                         const price = item.service?.price || 0;
                         return sum + price * item.quantity;
                       }, 0);
-                      let finalPrice = basePrice;
-                      if (pkg.discountType === "PERCENTAGE") {
-                        finalPrice =
-                          basePrice * (1 - Number(pkg.discountValue) / 100);
-                      } else if (pkg.discountType === "FIXED") {
-                        finalPrice = basePrice - Number(pkg.discountValue);
-                      }
                       return (
                         <SelectItem key={pkg.id} value={pkg.id}>
-                          {pkg.name} • {finalPrice.toFixed(2)} €
+                          {pkg.name} • {basePrice.toFixed(2)} €
                         </SelectItem>
                       );
                     })
@@ -481,8 +472,6 @@ export default function QuoteFormNew({
             </div>
             {discount > 0 && (
               <div className="flex justify-between text-sm">
-                {" "}
-                {/* BUG:attention les réductions ne doivent apparaitre que dans la partie remise avant total global, Les totaux dans la partie Article doit afficher le prix sans remise */}
                 <span className="text-muted-foreground">Remise</span>
                 <span className="font-medium text-destructive">
                   -{discount.toFixed(2)} €
