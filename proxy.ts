@@ -1,8 +1,8 @@
 /**
- * Next.js Middleware - Rate Limiting Global
+ * Next.js Proxy - Rate Limiting Global
  * Applique les limites de taux sur les routes sensibles
  *
- * @see https://nextjs.org/docs/app/building-your-application/routing/middleware
+ * @see https://nextjs.org/docs/app/getting-started/proxy
  */
 
 import { NextResponse } from "next/server";
@@ -10,10 +10,10 @@ import type { NextRequest } from "next/server";
 import { features } from "./lib/env";
 
 /**
- * Middleware exécuté avant chaque requête
+ * Proxy exécuté avant chaque requête
  * Applique le rate limiting seulement si configuré (Upstash Redis)
  */
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Vérifier si le rate limiting est activé (variables Upstash présentes)
   if (!features.rateLimiting) {
     // Rate limiting désactivé : continuer normalement
@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
 
 /**
  * Configuration du matcher
- * Spécifie les routes où le middleware s'applique
+ * Spécifie les routes où le proxy s'applique
  */
 export const config = {
   matcher: [
