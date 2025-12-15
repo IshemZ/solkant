@@ -77,12 +77,24 @@ export default function QuoteFormNew({
     );
   }, [clients, clientSearch]);
 
+  // Get selected client object
+  const selectedClient = useMemo(
+    () => clients.find((c) => c.id === selectedClientId),
+    [clients, selectedClientId]
+  );
+
   // Calculate totals in real-time
   const subtotal = useMemo(
     () => items.reduce((sum, item) => sum + item.total, 0),
     [items]
   );
   const total = useMemo(() => subtotal - discount, [subtotal, discount]);
+
+  // Clear client selection
+  function clearClient() {
+    setSelectedClientId("");
+    setClientSearch("");
+  }
 
   function addServiceItem(serviceId: string) {
     const service = services.find((s) => s.id === serviceId);
@@ -205,8 +217,6 @@ export default function QuoteFormNew({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
-      {/* #TODO: Mettre en valeur la sélection du client au lieu de la barre de recherche, mais garder la recherche*/}
-
       {/* Client Selection */}
       <Card>
         <CardHeader>
@@ -216,43 +226,83 @@ export default function QuoteFormNew({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <FormField
-            label="Rechercher un client"
-            id="clientSearch"
-            hint="Tapez le nom, prénom ou email"
-          >
+          {/* Search input - always visible, smaller when client selected */}
+          {selectedClient ? (
             <Input
               id="clientSearch"
               placeholder="Rechercher..."
               value={clientSearch}
               onChange={(e) => setClientSearch(e.target.value)}
+              className="h-9 text-sm"
             />
-          </FormField>
-
-          <FormField label="Client" id="client" required>
-            <Select
-              value={selectedClientId}
-              onValueChange={setSelectedClientId}
+          ) : (
+            <FormField
+              label="Rechercher un client"
+              id="clientSearch"
+              hint="Tapez le nom, prénom ou email"
             >
-              <SelectTrigger id="client">
-                <SelectValue placeholder="Sélectionner un client" />
-              </SelectTrigger>
-              <SelectContent>
-                {filteredClients.length === 0 ? (
-                  <div className="p-2 text-sm text-muted-foreground">
-                    Aucun client trouvé
-                  </div>
-                ) : (
-                  filteredClients.map((client) => (
-                    <SelectItem key={client.id} value={client.id}>
-                      {client.firstName} {client.lastName}
-                      {client.email && ` • ${client.email}`}
-                    </SelectItem>
-                  ))
+              <Input
+                id="clientSearch"
+                placeholder="Rechercher..."
+                value={clientSearch}
+                onChange={(e) => setClientSearch(e.target.value)}
+              />
+            </FormField>
+          )}
+
+          {/* Selected client card - only shown when client is selected */}
+          {selectedClient && (
+            <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearClient}
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                aria-label="Retirer la sélection du client"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <div className="pr-8">
+                <p className="font-semibold text-lg">
+                  {selectedClient.firstName} {selectedClient.lastName}
+                </p>
+                {selectedClient.email && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {selectedClient.email}
+                  </p>
                 )}
-              </SelectContent>
-            </Select>
-          </FormField>
+              </div>
+            </div>
+          )}
+
+          {/* Dropdown - only shown when NO client is selected */}
+          {!selectedClient && (
+            <FormField label="Client" id="client" required>
+              <Select
+                value={selectedClientId}
+                onValueChange={setSelectedClientId}
+              >
+                <SelectTrigger id="client">
+                  <SelectValue placeholder="Sélectionner un client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredClients.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Aucun client trouvé
+                    </div>
+                  ) : (
+                    filteredClients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.firstName} {client.lastName}
+                        {client.email && ` • ${client.email}`}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FormField>
+          )}
         </CardContent>
       </Card>
 

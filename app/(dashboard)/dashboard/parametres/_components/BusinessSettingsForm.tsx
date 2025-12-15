@@ -39,6 +39,7 @@ export default function BusinessSettingsForm({
       email: (formData.get("email") as string) || null,
       siret: (formData.get("siret") as string) || null,
       logo: null, // Pas encore implémenté dans le formulaire
+      showInstallmentPayment: formData.get("showInstallmentPayment") === "on",
     };
 
     const result = await updateBusiness(data);
@@ -258,6 +259,33 @@ export default function BusinessSettingsForm({
             {fieldErrors.siret[0]}
           </p>
         )}
+      </div>
+
+      {/* Options des devis */}
+      <div className="border-t border-foreground/10 pt-6">
+        <h3 className="text-lg font-medium text-foreground mb-4">
+          Options des devis
+        </h3>
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            id="showInstallmentPayment"
+            name="showInstallmentPayment"
+            defaultChecked={business.showInstallmentPayment}
+            className="mt-1 h-4 w-4 rounded border-foreground/20 text-foreground focus:ring-foreground/40"
+          />
+          <div className="flex-1">
+            <label
+              htmlFor="showInstallmentPayment"
+              className="block text-sm font-medium text-foreground cursor-pointer"
+            >
+              Afficher la mention de paiement en plusieurs fois
+            </label>
+            <p className="mt-1 text-sm text-foreground/60">
+              Affiche &quot;Si paiement en 4× sans frais&quot; en bas du devis
+            </p>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end gap-4">

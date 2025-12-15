@@ -1,7 +1,5 @@
 "use client";
-// DONE:Ajouter une demande de confirmation par email après l'inscription
 
-// DONE: Mettre en place un système de mot de passe oublié
 import LoginForm from "@/components/auth/LoginForm";
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";

@@ -237,6 +237,7 @@ export const updateBusinessSchema = z.object({
       "Couleur secondaire invalide (format hexadécimal attendu)"
     )
     .optional(),
+  showInstallmentPayment: z.boolean().default(false).optional(),
 });
 
 /**

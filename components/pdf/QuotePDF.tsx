@@ -377,11 +377,12 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
                 {quote.total.toFixed(2)} €
               </Text>
             </View>
-            {/* TODO: Ajouter une condition pour afficher uniquement si le paiement en plusieurs fois est activé dans les paramètres de l'entreprise */}
-            <Text style={styles.installmentPayment}>
-              Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
-              4
-            </Text>
+            {quote.business.showInstallmentPayment && (
+              <Text style={styles.installmentPayment}>
+                Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
+                4
+              </Text>
+            )}
           </View>
         </View>
 
