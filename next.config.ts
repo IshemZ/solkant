@@ -7,11 +7,22 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const nextConfig = {
-  productionBrowserSourceMaps: true,
+  // Source maps uploadées vers Sentry uniquement (pas exposées publiquement)
+  productionBrowserSourceMaps: false,
+
+  // Optimisations Next.js 16
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
+      ? { exclude: ['error', 'warn'] }
+      : false,
+  },
+
   experimental: {
     serverActions: {
       bodySizeLimit: '8mb', // Permet l'upload de logos jusqu'à 5MB (+ marge pour base64)
     },
+    // Optimiser les imports de packages lourds
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
   },
   async headers() {
     return [
