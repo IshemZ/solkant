@@ -440,8 +440,14 @@ export default function Article3Page() {
           </h3>
           <p className="text-foreground/80 leading-relaxed mb-6">
             Ne digitalisez pas tout d&apos;un coup. Commencez par ce qui vous
-            fait le plus perdre de temps : la création de devis, la gestion de
-            la clientèle, ou les rendez-vous ?
+            fait le plus perdre de temps : la création de devis, la{" "}
+            <Link
+              href="/gestion-institut-beaute-guide"
+              className="text-foreground font-semibold hover:underline"
+            >
+              gestion de la clientèle
+            </Link>
+            , ou les rendez-vous ?
           </p>
 
           <h3 className="text-xl font-semibold text-foreground mt-8 mb-3">

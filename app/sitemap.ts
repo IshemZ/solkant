@@ -75,9 +75,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }));
 
-  // NOTE: Pages piliers à ajouter après leur création
-  // Décommenter ces lignes après avoir créé les pages piliers
-  /*
+  // Pages piliers (haute priorité SEO)
   const pillarPages: MetadataRoute.Sitemap = [
     {
       url: `${baseUrl}/logiciel-devis-institut-beaute`,
@@ -92,10 +90,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.95,
     },
   ];
-  */
 
   // IMPORTANT: Pages auth et dashboard sont EXCLUES (pas dans le sitemap)
   // Elles seront bloquées via robots.txt et meta noindex
 
-  return [...staticPages, ...legalPages, ...blogPages];
+  return [...staticPages, ...legalPages, ...pillarPages, ...blogPages];
 }

@@ -318,7 +318,14 @@ export default function Article1Page() {
             1. Logiciel spécialisé (recommandé)
           </h3>
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Un logiciel comme Solkant vous permet de créer des devis
+            Un{" "}
+            <Link
+              href="/logiciel-devis-institut-beaute"
+              className="text-foreground font-semibold hover:underline"
+            >
+              logiciel de devis spécialisé pour institut de beauté
+            </Link>{" "}
+            comme Solkant vous permet de créer des devis
             professionnels en quelques clics. Avantages : numérotation
             automatique, calculs automatiques, design professionnel, sauvegarde
             de votre catalogue de services, historique par client.

@@ -205,7 +205,14 @@ export default function Article2Page() {
               ✅ La solution
             </h4>
             <p className="text-foreground/70">
-              Utilisez un outil qui vous permet de créer un devis en 2-3 minutes
+              Utilisez un{" "}
+              <Link
+                href="/logiciel-devis-institut-beaute"
+                className="text-purple-600 hover:underline"
+              >
+                logiciel de devis pour institut
+              </Link>{" "}
+              qui vous permet de créer un devis en 2-3 minutes
               maximum. Avec{" "}
               <Link
                 href="/fonctionnalites"

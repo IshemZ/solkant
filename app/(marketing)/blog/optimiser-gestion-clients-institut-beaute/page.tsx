@@ -230,7 +230,14 @@ export default function Article3Page() {
           </h3>
 
           <p>
-            Adoptez un outil de gestion centralisé spécialement conçu pour les
+            Adoptez un{" "}
+            <Link
+              href="/gestion-institut-beaute-guide"
+              className="text-foreground font-medium hover:underline"
+            >
+              outil de gestion centralisé
+            </Link>{" "}
+            spécialement conçu pour les
             instituts de beauté. Un logiciel comme{" "}
             <Link
               href="/"

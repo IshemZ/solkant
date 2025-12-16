@@ -269,8 +269,14 @@ export default function Article2Page() {
           <p className="text-foreground/80 leading-relaxed mb-6">
             Vous créez actuellement vos devis sur Word ou Excel ? Vous perdez
             probablement entre 10 et 20 minutes par devis à tout ressaisir,
-            chercher vos tarifs, calculer les totaux... Un logiciel dédié peut
-            diviser ce temps par 5 tout en améliorant votre professionnalisme.
+            chercher vos tarifs, calculer les totaux... Un{" "}
+            <Link
+              href="/logiciel-devis-institut-beaute"
+              className="text-foreground font-semibold hover:underline"
+            >
+              logiciel de devis dédié
+            </Link>{" "}
+            peut diviser ce temps par 5 tout en améliorant votre professionnalisme.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">

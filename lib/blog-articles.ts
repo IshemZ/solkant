@@ -148,4 +148,238 @@ export const blogArticles: BlogArticle[] = [
       "organisation institut",
     ],
   },
+  // NOUVEAUX ARTICLES SATELLITES (Section 3 - Renforcement des piliers)
+  {
+    slug: "devis-en-ligne-vs-papier-institut-beaute",
+    title: "Devis en ligne vs devis papier : quel choix pour votre institut de beauté ?",
+    description:
+      "Découvrez les avantages et inconvénients du devis papier et du devis numérique pour instituts de beauté. Comparatif complet pour faire le bon choix en 2025.",
+    date: "2025-01-10",
+    readTime: "7 min",
+    category: "Comparatif",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-10T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Devis en ligne vs papier institut beauté",
+    },
+    keywords: [
+      "devis en ligne",
+      "devis papier",
+      "digitalisation",
+      "comparatif",
+    ],
+  },
+  {
+    slug: "cout-logiciel-devis-petit-institut",
+    title: "Combien coûte vraiment un logiciel de devis pour petit institut ?",
+    description:
+      "Découvrez le vrai coût d'un logiciel de devis pour institut de beauté : abonnements, fonctionnalités, retour sur investissement. Comparatif complet 2025.",
+    date: "2025-01-12",
+    readTime: "8 min",
+    category: "Budget",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-12T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Coût logiciel devis institut beauté",
+    },
+    keywords: [
+      "prix logiciel devis",
+      "budget institut",
+      "ROI",
+      "abonnement",
+    ],
+  },
+  {
+    slug: "modele-devis-gratuit-institut-beaute",
+    title: "Modèle de devis gratuit pour institut de beauté (Word + conseils)",
+    description:
+      "Téléchargez un modèle de devis gratuit personnalisable pour votre institut. Guide complet des mentions obligatoires et bonnes pratiques 2025.",
+    date: "2025-01-14",
+    readTime: "6 min",
+    category: "Ressources",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-14T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Modèle devis gratuit institut beauté",
+    },
+    keywords: [
+      "modèle devis gratuit",
+      "template devis",
+      "exemple devis beauté",
+    ],
+  },
+  {
+    slug: "fideliser-clientes-institut-beaute-strategies",
+    title: "7 stratégies éprouvées pour fidéliser vos clientes d'institut de beauté",
+    description:
+      "Découvrez comment transformer vos clientes occasionnelles en clientes fidèles avec 7 stratégies concrètes et actionnables. Guide complet fidélisation 2025.",
+    date: "2025-01-15",
+    readTime: "9 min",
+    category: "Fidélisation",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-15T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Fidéliser clientes institut beauté",
+    },
+    keywords: [
+      "fidélisation clients",
+      "rétention",
+      "programme fidélité",
+      "relation client",
+    ],
+  },
+  {
+    slug: "envoyer-devis-par-email-bonnes-pratiques",
+    title: "Comment envoyer un devis par email : le guide complet 2025",
+    description:
+      "Objet d'email, timing d'envoi, relances efficaces : découvrez toutes les bonnes pratiques pour maximiser l'acceptation de vos devis envoyés par email.",
+    date: "2025-01-17",
+    readTime: "7 min",
+    category: "Guides",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-17T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Envoyer devis par email bonnes pratiques",
+    },
+    keywords: [
+      "envoyer devis email",
+      "objet email devis",
+      "relance devis",
+    ],
+  },
+  {
+    slug: "difference-devis-facture-institut-beaute",
+    title: "Devis vs Facture : différences et obligations légales pour instituts",
+    description:
+      "Quelle est la différence entre un devis et une facture ? Quand sont-ils obligatoires ? Guide juridique complet pour gérer correctement vos documents commerciaux.",
+    date: "2025-01-19",
+    readTime: "6 min",
+    category: "Juridique",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-19T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Différence devis facture institut beauté",
+    },
+    keywords: [
+      "devis vs facture",
+      "différence devis facture",
+      "obligations légales",
+    ],
+  },
+  {
+    slug: "organiser-planning-rendez-vous-institut",
+    title: "Comment organiser efficacement le planning de votre institut de beauté",
+    description:
+      "Optimisez votre planning pour éviter les trous dans l'agenda, réduire les no-shows et maximiser votre chiffre d'affaires. Méthodes et outils 2025.",
+    date: "2025-01-21",
+    readTime: "8 min",
+    category: "Organisation",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-21T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Organiser planning institut beauté",
+    },
+    keywords: [
+      "planning institut",
+      "organisation rendez-vous",
+      "agenda beauté",
+    ],
+  },
+  {
+    slug: "comptabilite-simplifie-institut-beaute",
+    title: "Comptabilité d'institut de beauté : guide simplifié pour débutants",
+    description:
+      "TVA, déclarations, facturation, charges : découvrez les bases de la comptabilité pour instituts de beauté en micro-entreprise ou société. Guide pratique 2025.",
+    date: "2025-01-23",
+    readTime: "10 min",
+    category: "Comptabilité",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-23T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Comptabilité institut beauté",
+    },
+    keywords: [
+      "comptabilité institut",
+      "TVA esthétique",
+      "micro-entreprise beauté",
+    ],
+  },
+  {
+    slug: "ouvrir-institut-beaute-demarches-administratives",
+    title: "Ouvrir un institut de beauté : toutes les démarches administratives",
+    description:
+      "SIRET, assurances, déclarations, local : checklist complète des démarches pour ouvrir votre institut de beauté en 2025. Guide étape par étape.",
+    date: "2025-01-25",
+    readTime: "12 min",
+    category: "Création",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-25T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Ouvrir institut beauté démarches",
+    },
+    keywords: [
+      "ouvrir institut beauté",
+      "créer salon esthétique",
+      "démarches administratives",
+    ],
+  },
+  {
+    slug: "fixer-tarifs-prestations-institut-beaute",
+    title: "Comment fixer vos tarifs de prestations en institut de beauté ?",
+    description:
+      "Méthode complète pour calculer vos prix : coûts réels, positionnement, concurrence, psychologie des prix. Guide pratique pour instituts débutants et confirmés.",
+    date: "2025-01-27",
+    readTime: "9 min",
+    category: "Stratégie",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-27T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Fixer tarifs institut beauté",
+    },
+    keywords: [
+      "fixer prix institut",
+      "tarifs prestations beauté",
+      "stratégie pricing",
+    ],
+  },
 ];
