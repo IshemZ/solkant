@@ -177,22 +177,23 @@ model PackageItem {
 }
 
 model Quote {
-  id          String      @id @default(cuid())
-  quoteNumber String
-  status      QuoteStatus @default(DRAFT)
-  validUntil  DateTime?
-  notes       String?
-  discount    Float       @default(0)
-  subtotal    Float       @default(0)
-  total       Float       @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  sentAt      DateTime?
-  businessId  String
-  clientId    String?
-  items       QuoteItem[]
-  business    Business    @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  client      Client?     @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  id           String       @id @default(cuid())
+  quoteNumber  String
+  status       QuoteStatus  @default(DRAFT)
+  validUntil   DateTime?
+  notes        String?
+  discount     Float        @default(0)
+  discountType DiscountType @default(FIXED)
+  subtotal     Float        @default(0)
+  total        Float        @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  sentAt       DateTime?
+  businessId   String
+  clientId     String?
+  items        QuoteItem[]
+  business     Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
 
   @@unique([businessId, quoteNumber])
   @@index([businessId])

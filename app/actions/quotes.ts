@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { createQuoteSchema, type CreateQuoteInput } from "@/lib/validations";
+import { createQuoteSchema, updateQuoteSchema, type CreateQuoteInput, type UpdateQuoteInput } from "@/lib/validations";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
@@ -154,7 +154,15 @@ async function createQuoteWithRetry(
 
       // Calculate totals
       const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-      const total = subtotal - (quoteData.discount || 0);
+
+      // Calculate discount amount based on type
+      const discountType = quoteData.discountType || 'FIXED';
+      const discountValue = quoteData.discount || 0;
+      const discountAmount = discountType === 'PERCENTAGE'
+        ? subtotal * (discountValue / 100)
+        : discountValue;
+
+      const total = subtotal - discountAmount;
 
       // Create quote with items in a transaction
       const quote = await prisma.quote.create({
@@ -309,6 +317,156 @@ export async function deleteQuote(id: string): Promise<ActionResult<void>> {
     }
 
     return errorResult("Erreur lors de la suppression du devis");
+  }
+}
+
+/**
+ * Met à jour un devis existant
+ * IMPORTANT : Seuls les devis avec le statut DRAFT peuvent être modifiés
+ */
+export async function updateQuote(
+  id: string,
+  input: UpdateQuoteInput
+): Promise<ActionResult<QuoteWithRelations>> {
+  const validatedSession = await validateSessionWithEmail();
+
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId, userId } = validatedSession;
+
+  // Sanitize input before validation
+  const sanitized = sanitizeObject(input);
+
+  const validation = updateQuoteSchema.safeParse(sanitized);
+  if (!validation.success) {
+    return errorResult("Données invalides", "VALIDATION_ERROR");
+  }
+
+  try {
+    // Vérifier que le devis existe et est en statut DRAFT
+    const existingQuote = await prisma.quote.findFirst({
+      where: {
+        id,
+        businessId,
+      },
+      select: {
+        status: true,
+        quoteNumber: true,
+        discount: true,
+        discountType: true,
+      },
+    });
+
+    if (!existingQuote) {
+      return errorResult("Devis introuvable", "NOT_FOUND");
+    }
+
+    if (existingQuote.status !== "DRAFT") {
+      return errorResult(
+        "Impossible de modifier un devis déjà envoyé",
+        "INVALID_STATUS"
+      );
+    }
+
+    const { items, ...quoteData } = validation.data;
+
+    // Si des items sont fournis, calculer les nouveaux totaux
+    let subtotal: number | undefined;
+    let total: number | undefined;
+
+    if (items && items.length > 0) {
+      subtotal = items.reduce((sum, item) => sum + item.total, 0);
+
+      // Calculate discount amount based on type
+      // Use existing values as fallback if not provided in update
+      const discountType = quoteData.discountType || existingQuote.discountType;
+      const discountValue = quoteData.discount !== undefined
+        ? quoteData.discount
+        : existingQuote.discount;
+      const discountAmount = discountType === 'PERCENTAGE'
+        ? subtotal * (discountValue / 100)
+        : discountValue;
+
+      total = subtotal - discountAmount;
+    }
+
+    // Mettre à jour le devis dans une transaction
+    const updatedQuote = await prisma.$transaction(async (tx) => {
+      // Si des items sont fournis, supprimer les anciens et créer les nouveaux
+      if (items && items.length > 0) {
+        await tx.quoteItem.deleteMany({
+          where: { quoteId: id },
+        });
+      }
+
+      // Mettre à jour le devis
+      const quote = await tx.quote.update({
+        where: {
+          id,
+          businessId,
+        },
+        data: {
+          ...quoteData,
+          ...(subtotal !== undefined && { subtotal }),
+          ...(total !== undefined && { total }),
+          ...(items &&
+            items.length > 0 && {
+              items: {
+                create: items.map((item) => ({
+                  serviceId: item.serviceId,
+                  name: item.name,
+                  description: item.description,
+                  price: item.price,
+                  quantity: item.quantity,
+                  total: item.total,
+                })),
+              },
+            }),
+        },
+        include: {
+          client: true,
+          items: {
+            include: {
+              service: true,
+            },
+          },
+        },
+      });
+
+      return quote;
+    });
+
+    // Log d'audit
+    await auditLog({
+      action: AuditAction.QUOTE_UPDATED,
+      level: AuditLevel.INFO,
+      userId,
+      businessId,
+      resourceId: id,
+      resourceType: "Quote",
+      metadata: {
+        quoteNumber: existingQuote.quoteNumber,
+        changes: Object.keys(quoteData),
+      },
+    });
+
+    revalidatePath("/dashboard/devis");
+    revalidatePath(`/dashboard/devis/${id}`);
+
+    return successResult(updatedQuote);
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { action: "updateQuote", businessId },
+      extra: { quoteId: id, input },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error updating quote:", error);
+    }
+
+    return errorResult("Erreur lors de la mise à jour du devis");
   }
 }
 

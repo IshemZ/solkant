@@ -364,9 +364,13 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
 
             {quote.discount > 0 && (
               <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>Remise</Text>
+                <Text style={styles.totalLabel}>
+                  Remise{quote.discountType === 'PERCENTAGE' ? ` (${quote.discount}%)` : ''}
+                </Text>
                 <Text style={[styles.totalValue, { color: "#dc2626" }]}>
-                  -{quote.discount.toFixed(2)} €
+                  -{(quote.discountType === 'PERCENTAGE'
+                    ? quote.subtotal * (quote.discount / 100)
+                    : quote.discount).toFixed(2)} €
                 </Text>
               </View>
             )}

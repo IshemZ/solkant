@@ -312,6 +312,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",
@@ -403,6 +404,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",
@@ -476,6 +478,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",
@@ -557,6 +560,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 20, // Remise de 20€
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",
@@ -624,6 +628,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",
@@ -693,6 +698,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [],
       });
 
@@ -714,6 +720,7 @@ describe("Quote Server Actions", () => {
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
+        discountType: "FIXED" as const,
         items: [
           {
             serviceId: "clxxx444444444444444",

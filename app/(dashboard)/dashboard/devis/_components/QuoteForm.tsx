@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createQuote } from "@/app/actions/quotes";
+import DiscountField, { type DiscountType } from "@/components/shared/DiscountField";
 import type { Client, Service } from "@prisma/client";
 
 interface QuoteFormProps {
@@ -27,6 +28,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
   const [selectedClientId, setSelectedClientId] = useState("");
   const [items, setItems] = useState<QuoteItem[]>([]);
   const [discount, setDiscount] = useState(0);
+  const [discountType, setDiscountType] = useState<DiscountType>("FIXED");
   const [notes, setNotes] = useState("");
   const [validUntil, setValidUntil] = useState("");
 
@@ -66,8 +68,19 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
     setItems(items.filter((_, i) => i !== index));
   }
 
-  const subtotal = items.reduce((sum, item) => sum + item.total, 0);
-  const total = subtotal - discount;
+  // Calculate totals with proper discount handling
+  const subtotal = useMemo(
+    () => items.reduce((sum, item) => sum + item.total, 0),
+    [items]
+  );
+
+  const discountAmount = useMemo(() => {
+    return discountType === "PERCENTAGE"
+      ? subtotal * (discount / 100)
+      : discount;
+  }, [discount, discountType, subtotal]);
+
+  const total = useMemo(() => subtotal - discountAmount, [subtotal, discountAmount]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -90,6 +103,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
       clientId: selectedClientId,
       items,
       discount,
+      discountType,
       notes: notes || undefined,
       validUntil: validUntil ? new Date(validUntil) : undefined,
     };
@@ -289,20 +303,14 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div>
-            <label
-              htmlFor="discount"
-              className="block text-sm font-medium text-foreground"
-            >
-              Remise (€)
-            </label>
-            <input
-              type="number"
-              id="discount"
-              step="0.01"
-              min="0"
+            <DiscountField
               value={discount}
-              onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
-              className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+              type={discountType}
+              subtotal={subtotal}
+              onChange={(value, type) => {
+                setDiscount(value);
+                setDiscountType(type);
+              }}
             />
           </div>
 
@@ -349,9 +357,12 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-foreground/60">Remise</span>
+              <span className="text-foreground/60">
+                Remise
+                {discountType === "PERCENTAGE" && ` (${discount}%)`}
+              </span>
               <span className="font-medium text-red-600">
-                -{discount.toFixed(2)} €
+                -{discountAmount.toFixed(2)} €
               </span>
             </div>
           )}

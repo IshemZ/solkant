@@ -11,6 +11,16 @@ export const quoteStatusEnum = z.enum(['DRAFT', 'SENT'])
 export type QuoteStatus = z.infer<typeof quoteStatusEnum>
 
 /**
+ * Enum pour le type de remise
+ */
+export const discountTypeEnum = z.enum(['PERCENTAGE', 'FIXED'])
+
+/**
+ * Type pour le type de remise
+ */
+export type DiscountType = z.infer<typeof discountTypeEnum>
+
+/**
  * Schéma de validation pour un item de devis (ligne)
  */
 export const quoteItemSchema = z.object({
@@ -73,11 +83,39 @@ export const createQuoteSchema = z.object({
     .max(999999.99, 'La remise ne peut pas dépasser 999 999,99 €')
     .multipleOf(0.01, 'La remise doit avoir au maximum 2 décimales')
     .default(0),
+  discountType: discountTypeEnum.default('FIXED'),
   items: z
     .array(quoteItemSchema)
     .min(1, 'Au moins un article est requis')
     .max(100, 'Un devis ne peut pas contenir plus de 100 articles'),
 })
+.refine(
+  (data) => {
+    // Validation conditionnelle : si discountType est PERCENTAGE, discount doit être <= 100
+    if (data.discountType === 'PERCENTAGE' && data.discount > 100) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: 'La remise en pourcentage ne peut pas dépasser 100%',
+    path: ['discount'],
+  }
+)
+.refine(
+  (data) => {
+    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total
+    const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
+    const discountAmount = data.discountType === 'PERCENTAGE'
+      ? subtotal * (data.discount / 100)
+      : data.discount;
+    return discountAmount <= subtotal;
+  },
+  {
+    message: 'La remise ne peut pas dépasser le sous-total',
+    path: ['discount'],
+  }
+)
 
 /**
  * Schéma de validation pour la mise à jour d'un devis
@@ -116,12 +154,46 @@ export const updateQuoteSchema = z.object({
     .max(999999.99, 'La remise ne peut pas dépasser 999 999,99 €')
     .multipleOf(0.01, 'La remise doit avoir au maximum 2 décimales')
     .optional(),
+  discountType: discountTypeEnum.optional(),
   items: z
     .array(quoteItemSchema)
     .min(1, 'Au moins un article est requis')
     .max(100, 'Un devis ne peut pas contenir plus de 100 articles')
     .optional(),
 })
+.refine(
+  (data) => {
+    // Validation conditionnelle : si discountType est PERCENTAGE, discount doit être <= 100
+    if (data.discountType === 'PERCENTAGE' && data.discount && data.discount > 100) {
+      return false;
+    }
+    return true;
+  },
+  {
+    message: 'La remise en pourcentage ne peut pas dépasser 100%',
+    path: ['discount'],
+  }
+)
+.refine(
+  (data) => {
+    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total
+    // Seulement si items ET discount sont fournis
+    if (!data.items || !data.discount) {
+      return true;
+    }
+
+    const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
+    const discountType = data.discountType || 'FIXED';
+    const discountAmount = discountType === 'PERCENTAGE'
+      ? subtotal * (data.discount / 100)
+      : data.discount;
+    return discountAmount <= subtotal;
+  },
+  {
+    message: 'La remise ne peut pas dépasser le sous-total',
+    path: ['discount'],
+  }
+)
 
 /**
  * Schéma pour mettre à jour uniquement le statut d'un devis

@@ -73,6 +73,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
     validUntil: new Date("2025-12-31").toISOString(),
     status: "DRAFT" as const,
     discount: 0,
+    discountType: "FIXED" as const,
     items: [
       {
         serviceId: "clxxx444444444444444", // Format CUID

@@ -3,7 +3,7 @@
 import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { X, Plus, AlertCircle, Package as PackageIcon } from "lucide-react";
+import { X, Plus, AlertCircle } from "lucide-react";
 import {
   Button,
   Input,
@@ -28,23 +28,23 @@ import {
   Alert,
   AlertDescription,
 } from "@/components/ui";
-import { createQuote } from "@/app/actions/quotes";
+import { updateQuote } from "@/app/actions/quotes";
 import DiscountField, { type DiscountType } from "@/components/shared/DiscountField";
-import type { Client, Service, Package, PackageItem } from "@prisma/client";
+import type { Client, Service, Quote, QuoteItem as PrismaQuoteItem } from "@prisma/client";
 
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
+type QuoteWithItems = Quote & {
+  items: PrismaQuoteItem[];
+  client: Client | null;
+};
 
-interface QuoteFormProps {
+interface QuoteFormEditProps {
+  quote: QuoteWithItems;
   clients: Client[];
   services: Service[];
-  packages: PackageWithRelations[];
 }
 
 interface QuoteItem {
   serviceId?: string;
-  packageId?: string;
   name: string;
   description?: string;
   price: number;
@@ -52,19 +52,30 @@ interface QuoteItem {
   total: number;
 }
 
-export default function QuoteFormNew({
+export default function QuoteFormEdit({
+  quote,
   clients,
   services,
-  packages,
-}: QuoteFormProps) {
+}: QuoteFormEditProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [items, setItems] = useState<QuoteItem[]>([]);
-  const [discount, setDiscount] = useState(0);
-  const [discountType, setDiscountType] = useState<DiscountType>("FIXED");
-  const [notes, setNotes] = useState("");
+
+  // Initialize with quote data
+  const [selectedClientId, setSelectedClientId] = useState(quote.clientId || "");
+  const [items, setItems] = useState<QuoteItem[]>(
+    quote.items.map((item) => ({
+      serviceId: item.serviceId || undefined,
+      name: item.name,
+      description: item.description || undefined,
+      price: item.price,
+      quantity: item.quantity,
+      total: item.total,
+    }))
+  );
+  const [discount, setDiscount] = useState(quote.discount);
+  const [discountType, setDiscountType] = useState<DiscountType>(quote.discountType as DiscountType);
+  const [notes, setNotes] = useState(quote.notes || "");
   const [clientSearch, setClientSearch] = useState("");
 
   // Filtered clients for search
@@ -91,6 +102,7 @@ export default function QuoteFormNew({
     [items]
   );
 
+  // Calculate discount amount based on type
   const discountAmount = useMemo(() => {
     return discountType === "PERCENTAGE"
       ? subtotal * (discount / 100)
@@ -121,47 +133,6 @@ export default function QuoteFormNew({
     setItems([...items, newItem]);
   }
 
-  function addPackageItem(packageId: string) {
-    const pkg = packages.find((p) => p.id === packageId);
-    if (!pkg) return;
-
-    // Calculate base price from all services in the package
-    const basePrice = pkg.items.reduce((sum, item) => {
-      const price = item.service?.price || 0;
-      return sum + price * item.quantity;
-    }, 0);
-
-    // Calculate discount amount to add to global discount
-    let packageDiscountAmount = 0;
-    if (pkg.discountType === "PERCENTAGE") {
-      const discountValue = Number(pkg.discountValue);
-      packageDiscountAmount = basePrice * (discountValue / 100);
-    } else if (pkg.discountType === "FIXED") {
-      packageDiscountAmount = Number(pkg.discountValue);
-    }
-
-    // Create description with included services (NO discount text)
-    const servicesDescription = pkg.items
-      .map((item) => `${item.service?.name} × ${item.quantity}`)
-      .join(", ");
-
-    const newItem: QuoteItem = {
-      packageId: pkg.id,
-      name: pkg.name,
-      description: servicesDescription,
-      price: basePrice, // Use base price, not discounted price
-      quantity: 1,
-      total: basePrice,
-    };
-
-    setItems([...items, newItem]);
-
-    // Add package discount to global discount field
-    if (packageDiscountAmount > 0) {
-      setDiscount(discount + packageDiscountAmount);
-    }
-  }
-
   function updateItem(
     index: number,
     field: keyof QuoteItem,
@@ -170,7 +141,6 @@ export default function QuoteFormNew({
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
-    // Recalculate total for this item
     if (field === "price" || field === "quantity") {
       newItems[index].total = newItems[index].price * newItems[index].quantity;
     }
@@ -207,14 +177,14 @@ export default function QuoteFormNew({
       notes: notes || undefined,
     };
 
-    const result = await createQuote(quoteData);
+    const result = await updateQuote(quote.id, quoteData);
 
     if (!result.success) {
       setError(result.error);
-      toast.error("Erreur lors de la création du devis");
+      toast.error("Erreur lors de la modification du devis");
       setIsLoading(false);
     } else {
-      toast.success(`Devis ${result.data.quoteNumber} créé avec succès`);
+      toast.success(`Devis ${result.data.quoteNumber} modifié avec succès`);
       router.push(`/dashboard/devis/${result.data.id}`);
     }
   }
@@ -227,6 +197,7 @@ export default function QuoteFormNew({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
       {/* Client Selection */}
       <Card>
         <CardHeader>
@@ -236,82 +207,77 @@ export default function QuoteFormNew({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {/* Search input - always visible, smaller when client selected */}
           {selectedClient ? (
-            <Input
-              id="clientSearch"
-              placeholder="Rechercher..."
-              value={clientSearch}
-              onChange={(e) => setClientSearch(e.target.value)}
-              className="h-9 text-sm"
-            />
-          ) : (
-            <FormField
-              label="Rechercher un client"
-              id="clientSearch"
-              hint="Tapez le nom, prénom ou email"
-            >
+            <>
               <Input
                 id="clientSearch"
                 placeholder="Rechercher..."
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
+                className="h-9 text-sm"
               />
-            </FormField>
-          )}
-
-          {/* Selected client card - only shown when client is selected */}
-          {selectedClient && (
-            <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 relative">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={clearClient}
-                className="absolute top-2 right-2 h-8 w-8 p-0"
-                aria-label="Retirer la sélection du client"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-              <div className="pr-8">
-                <p className="font-semibold text-lg">
-                  {selectedClient.firstName} {selectedClient.lastName}
-                </p>
-                {selectedClient.email && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {selectedClient.email}
+              <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 relative">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearClient}
+                  className="absolute top-2 right-2 h-8 w-8 p-0"
+                  aria-label="Retirer la sélection du client"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+                <div className="pr-8">
+                  <p className="font-semibold text-lg">
+                    {selectedClient.firstName} {selectedClient.lastName}
                   </p>
-                )}
-              </div>
-            </div>
-          )}
-
-          {/* Dropdown - only shown when NO client is selected */}
-          {!selectedClient && (
-            <FormField label="Client" id="client" required>
-              <Select
-                value={selectedClientId}
-                onValueChange={setSelectedClientId}
-              >
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Sélectionner un client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {filteredClients.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Aucun client trouvé
-                    </div>
-                  ) : (
-                    filteredClients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.firstName} {client.lastName}
-                        {client.email && ` • ${client.email}`}
-                      </SelectItem>
-                    ))
+                  {selectedClient.email && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {selectedClient.email}
+                    </p>
                   )}
-                </SelectContent>
-              </Select>
-            </FormField>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <FormField
+                label="Rechercher un client"
+                id="clientSearch"
+                hint="Tapez le nom, prénom ou email"
+              >
+                <Input
+                  id="clientSearch"
+                  placeholder="Rechercher..."
+                  value={clientSearch}
+                  onChange={(e) => setClientSearch(e.target.value)}
+                />
+              </FormField>
+              <FormField label="Client" id="client" required>
+                <Select
+                  value={selectedClientId}
+                  onValueChange={setSelectedClientId}
+                >
+                  <SelectTrigger id="client">
+                    <SelectValue placeholder="Sélectionner un client" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filteredClients.length === 0 ? (
+                      <div className="p-2 text-sm text-muted-foreground">
+                        Aucun client trouvé
+                      </div>
+                    ) : (
+                      filteredClients.map((client) => (
+                        <SelectItem key={client.id} value={client.id}>
+                          {client.firstName} {client.lastName}
+                          {client.email && ` • ${client.email}`}
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              </FormField>
+            </>
           )}
         </CardContent>
       </Card>
@@ -323,56 +289,28 @@ export default function QuoteFormNew({
             <div>
               <CardTitle>Articles</CardTitle>
               <CardDescription>
-                Ajoutez des services ou des forfaits à inclure dans le devis
+                Ajoutez des services à inclure dans le devis
               </CardDescription>
             </div>
-            <div className="flex gap-2">
-              <Select onValueChange={addServiceItem}>
-                <SelectTrigger className="w-[200px]">
-                  <Plus className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Ajouter un service" />
-                </SelectTrigger>
-                <SelectContent>
-                  {services.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Aucun service disponible
-                    </div>
-                  ) : (
-                    services.map((service) => (
-                      <SelectItem key={service.id} value={service.id}>
-                        {service.name} • {service.price.toFixed(2)} €
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <Select onValueChange={addPackageItem}>
-                <SelectTrigger className="w-[200px]">
-                  <PackageIcon className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Ajouter un forfait" />
-                </SelectTrigger>
-                <SelectContent>
-                  {packages.length === 0 ? (
-                    <div className="p-2 text-sm text-muted-foreground">
-                      Aucun forfait disponible
-                    </div>
-                  ) : (
-                    packages.map((pkg) => {
-                      // Calculate base price (without discount)
-                      const basePrice = pkg.items.reduce((sum, item) => {
-                        const price = item.service?.price || 0;
-                        return sum + price * item.quantity;
-                      }, 0);
-                      return (
-                        <SelectItem key={pkg.id} value={pkg.id}>
-                          {pkg.name} • {basePrice.toFixed(2)} €
-                        </SelectItem>
-                      );
-                    })
-                  )}
-                </SelectContent>
-              </Select>
-            </div>
+            <Select onValueChange={addServiceItem}>
+              <SelectTrigger className="w-[200px]">
+                <Plus className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Ajouter un service" />
+              </SelectTrigger>
+              <SelectContent>
+                {services.length === 0 ? (
+                  <div className="p-2 text-sm text-muted-foreground">
+                    Aucun service disponible
+                  </div>
+                ) : (
+                  services.map((service) => (
+                    <SelectItem key={service.id} value={service.id}>
+                      {service.name} • {service.price.toFixed(2)} €
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
           </div>
         </CardHeader>
         <CardContent>
@@ -382,8 +320,7 @@ export default function QuoteFormNew({
                 Aucun article ajouté
               </p>
               <p className="text-xs text-muted-foreground mt-1">
-                Utilisez les boutons ci-dessus pour ajouter des services ou des
-                forfaits
+                Utilisez le bouton ci-dessus pour ajouter des services
               </p>
             </div>
           ) : (
@@ -531,13 +468,13 @@ export default function QuoteFormNew({
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/devis")}
+          onClick={() => router.push(`/dashboard/devis/${quote.id}`)}
           disabled={isLoading}
         >
           Annuler
         </Button>
         <Button type="submit" disabled={isLoading || items.length === 0}>
-          {isLoading ? "Création..." : "Créer le devis"}
+          {isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
         </Button>
       </div>
     </form>

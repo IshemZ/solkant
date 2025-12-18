@@ -71,11 +71,13 @@ export {
   updateQuoteStatusSchema,
   quoteItemSchema,
   quoteStatusEnum,
+  discountTypeEnum,
   type CreateQuoteInput,
   type UpdateQuoteInput,
   type UpdateQuoteStatusInput,
   type QuoteItemInput,
   type QuoteStatus,
+  type DiscountType,
 } from "./quote";
 
 // Package
