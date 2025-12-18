@@ -538,10 +538,24 @@ export default function QuoteFormNew({
               <span className="text-muted-foreground">Sous-total</span>
               <span className="font-medium">{subtotal.toFixed(2)} €</span>
             </div>
+            {packageDiscountsTotal > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Remises forfaits</span>
+                <span className="font-medium text-green-600">
+                  -{packageDiscountsTotal.toFixed(2)} €
+                </span>
+              </div>
+            )}
+            {packageDiscountsTotal > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Sous-total après remises</span>
+                <span className="font-medium">{subtotalAfterPackageDiscounts.toFixed(2)} €</span>
+              </div>
+            )}
             {discount > 0 && (
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">
-                  Remise
+                  Remise globale
                   {discountType === "PERCENTAGE" && ` (${discount}%)`}
                 </span>
                 <span className="font-medium text-destructive">
@@ -550,7 +564,7 @@ export default function QuoteFormNew({
               </div>
             )}
             <div className="flex justify-between border-t pt-2 text-lg font-semibold">
-              <span>Total</span>
+              <span>Total TTC</span>
               <span>{total.toFixed(2)} €</span>
             </div>
           </div>
