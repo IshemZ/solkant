@@ -132,16 +132,17 @@ export default function QuoteFormNew({
       return sum + price * item.quantity;
     }, 0);
 
-    // Calculate discount amount to add to global discount
-    let packageDiscountAmount = 0;
-    if (pkg.discountType === "PERCENTAGE") {
+    // Calculate package discount separately
+    let packageDiscount = 0;
+
+    if (pkg.discountType === "PERCENTAGE" && Number(pkg.discountValue) > 0) {
       const discountValue = Number(pkg.discountValue);
-      packageDiscountAmount = basePrice * (discountValue / 100);
-    } else if (pkg.discountType === "FIXED") {
-      packageDiscountAmount = Number(pkg.discountValue);
+      packageDiscount = basePrice * (discountValue / 100);
+    } else if (pkg.discountType === "FIXED" && Number(pkg.discountValue) > 0) {
+      packageDiscount = Math.min(Number(pkg.discountValue), basePrice); // Limit to basePrice
     }
 
-    // Create description with included services (NO discount text)
+    // Create description with included services
     const servicesDescription = pkg.items
       .map((item) => `${item.service?.name} × ${item.quantity}`)
       .join(", ");
@@ -150,17 +151,13 @@ export default function QuoteFormNew({
       packageId: pkg.id,
       name: pkg.name,
       description: servicesDescription,
-      price: basePrice, // Use base price, not discounted price
+      price: basePrice, // Use FULL price, not discounted
       quantity: 1,
       total: basePrice,
+      packageDiscount: packageDiscount, // Store discount separately
     };
 
     setItems([...items, newItem]);
-
-    // Add package discount to global discount field
-    if (packageDiscountAmount > 0) {
-      setDiscount(discount + packageDiscountAmount);
-    }
   }
 
   function updateItem(
