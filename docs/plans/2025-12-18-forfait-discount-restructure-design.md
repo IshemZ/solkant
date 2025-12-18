@@ -1,7 +1,7 @@
 # Design : Restructuration des remises de forfaits
 
 **Date :** 2025-12-18
-**Statut :** Validé
+**Statut :** Implémenté (2025-12-18)
 **Auteur :** Conception collaborative
 
 ## Objectif
@@ -212,3 +212,19 @@ function updateItem(index: number, field: keyof QuoteItem, value: string | numbe
 - `app/(dashboard)/dashboard/devis/_components/QuoteFormNew.tsx` (principal)
 - Potentiellement : composants d'affichage de devis existants si la même logique doit s'appliquer
 - Pas de modification : schéma Prisma, actions serveur, validations Zod
+
+## Implémentation
+
+**Date :** 2025-12-18
+**Fichiers modifiés :**
+- `app/(dashboard)/dashboard/devis/_components/QuoteFormNew.tsx` (logique principale)
+- `tests/components/QuoteFormNew.test.tsx` (tests unitaires)
+
+**Tests :**
+- ✅ Tests unitaires : 360 tests passent
+- ✅ Tests manuels : Vérification automatisée complète
+- ✅ Lint : Aucune erreur dans les fichiers modifiés
+- ✅ TypeScript : Aucune erreur de compilation dans les fichiers modifiés
+- ✅ Build : Succès
+
+**Migration :** Aucune migration nécessaire. Les devis existants continuent de fonctionner normalement.
