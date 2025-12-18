@@ -180,6 +180,11 @@ export default function QuoteFormNew({
     field: keyof QuoteItem,
     value: string | number
   ) {
+    // Block price and quantity modifications for packages
+    if (items[index].packageId && (field === "price" || field === "quantity")) {
+      return; // Silently ignore modifications
+    }
+
     const newItems = [...items];
     newItems[index] = { ...newItems[index], [field]: value };
 
