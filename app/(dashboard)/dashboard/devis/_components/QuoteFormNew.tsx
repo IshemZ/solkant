@@ -438,34 +438,47 @@ export default function QuoteFormNew({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={item.price}
-                          onChange={(e) =>
-                            updateItem(
-                              index,
-                              "price",
-                              parseFloat(e.target.value) || 0
-                            )
-                          }
-                          className="w-full"
-                        />
+                        {item.packageId ? (
+                          <div className="flex items-center gap-2 px-3 py-2 text-sm">
+                            <PackageIcon className="h-3 w-3 text-muted-foreground" />
+                            <span className="font-medium">{item.price.toFixed(2)} €</span>
+                          </div>
+                        ) : (
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={item.price}
+                            onChange={(e) =>
+                              updateItem(
+                                index,
+                                "price",
+                                parseFloat(e.target.value) || 0
+                              )
+                            }
+                            className="w-full"
+                          />
+                        )}
                       </TableCell>
                       <TableCell>
-                        <Input
-                          type="number"
-                          min="1"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateItem(
-                              index,
-                              "quantity",
-                              parseInt(e.target.value) || 1
-                            )
-                          }
-                          className="w-full"
-                        />
+                        {item.packageId ? (
+                          <div className="px-3 py-2 text-sm font-medium text-center">
+                            1
+                          </div>
+                        ) : (
+                          <Input
+                            type="number"
+                            min="1"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateItem(
+                                index,
+                                "quantity",
+                                parseInt(e.target.value) || 1
+                              )
+                            }
+                            className="w-full"
+                          />
+                        )}
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         {item.total.toFixed(2)} €
