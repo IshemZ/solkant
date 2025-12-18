@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { getPackages } from "@/app/actions/packages";
 import QuoteFormEdit from "../../_components/QuoteFormEdit";
 
 interface PageProps {
@@ -39,8 +40,8 @@ export default async function ModifierDevisPage({ params }: PageProps) {
     redirect(`/dashboard/devis/${id}`);
   }
 
-  // Fetch clients and services for the form
-  const [clients, services] = await Promise.all([
+  // Fetch clients, services, and packages for the form
+  const [clients, services, packagesResult] = await Promise.all([
     prisma.client.findMany({
       where: { businessId },
       orderBy: { lastName: "asc" },
@@ -53,16 +54,24 @@ export default async function ModifierDevisPage({ params }: PageProps) {
       },
       orderBy: { name: "asc" },
     }),
+    getPackages(),
   ]);
 
+  // Check if packages fetch was successful
+  if (!packagesResult.success) {
+    redirect("/dashboard");
+  }
+
+  const packages = packagesResult.data;
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">Modifier le devis</h1>
-        <p className="text-muted-foreground mt-2">Devis {quote.quoteNumber}</p>
+    <div className="mx-auto max-w-5xl py-8">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold tracking-tight">Modifier le devis</h1>
+        <p className="mt-2 text-muted-foreground">Devis {quote.quoteNumber}</p>
       </div>
 
-      <QuoteFormEdit quote={quote} clients={clients} services={services} />
+      <QuoteFormEdit quote={quote} clients={clients} services={services} packages={packages} />
     </div>
   );
 }

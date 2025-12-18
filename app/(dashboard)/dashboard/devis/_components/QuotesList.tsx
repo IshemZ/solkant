@@ -128,18 +128,35 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <div className="flex items-center justify-end gap-3">
-                        <Link
-                          href={`/dashboard/devis/${quote.id}`}
-                          className="rounded-md bg-foreground/10 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/20 transition-colors"
-                        >
-                          Voir le détail
-                        </Link>
-                        <button
-                          onClick={() => openDeleteDialog(quote.id)}
-                          className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                        >
-                          Supprimer
-                        </button>
+                        {quote.status === "DRAFT" ? (
+                          <>
+                            <Link
+                              href={`/dashboard/devis/${quote.id}/modifier`}
+                              className="rounded-md bg-foreground px-3 py-1.5 text-sm font-medium text-background hover:bg-foreground/90 transition-colors"
+                            >
+                              Modifier
+                            </Link>
+                            <Link
+                              href={`/dashboard/devis/${quote.id}`}
+                              className="rounded-md bg-foreground/10 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/20 transition-colors"
+                            >
+                              Voir
+                            </Link>
+                            <button
+                              onClick={() => openDeleteDialog(quote.id)}
+                              className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                            >
+                              Supprimer
+                            </button>
+                          </>
+                        ) : (
+                          <Link
+                            href={`/dashboard/devis/${quote.id}`}
+                            className="rounded-md bg-foreground/10 px-3 py-1.5 text-sm font-medium text-foreground hover:bg-foreground/20 transition-colors"
+                          >
+                            Voir le détail
+                          </Link>
+                        )}
                       </div>
                     </td>
                   </tr>

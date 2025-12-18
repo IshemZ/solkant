@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Pencil, Trash2, Download, Mail } from "lucide-react";
+import { toast } from "sonner";
 import type {
   Quote,
   Client,
@@ -10,6 +13,8 @@ import type {
   Service,
 } from "@prisma/client";
 import { formatDate } from "@/lib/date-utils";
+import { deleteQuote } from "@/app/actions/quotes";
+import ConfirmDialog from "@/components/shared/ConfirmDialog";
 
 interface QuoteWithRelations extends Quote {
   client: Client | null;
@@ -22,8 +27,10 @@ interface QuoteViewProps {
 }
 
 export default function QuoteView({ quote }: QuoteViewProps) {
+  const router = useRouter();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   async function handleDownloadPDF() {
     setIsGenerating(true);
@@ -90,6 +97,16 @@ export default function QuoteView({ quote }: QuoteViewProps) {
     }
   }
 
+  async function handleDelete() {
+    const result = await deleteQuote(quote.id);
+    if (result.success) {
+      toast.success("Devis supprimé avec succès");
+      router.push("/dashboard/devis");
+    } else {
+      toast.error(result.error || "Erreur lors de la suppression");
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -112,52 +129,64 @@ export default function QuoteView({ quote }: QuoteViewProps) {
         </div>
 
         <div className="flex gap-3">
-          <button
-            onClick={handleSendEmail}
-            disabled={isSending || !quote.client || !quote.client.email}
-            className="inline-flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed"
-            title={
-              !quote.client || !quote.client.email
-                ? "Le client n'a pas d'email"
-                : "Envoyer par email"
-            }
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              />
-            </svg>
-            {isSending ? "Envoi..." : "Envoyer par email"}
-          </button>
+          {quote.status === "DRAFT" ? (
+            <>
+              {/* Action principale: Modifier */}
+              <Link
+                href={`/dashboard/devis/${quote.id}/modifier`}
+                className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
+              >
+                <Pencil className="h-4 w-4" />
+                Modifier
+              </Link>
 
-          <button
-            onClick={handleDownloadPDF}
-            disabled={isGenerating}
-            className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-          >
-            <svg
-              className="h-4 w-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              />
-            </svg>
-            {isGenerating ? "Génération..." : "Télécharger PDF"}
-          </button>
+              {/* Action destructive: Supprimer */}
+              <button
+                onClick={() => setDeleteDialogOpen(true)}
+                className="inline-flex items-center gap-2 rounded-md border border-red-600 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                <Trash2 className="h-4 w-4" />
+                Supprimer
+              </button>
+
+              {/* Action secondaire: Télécharger PDF */}
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="h-4 w-4" />
+                {isGenerating ? "Génération..." : "Télécharger PDF"}
+              </button>
+            </>
+          ) : (
+            <>
+              {/* Action principale: Télécharger PDF */}
+              <button
+                onClick={handleDownloadPDF}
+                disabled={isGenerating}
+                className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Download className="h-4 w-4" />
+                {isGenerating ? "Génération..." : "Télécharger PDF"}
+              </button>
+
+              {/* Action secondaire: Envoyer à nouveau */}
+              <button
+                onClick={handleSendEmail}
+                disabled={isSending || !quote.client || !quote.client.email}
+                className="inline-flex items-center gap-2 rounded-md border border-foreground/20 bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-foreground/5 disabled:opacity-50 disabled:cursor-not-allowed"
+                title={
+                  !quote.client || !quote.client.email
+                    ? "Le client n'a pas d'email"
+                    : "Envoyer par email"
+                }
+              >
+                <Mail className="h-4 w-4" />
+                {isSending ? "Envoi..." : "Envoyer à nouveau"}
+              </button>
+            </>
+          )}
         </div>
       </div>
 
@@ -301,6 +330,17 @@ export default function QuoteView({ quote }: QuoteViewProps) {
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDelete}
+        title="Supprimer le devis"
+        description="Êtes-vous sûr de vouloir supprimer ce devis ? Cette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        variant="danger"
+      />
     </div>
   );
 }
