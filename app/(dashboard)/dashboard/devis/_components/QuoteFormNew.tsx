@@ -50,6 +50,7 @@ interface QuoteItem {
   price: number;
   quantity: number;
   total: number;
+  packageDiscount?: number; // NEW: Montant de la remise du forfait
 }
 
 export default function QuoteFormNew({
