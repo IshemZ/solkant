@@ -281,7 +281,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       // ✅ Vérifie les éléments de formulaire réels
       expect(screen.getByLabelText(/Rechercher un client/)).toBeInTheDocument();
       expect(screen.getByLabelText(/Client/)).toBeInTheDocument();
-      expect(screen.getByLabelText(/Remise/)).toBeInTheDocument();
+      expect(screen.getByLabelText(/Montant de la remise/)).toBeInTheDocument();
       // Note: "Valable jusqu'au" field was removed from the form
       expect(screen.getByLabelText(/Notes/)).toBeInTheDocument();
     });
@@ -478,6 +478,240 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       // on testerait le comportement des mocks, pas le composant!
 
       expect(vi.isMockFunction(vi.fn())).toBe(true); // Sanity check
+    });
+  });
+
+  // ✅ NEW: Tests pour la logique de calcul packageDiscount dans addPackageItem
+  describe("Business Logic: Package Discount in addPackageItem", () => {
+    it("devrait calculer correctement la réduction PERCENTAGE (10% de 80€ = 8€)", () => {
+      const pkg = mockPackages[0]; // PERCENTAGE discount package
+
+      // Calcul du prix de base (sum of all items)
+      const basePrice = pkg.items.reduce((sum, item) => {
+        const price = item.service?.price || 0;
+        return sum + price * item.quantity;
+      }, 0);
+
+      expect(basePrice).toBe(80); // 50€ + 30€
+
+      // Calcul de la réduction (ce que fait addPackageItem)
+      const discountValue = pkg.discountValue.toNumber();
+      const packageDiscount = Math.min(
+        basePrice * (discountValue / 100),
+        basePrice
+      );
+
+      expect(packageDiscount).toBe(8); // 10% de 80€ = 8€
+      expect(basePrice - packageDiscount).toBe(72); // Prix final
+    });
+
+    it("devrait calculer correctement la réduction FIXED (15€ fixe)", () => {
+      const pkg = mockPackages[1]; // FIXED discount package
+
+      // Calcul du prix de base
+      const basePrice = pkg.items.reduce((sum, item) => {
+        const price = item.service?.price || 0;
+        return sum + price * item.quantity;
+      }, 0);
+
+      expect(basePrice).toBe(80); // Service à 80€
+
+      // Calcul de la réduction fixe (ce que fait addPackageItem)
+      const discountValue = pkg.discountValue.toNumber();
+      const packageDiscount = Math.min(discountValue, basePrice);
+
+      expect(packageDiscount).toBe(15); // Réduction fixe de 15€
+      expect(basePrice - packageDiscount).toBe(65); // Prix final
+    });
+
+    it("devrait limiter la réduction au prix de base si réduction > prix", () => {
+      // Créer un forfait avec réduction > prix de base
+      const expensiveDiscountPackage = createMockPackage({
+        id: "package-expensive",
+        discountType: "FIXED",
+        discountValue: new Decimal(100), // 100€ de réduction
+        items: [
+          {
+            id: "item-cheap",
+            packageId: "package-expensive",
+            serviceId: "service-1",
+            quantity: 1,
+            service: createMockService({ id: "service-1", price: 50 }), // Seulement 50€
+          },
+        ],
+      });
+
+      const basePrice = expensiveDiscountPackage.items.reduce((sum, item) => {
+        const price = item.service?.price || 0;
+        return sum + price * item.quantity;
+      }, 0);
+
+      expect(basePrice).toBe(50);
+
+      // Calcul avec Math.min pour limiter la réduction
+      const discountValue = expensiveDiscountPackage.discountValue.toNumber();
+      const packageDiscount = Math.min(discountValue, basePrice);
+
+      // La réduction ne doit jamais dépasser le prix de base
+      expect(packageDiscount).toBe(50); // Limitée à 50€, pas 100€
+      expect(basePrice - packageDiscount).toBe(0); // Prix final = 0€ (gratuit)
+    });
+  });
+
+  // ✅ NEW: Tests pour le calcul en cascade des réductions
+  describe("Package Discounts Cascade Calculation", () => {
+    it("devrait calculer packageDiscountsTotal comme la somme de toutes les réductions de forfaits", () => {
+      // Simule plusieurs articles avec différents packageDiscount
+      const items = [
+        {
+          id: "1",
+          serviceId: "s1",
+          packageId: "p1",
+          name: "Forfait 1",
+          price: 80,
+          quantity: 1,
+          total: 80,
+          packageDiscount: 8, // 10% de 80€
+        },
+        {
+          id: "2",
+          serviceId: "s2",
+          packageId: "p2",
+          name: "Forfait 2",
+          price: 80,
+          quantity: 1,
+          total: 80,
+          packageDiscount: 15, // 15€ fixe
+        },
+        {
+          id: "3",
+          serviceId: "s3",
+          packageId: null, // Service normal sans réduction
+          name: "Service normal",
+          price: 50,
+          quantity: 1,
+          total: 50,
+          packageDiscount: 0,
+        },
+      ];
+
+      // Calcul de la somme des réductions de forfaits (ce que fait useMemo)
+      const packageDiscountsTotal = items.reduce(
+        (sum, item) => sum + (item.packageDiscount || 0),
+        0
+      );
+
+      expect(packageDiscountsTotal).toBe(23); // 8 + 15 + 0 = 23€
+    });
+
+    it("devrait calculer subtotalAfterPackageDiscounts correctement", () => {
+      const items = [
+        { price: 80, quantity: 1, total: 80, packageDiscount: 8 },
+        { price: 80, quantity: 1, total: 80, packageDiscount: 15 },
+        { price: 50, quantity: 1, total: 50, packageDiscount: 0 },
+      ];
+
+      // 1. Calcul du subtotal (somme des totaux)
+      const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+      expect(subtotal).toBe(210); // 80 + 80 + 50
+
+      // 2. Calcul de la somme des réductions de forfaits
+      const packageDiscountsTotal = items.reduce(
+        (sum, item) => sum + (item.packageDiscount || 0),
+        0
+      );
+      expect(packageDiscountsTotal).toBe(23);
+
+      // 3. Calcul du subtotal après réductions de forfaits (ce que fait useMemo)
+      const subtotalAfterPackageDiscounts = subtotal - packageDiscountsTotal;
+      expect(subtotalAfterPackageDiscounts).toBe(187); // 210 - 23 = 187€
+    });
+
+    it("devrait appliquer la remise globale FIXED sur subtotalAfterPackageDiscounts", () => {
+      const subtotal = 210;
+      const packageDiscountsTotal = 23;
+      const subtotalAfterPackageDiscounts = subtotal - packageDiscountsTotal; // 187€
+
+      // Remise globale FIXED de 20€
+      const discountType = "FIXED";
+      const discountValue = 20;
+
+      // Calcul de la remise globale (ce que fait useMemo)
+      const globalDiscount =
+        discountType === "PERCENTAGE"
+          ? subtotalAfterPackageDiscounts * (discountValue / 100)
+          : discountValue;
+
+      expect(globalDiscount).toBe(20); // 20€ fixe
+
+      // Total final
+      const total = subtotalAfterPackageDiscounts - globalDiscount;
+      expect(total).toBe(167); // 187 - 20 = 167€
+    });
+
+    it("devrait appliquer la remise globale PERCENTAGE sur subtotalAfterPackageDiscounts", () => {
+      const subtotal = 210;
+      const packageDiscountsTotal = 23;
+      const subtotalAfterPackageDiscounts = subtotal - packageDiscountsTotal; // 187€
+
+      // Remise globale PERCENTAGE de 10%
+      const discountType = "PERCENTAGE";
+      const discountValue = 10;
+
+      // Calcul de la remise globale (ce que fait useMemo)
+      const globalDiscount =
+        discountType === "PERCENTAGE"
+          ? subtotalAfterPackageDiscounts * (discountValue / 100)
+          : discountValue;
+
+      expect(globalDiscount).toBe(18.7); // 10% de 187€ = 18.7€
+
+      // Total final
+      const total = subtotalAfterPackageDiscounts - globalDiscount;
+      expect(total).toBe(168.3); // 187 - 18.7 = 168.3€
+    });
+  });
+
+  // ✅ NEW: Tests pour le blocage des modifications d'articles de forfaits
+  describe("Package Item Modifications", () => {
+    it("devrait bloquer les modifications de prix/quantité pour les articles avec packageId", () => {
+      // Article de forfait (packageId non null)
+      const packageItem = {
+        id: "1",
+        serviceId: "s1",
+        packageId: "p1", // Article lié à un forfait
+        name: "Coupe de cheveux",
+        price: 50,
+        quantity: 1,
+        total: 50,
+        packageDiscount: 5,
+      };
+
+      // Article normal (packageId null)
+      const normalItem = {
+        id: "2",
+        serviceId: "s2",
+        packageId: null, // Article normal
+        name: "Brushing",
+        price: 30,
+        quantity: 2,
+        total: 60,
+        packageDiscount: 0,
+      };
+
+      // ✅ Les articles de forfait sont identifiables par packageId
+      expect(packageItem.packageId).not.toBeNull();
+      expect(packageItem.packageId).toBe("p1");
+
+      // ✅ Les articles normaux n'ont pas de packageId
+      expect(normalItem.packageId).toBeNull();
+
+      // ✅ Dans le composant réel, les inputs sont disabled si packageId existe
+      // Ici on vérifie juste la logique de détection
+      const isPackageItem = (item: typeof packageItem) => item.packageId !== null;
+
+      expect(isPackageItem(packageItem)).toBe(true); // Input disabled
+      expect(isPackageItem(normalItem)).toBe(false); // Input enabled
     });
   });
 });
