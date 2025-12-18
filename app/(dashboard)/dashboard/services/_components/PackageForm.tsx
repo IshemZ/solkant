@@ -121,7 +121,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
       } else {
         toast.error(result.error);
       }
-    } catch (error) {
+    } catch {
       toast.error("Une erreur est survenue");
     } finally {
       setLoading(false);
@@ -197,10 +197,11 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
               return (
                 <div key={index} className="flex items-center gap-4 rounded-md border border-foreground/10 p-4">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-foreground/60 mb-1">
+                    <label htmlFor={`service-${index}`} className="block text-sm font-medium text-foreground/60 mb-1">
                       Service
                     </label>
                     <select
+                      id={`service-${index}`}
                       value={item.serviceId}
                       onChange={(e) => updateItem(index, "serviceId", e.target.value)}
                       className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
@@ -214,10 +215,11 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                   </div>
 
                   <div className="w-32">
-                    <label className="block text-sm font-medium text-foreground/60 mb-1">
+                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-foreground/60 mb-1">
                       Quantité
                     </label>
                     <input
+                      id={`quantity-${index}`}
                       type="number"
                       min="1"
                       value={item.quantity}
@@ -252,10 +254,11 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-1">
+            <label htmlFor="discount-type" className="block text-sm font-medium text-foreground mb-1">
               Type de réduction
             </label>
             <select
+              id="discount-type"
               value={discountType}
               onChange={(e) => {
                 setDiscountType(e.target.value as "NONE" | "PERCENTAGE" | "FIXED");
