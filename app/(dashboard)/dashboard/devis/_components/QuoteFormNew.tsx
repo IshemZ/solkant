@@ -92,13 +92,28 @@ export default function QuoteFormNew({
     [items]
   );
 
+  // NEW: Calculate total package discounts
+  const packageDiscountsTotal = useMemo(
+    () => items.reduce((sum, item) => sum + (item.packageDiscount || 0), 0),
+    [items]
+  );
+
+  // NEW: Calculate subtotal after package discounts
+  const subtotalAfterPackageDiscounts = useMemo(
+    () => subtotal - packageDiscountsTotal,
+    [subtotal, packageDiscountsTotal]
+  );
+
   const discountAmount = useMemo(() => {
     return discountType === "PERCENTAGE"
-      ? subtotal * (discount / 100)
+      ? subtotalAfterPackageDiscounts * (discount / 100)
       : discount;
-  }, [discount, discountType, subtotal]);
+  }, [discount, discountType, subtotalAfterPackageDiscounts]);
 
-  const total = useMemo(() => subtotal - discountAmount, [subtotal, discountAmount]);
+  const total = useMemo(
+    () => subtotalAfterPackageDiscounts - discountAmount,
+    [subtotalAfterPackageDiscounts, discountAmount]
+  );
 
   // Clear client selection
   function clearClient() {
