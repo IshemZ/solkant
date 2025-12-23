@@ -9,19 +9,19 @@ datasource db {
 }
 
 model User {
-  id                   String    @id @default(cuid())
-  email                String    @unique
-  emailVerified        DateTime?
-  password             String?
-  name                 String?
-  image                String?
-  verificationToken    String?   @unique
-  tokenExpiry          DateTime?
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-  accounts             Account[]
-  business             Business?
-  sessions             Session[]
+  id                String    @id @default(cuid())
+  email             String    @unique
+  emailVerified     DateTime?
+  password          String?
+  name              String?
+  image             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  tokenExpiry       DateTime?
+  verificationToken String?   @unique
+  accounts          Account[]
+  business          Business?
+  sessions          Session[]
 
   @@map("users")
 }
@@ -65,36 +65,36 @@ model VerificationToken {
 }
 
 model Business {
-  id                   String             @id @default(cuid())
-  name                 String
-  address              String?            // OLD - kept temporarily for legacy data
-  rue                  String?            // NEW - street address
-  complement           String?            // NEW - optional address line 2
-  codePostal           String?            // NEW - postal code
-  ville                String?            // NEW - city
-  phone                String?
-  email                String?
-  logo                 String?
-  siret                String?
-  primaryColor         String             @default("#D4B5A0")
-  secondaryColor       String             @default("#8B7355")
-  createdAt            DateTime           @default(now())
-  updatedAt            DateTime           @updatedAt
-  userId               String             @unique
-  stripeCustomerId     String?            @unique
-  stripePriceId        String?
-  stripeSubscriptionId String?            @unique
-  subscriptionEndsAt   DateTime?
-  subscriptionStatus   SubscriptionStatus @default(TRIAL)
-  trialEndsAt          DateTime?
-  isPro                Boolean            @default(false)
-  showInstallmentPayment Boolean          @default(false)
-  pdfFileNamePrefix    String?            // NEW - Nom générique pour les PDF
-  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  clients              Client[]
-  quotes               Quote[]
-  services             Service[]
-  packages             Package[]
+  id                     String             @id @default(cuid())
+  name                   String
+  address                String?
+  phone                  String?
+  email                  String?
+  logo                   String?
+  siret                  String?
+  primaryColor           String             @default("#D4B5A0")
+  secondaryColor         String             @default("#8B7355")
+  createdAt              DateTime           @default(now())
+  updatedAt              DateTime           @updatedAt
+  userId                 String             @unique
+  stripeCustomerId       String?            @unique
+  stripePriceId          String?
+  stripeSubscriptionId   String?            @unique
+  subscriptionEndsAt     DateTime?
+  subscriptionStatus     SubscriptionStatus @default(TRIAL)
+  trialEndsAt            DateTime?
+  isPro                  Boolean            @default(false)
+  codePostal             String?
+  complement             String?
+  rue                    String?
+  ville                  String?
+  showInstallmentPayment Boolean            @default(false)
+  pdfFileNamePrefix      String?
+  user                   User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  clients                Client[]
+  packages               Package[]
+  quotes                 Quote[]
+  services               Service[]
 
   @@index([stripeCustomerId])
   @@index([stripeSubscriptionId])
@@ -107,15 +107,15 @@ model Client {
   lastName   String
   email      String?
   phone      String?
-  address    String?  // OLD - kept temporarily for legacy data
-  rue        String?  // NEW - street address
-  complement String?  // NEW - optional address line 2
-  codePostal String?  // NEW - postal code
-  ville      String?  // NEW - city
+  address    String?
   notes      String?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   businessId String
+  codePostal String?
+  complement String?
+  rue        String?
+  ville      String?
   business   Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
   quotes     Quote[]
 
@@ -131,12 +131,12 @@ model Service {
   duration     Int?
   category     String?
   isActive     Boolean       @default(true)
-  deletedAt    DateTime?
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   businessId   String
-  quoteItems   QuoteItem[]
+  deletedAt    DateTime?
   packageItems PackageItem[]
+  quoteItems   QuoteItem[]
   business     Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
 
   @@index([businessId])
@@ -152,11 +152,11 @@ model Package {
   isActive      Boolean       @default(true)
   deletedAt     DateTime?
   businessId    String
-  business      Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  items         PackageItem[]
-  quoteItems    QuoteItem[]
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
+  items         PackageItem[]
+  business      Business      @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  quoteItems    QuoteItem[]
 
   @@index([businessId])
   @@index([isActive])
@@ -166,10 +166,10 @@ model Package {
 model PackageItem {
   id        String  @id @default(cuid())
   packageId String
-  package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
   serviceId String
-  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   quantity  Int     @default(1)
+  package   Package @relation(fields: [packageId], references: [id], onDelete: Cascade)
+  service   Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
 
   @@index([packageId])
   @@index([serviceId])
@@ -183,7 +183,6 @@ model Quote {
   validUntil   DateTime?
   notes        String?
   discount     Float        @default(0)
-  discountType DiscountType @default(FIXED)
   subtotal     Float        @default(0)
   total        Float        @default(0)
   createdAt    DateTime     @default(now())
@@ -191,6 +190,7 @@ model Quote {
   sentAt       DateTime?
   businessId   String
   clientId     String?
+  discountType DiscountType @default(FIXED)
   items        QuoteItem[]
   business     Business     @relation(fields: [businessId], references: [id], onDelete: Cascade)
   client       Client?      @relation(fields: [clientId], references: [id], onDelete: SetNull)
@@ -204,7 +204,6 @@ model Quote {
 model QuoteItem {
   id          String   @id @default(cuid())
   serviceId   String?
-  packageId   String?
   name        String
   description String?
   price       Float
@@ -213,12 +212,36 @@ model QuoteItem {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   quoteId     String
+  packageId   String?
+  package     Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
   quote       Quote    @relation(fields: [quoteId], references: [id], onDelete: Cascade)
   service     Service? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
-  package     Package? @relation(fields: [packageId], references: [id], onDelete: SetNull)
 
   @@index([quoteId])
   @@map("quote_items")
+}
+
+model WebhookEvent {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  processed Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([eventId])
+  @@map("webhook_events")
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  code      String
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([code])
+  @@map("password_reset_tokens")
 }
 
 enum QuoteStatus {
@@ -238,27 +261,4 @@ enum DiscountType {
   NONE
   PERCENTAGE
   FIXED
-}
-
-model WebhookEvent {
-  id        String   @id @default(cuid())
-  eventId   String   @unique
-  processed Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([eventId])
-  @@map("webhook_events")
-}
-
-model PasswordResetToken {
-  id        String   @id @default(cuid())
-  email     String
-  code      String   // Code OTP à 6 chiffres
-  expiresAt DateTime // Validité : 15 minutes
-  used      Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@index([email])
-  @@index([code])
-  @@map("password_reset_tokens")
 }
