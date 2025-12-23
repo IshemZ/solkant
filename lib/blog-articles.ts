@@ -382,4 +382,30 @@ export const blogArticles: BlogArticle[] = [
       "stratégie pricing",
     ],
   },
+  {
+    slug: "materiel-informatique-institut-beaute",
+    title: "Matériel informatique pour institut de beauté : Guide complet 2025",
+    description:
+      "Ordinateur, tablette, logiciel de gestion : découvrez tout le matériel informatique essentiel pour digitaliser votre institut de beauté. Guide complet avec budget détaillé.",
+    date: "2025-01-28",
+    readTime: "14 min",
+    category: "Guides",
+    author: {
+      name: "Solkant",
+      role: "Équipe éditoriale",
+    },
+    publishedTime: "2025-01-28T09:00:00Z",
+    image: {
+      url: "https://solkant.com/images/og/blog.png",
+      alt: "Matériel informatique pour institut de beauté",
+    },
+    keywords: [
+      "matériel informatique institut beauté",
+      "équipement informatique salon beauté",
+      "matériel digital institut",
+      "quel ordinateur institut beauté",
+      "logiciel gestion institut",
+      "solution digitale salon",
+    ],
+  },
 ];
