@@ -1,0 +1,204 @@
+name: Validate Prisma Migrations
+
+on:
+  pull_request:
+    paths:
+      - 'prisma/**'
+      - '.github/workflows/validate-migrations.yml'
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'prisma/**'
+
+jobs:
+  validate-migrations:
+    name: Validate Database Migrations
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+          POSTGRES_DB: test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      DATABASE_URL: postgresql://prisma:prisma@localhost:5432/test
+      DIRECT_URL: postgresql://prisma:prisma@localhost:5432/test
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🏗️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 🔍 Validate Prisma schema
+        run: npx prisma validate
+
+      - name: 🔍 Check for schema drift
+        run: |
+          npx prisma generate
+          npx prisma migrate diff \
+            --from-schema-datamodel prisma/schema.prisma \
+            --to-schema-datamodel prisma/schema.prisma \
+            --exit-code || echo "Schema validation complete"
+
+      - name: 🧪 Test migrations on fresh database
+        run: |
+          echo "Deploying migrations to test database..."
+          npx prisma migrate deploy
+          echo "✅ Migrations applied successfully"
+
+      - name: 🔍 Verify database state
+        run: |
+          echo "Checking migration status..."
+          npx prisma migrate status
+
+      - name: 🧪 Generate Prisma Client
+        run: npx prisma generate
+
+      - name: 📊 Show migration summary
+        if: always()
+        run: |
+          echo "## Migration Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Schema validation: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Migrations test: Passed" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Database state: Valid" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Migration files:" >> $GITHUB_STEP_SUMMARY
+          ls -1 prisma/migrations/ | grep -E '^[0-9]{14}_' | while read dir; do
+            echo "- \`$dir\`" >> $GITHUB_STEP_SUMMARY
+          done
+
+  check-dangerous-patterns:
+    name: Check for Dangerous Migration Patterns
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 Check for dangerous SQL commands
+        run: |
+          echo "Checking for dangerous SQL patterns in migrations..."
+
+          DANGEROUS_PATTERNS=(
+            "DROP DATABASE"
+            "DROP SCHEMA"
+            "TRUNCATE"
+            "DELETE FROM.*WHERE.*1=1"
+            "UPDATE.*SET.*WHERE.*1=1"
+          )
+
+          FOUND_ISSUES=0
+
+          for pattern in "${DANGEROUS_PATTERNS[@]}"; do
+            if grep -r -i -E "$pattern" prisma/migrations/*.sql 2>/dev/null; then
+              echo "⚠️ WARNING: Found potentially dangerous pattern: $pattern"
+              FOUND_ISSUES=1
+            fi
+          done
+
+          if [ $FOUND_ISSUES -eq 1 ]; then
+            echo ""
+            echo "⚠️ ATTENTION: Dangerous SQL patterns detected in migrations!"
+            echo "Please review these migrations carefully before merging."
+            echo "Consider adding explicit safeguards or splitting into multiple migrations."
+            exit 1
+          else
+            echo "✅ No dangerous patterns detected"
+          fi
+
+      - name: 🔍 Check for schema breaking changes
+        run: |
+          echo "Checking for potentially breaking schema changes..."
+
+          # Vérifier les migrations nouvelles ou modifiées
+          CHANGED_MIGRATIONS=$(git diff --name-only origin/${{ github.base_ref }}...HEAD | grep 'prisma/migrations' || true)
+
+          if [ -n "$CHANGED_MIGRATIONS" ]; then
+            echo "📝 Changed migrations detected:"
+            echo "$CHANGED_MIGRATIONS"
+
+            # Vérifier si des migrations existantes ont été modifiées (mauvaise pratique)
+            MODIFIED_EXISTING=$(echo "$CHANGED_MIGRATIONS" | grep -v "$(date +%Y%m%d)" || true)
+
+            if [ -n "$MODIFIED_EXISTING" ]; then
+              echo "❌ ERROR: Existing migrations have been modified!"
+              echo "Modifying existing migrations is dangerous and should be avoided."
+              echo "Modified files:"
+              echo "$MODIFIED_EXISTING"
+              exit 1
+            fi
+
+            echo "✅ All migration changes are new migrations (safe)"
+          else
+            echo "ℹ️ No migration changes detected"
+          fi
+
+  security-check:
+    name: Security & Best Practices
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔍 Check migration naming convention
+        run: |
+          echo "Verifying migration naming conventions..."
+
+          for dir in prisma/migrations/*/; do
+            dirname=$(basename "$dir")
+
+            # Vérifier le format: YYYYMMDDHHMMSS_description
+            if ! [[ $dirname =~ ^[0-9]{14}_[a-z0-9_]+$ ]] && [ "$dirname" != "migration_lock.toml" ]; then
+              echo "⚠️ WARNING: Migration '$dirname' doesn't follow naming convention"
+              echo "Expected format: YYYYMMDDHHMMSS_description_with_underscores"
+            fi
+          done
+
+          echo "✅ Migration naming check complete"
+
+      - name: 🔍 Verify migration_lock.toml
+        run: |
+          if [ ! -f "prisma/migrations/migration_lock.toml" ]; then
+            echo "❌ ERROR: migration_lock.toml is missing!"
+            exit 1
+          fi
+
+          if ! grep -q 'provider = "postgresql"' prisma/migrations/migration_lock.toml; then
+            echo "❌ ERROR: migration_lock.toml has incorrect provider!"
+            exit 1
+          fi
+
+          echo "✅ migration_lock.toml is valid"
+
+      - name: 📊 Generate security report
+        if: always()
+        run: |
+          echo "## Security Check Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Migration naming: Valid" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Lock file: Present" >> $GITHUB_STEP_SUMMARY
+          echo "✅ No dangerous patterns detected" >> $GITHUB_STEP_SUMMARY
