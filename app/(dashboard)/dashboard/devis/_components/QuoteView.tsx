@@ -15,6 +15,7 @@ import type {
 import { formatDate } from "@/lib/date-utils";
 import { deleteQuote } from "@/app/actions/quotes";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
+import QuotePreview from "./QuotePreview";
 
 interface QuoteWithRelations extends Quote {
   client: Client | null;
@@ -190,146 +191,8 @@ export default function QuoteView({ quote }: QuoteViewProps) {
         </div>
       </div>
 
-      {/* Quote preview */}
-      <div className="rounded-lg border border-foreground/10 bg-white p-8 shadow-sm">
-        {/* Business and client info */}
-        <div className="mb-8 grid gap-8 sm:grid-cols-2">
-          <div>
-            <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-              De
-            </h2>
-            <div className="text-gray-900">
-              <p className="font-bold">{quote.business.name}</p>
-              {quote.business.address && (
-                <p className="text-sm">{quote.business.address}</p>
-              )}
-              {quote.business.phone && (
-                <p className="text-sm">{quote.business.phone}</p>
-              )}
-              {quote.business.email && (
-                <p className="text-sm">{quote.business.email}</p>
-              )}
-              {quote.business.siret && (
-                <p className="mt-2 text-xs text-gray-500">
-                  SIRET: {quote.business.siret}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <h2 className="mb-2 text-sm font-semibold uppercase text-gray-500">
-              Pour
-            </h2>
-            <div className="text-gray-900">
-              {quote.client ? (
-                <>
-                  <p className="font-bold">
-                    {quote.client.firstName} {quote.client.lastName}
-                  </p>
-                  {quote.client.address && (
-                    <p className="text-sm">{quote.client.address}</p>
-                  )}
-                  {quote.client.phone && (
-                    <p className="text-sm">{quote.client.phone}</p>
-                  )}
-                  {quote.client.email && (
-                    <p className="text-sm">{quote.client.email}</p>
-                  )}
-                </>
-              ) : (
-                <p className="text-sm italic text-gray-500">Client supprimé</p>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Items table */}
-        <div className="mb-8">
-          <table className="w-full">
-            <thead className="border-b-2 border-gray-300">
-              <tr>
-                <th className="pb-2 text-left text-sm font-semibold text-gray-700">
-                  Description
-                </th>
-                <th className="pb-2 text-right text-sm font-semibold text-gray-700">
-                  Prix unitaire
-                </th>
-                <th className="pb-2 text-right text-sm font-semibold text-gray-700">
-                  Quantité
-                </th>
-                <th className="pb-2 text-right text-sm font-semibold text-gray-700">
-                  Total
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {quote.items.map((item) => (
-                <tr key={item.id} className="border-b border-gray-200">
-                  <td className="py-3">
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    {item.description && (
-                      <p className="text-sm text-gray-500">
-                        {item.description}
-                      </p>
-                    )}
-                  </td>
-                  <td className="py-3 text-right text-gray-900">
-                    {item.price.toFixed(2)} €
-                  </td>
-                  <td className="py-3 text-right text-gray-900">
-                    {item.quantity}
-                  </td>
-                  <td className="py-3 text-right font-medium text-gray-900">
-                    {item.total.toFixed(2)} €
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {/* Totals */}
-        <div className="flex justify-end">
-          <div className="w-64 space-y-2">
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Sous-total</span>
-              <span className="font-medium text-gray-900">
-                {quote.subtotal.toFixed(2)} €
-              </span>
-            </div>
-            {quote.discount > 0 && (
-              <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Remise</span>
-                <span className="font-medium text-red-600">
-                  -{quote.discount.toFixed(2)} €
-                </span>
-              </div>
-            )}
-            <div className="flex justify-between border-t-2 border-gray-300 pt-2">
-              <span className="font-semibold text-gray-900">Total</span>
-              <span className="text-xl font-bold text-gray-900">
-                {quote.total.toFixed(2)} €
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Notes and validity */}
-        <div className="mt-8 space-y-4 border-t border-gray-200 pt-6">
-          {quote.validUntil && (
-            <p className="text-sm text-gray-600">
-              Devis valable jusqu&apos;au {formatDate(quote.validUntil)}
-            </p>
-          )}
-          {quote.notes && (
-            <div>
-              <p className="text-sm font-semibold text-gray-700">Notes</p>
-              <p className="mt-1 text-sm text-gray-600">{quote.notes}</p>
-            </div>
-          )}
-        </div>
-      </div>
+      {/* Quote preview - WYSIWYG matching PDF structure */}
+      <QuotePreview quote={quote} />
 
       <ConfirmDialog
         open={deleteDialogOpen}
