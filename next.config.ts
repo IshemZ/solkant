@@ -24,6 +24,8 @@ const nextConfig = {
     },
     // Optimiser les imports de packages lourds
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],
+    // Optimise CSS loading performance
+    optimizeCss: true,
   },
   async headers() {
     return [
