@@ -533,7 +533,7 @@ export default function ArticlePage() {
               href="/logiciel-devis-institut-beaute"
               className="rounded-md border border-foreground/20 px-6 py-3 font-semibold text-foreground hover:bg-foreground/5"
             >
-              En savoir plus
+              En savoir plus sur notre logiciel
             </Link>
           </div>
         </div>

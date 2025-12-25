@@ -124,7 +124,7 @@ export function CookieBanner() {
                       href="/politique-confidentialite"
                       className="underline hover:text-purple-600"
                     >
-                      En savoir plus
+                      En savoir plus sur les cookies
                     </Link>
                   </p>
                 </div>

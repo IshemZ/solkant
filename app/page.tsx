@@ -193,7 +193,7 @@ export default function Home() {
               href="#features"
               className="rounded-md border border-foreground/20 px-8 py-3 text-base font-semibold text-foreground hover:bg-foreground/5"
             >
-              En savoir plus
+              Découvrir les fonctionnalités
             </Link>
           </div>
         </div>
@@ -1258,6 +1258,7 @@ export default function Home() {
             <Link
               href="/blog/comment-faire-devis-professionnel-institut-beaute"
               className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+              aria-label="Lire l'article : Comment faire un devis professionnel pour votre institut"
             >
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Comment faire un devis professionnel pour votre institut
@@ -1266,7 +1267,7 @@ export default function Home() {
                 Guide complet pour créer des devis conformes et professionnels
                 qui rassurent vos clients.
               </p>
-              <span className="text-sm font-medium text-foreground hover:underline">
+              <span className="text-sm font-medium text-foreground hover:underline" aria-hidden="true">
                 Lire l&apos;article →
               </span>
             </Link>
@@ -1274,6 +1275,7 @@ export default function Home() {
             <Link
               href="/blog/choisir-logiciel-devis-institut-beaute"
               className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+              aria-label="Lire l'article : Comment choisir le bon logiciel de devis"
             >
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Comment choisir le bon logiciel de devis
@@ -1282,7 +1284,7 @@ export default function Home() {
                 Critères essentiels pour choisir l&apos;outil qui correspond
                 vraiment aux besoins de votre institut.
               </p>
-              <span className="text-sm font-medium text-foreground hover:underline">
+              <span className="text-sm font-medium text-foreground hover:underline" aria-hidden="true">
                 Lire l&apos;article →
               </span>
             </Link>
@@ -1290,6 +1292,7 @@ export default function Home() {
             <Link
               href="/blog/optimiser-gestion-clients-institut-beaute"
               className="rounded-lg bg-background border border-foreground/10 p-6 hover:shadow-md transition-shadow"
+              aria-label="Lire l'article : Optimiser la gestion de vos clients"
             >
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Optimiser la gestion de vos clients
@@ -1298,7 +1301,7 @@ export default function Home() {
                 Stratégies concrètes pour fidéliser votre clientèle et améliorer
                 votre organisation.
               </p>
-              <span className="text-sm font-medium text-foreground hover:underline">
+              <span className="text-sm font-medium text-foreground hover:underline" aria-hidden="true">
                 Lire l&apos;article →
               </span>
             </Link>
