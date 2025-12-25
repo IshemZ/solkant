@@ -96,6 +96,9 @@ export default function Article3Page() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -509,6 +512,8 @@ export default function Article3Page() {
         articles={blogArticles}
         currentSlug="optimiser-gestion-clients-institut-beaute"
       />
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10 bg-foreground/5">

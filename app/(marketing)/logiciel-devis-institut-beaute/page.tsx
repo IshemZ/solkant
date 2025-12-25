@@ -164,6 +164,9 @@ export default function LogicielDevisInstitutPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Article Content */}
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Breadcrumbs
@@ -1137,6 +1140,8 @@ export default function LogicielDevisInstitutPage() {
           </div>
         </div>
       </article>
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

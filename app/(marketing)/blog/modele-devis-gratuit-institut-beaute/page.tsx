@@ -93,6 +93,9 @@ export default function ArticleModeleDevisPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -316,6 +319,7 @@ export default function ArticleModeleDevisPage() {
           </dl>
         </div>
       </article>
+      </main>
     </div>
   );
 }

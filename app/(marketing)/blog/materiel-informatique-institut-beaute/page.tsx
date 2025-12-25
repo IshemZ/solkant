@@ -95,6 +95,9 @@ export default function MaterielInformatiqueArticle() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -2659,6 +2662,8 @@ export default function MaterielInformatiqueArticle() {
         articles={blogArticles}
         currentSlug="materiel-informatique-institut-beaute"
       />
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

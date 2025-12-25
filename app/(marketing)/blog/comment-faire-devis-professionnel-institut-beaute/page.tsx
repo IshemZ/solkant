@@ -96,6 +96,9 @@ export default function Article1Page() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -474,6 +477,8 @@ export default function Article1Page() {
         articles={blogArticles}
         currentSlug="comment-faire-devis-professionnel-institut-beaute"
       />
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

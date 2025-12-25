@@ -21,7 +21,7 @@ export const metadata: Metadata = {
  */
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4">
       <Suspense
         fallback={
           <div className="w-full max-w-md p-8 bg-card border rounded-lg shadow-lg text-center">
@@ -32,6 +32,6 @@ export default function VerifyEmailPage() {
       >
         <VerifyEmailContent />
       </Suspense>
-    </div>
+    </main>
   );
 }

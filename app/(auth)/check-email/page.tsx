@@ -18,7 +18,7 @@ export const metadata: Metadata = {
  */
 export default function CheckEmailPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4">
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-secondary/10 px-4">
       <div className="w-full max-w-md p-8 bg-card border rounded-lg shadow-lg">
         <div className="text-center">
           {/* Icon */}
@@ -77,6 +77,6 @@ export default function CheckEmailPage() {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 }

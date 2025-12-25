@@ -91,6 +91,9 @@ export default function AboutPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
         <Breadcrumbs
@@ -430,6 +433,8 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10 bg-foreground/5">

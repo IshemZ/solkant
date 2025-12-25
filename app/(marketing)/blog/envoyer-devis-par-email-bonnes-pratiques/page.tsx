@@ -93,6 +93,9 @@ export default function ArticleEmailPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -323,6 +326,7 @@ export default function ArticleEmailPage() {
           </dl>
         </div>
       </article>
+      </main>
     </div>
   );
 }

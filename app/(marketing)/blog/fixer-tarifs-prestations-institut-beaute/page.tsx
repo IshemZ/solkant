@@ -95,6 +95,9 @@ export default function ArticleFixerTarifsPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -305,6 +308,7 @@ export default function ArticleFixerTarifsPage() {
           </dl>
         </div>
       </article>
+      </main>
     </div>
   );
 }

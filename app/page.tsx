@@ -169,8 +169,10 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
+      {/* Main Content */}
+      <main>
+        {/* Hero Section */}
+        <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-32 lg:px-8">
         <div className="text-center">
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
             Logiciel de devis pour instituts de beauté – Solkant
@@ -1348,6 +1350,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

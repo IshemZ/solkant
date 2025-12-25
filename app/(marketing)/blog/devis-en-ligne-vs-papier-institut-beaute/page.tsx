@@ -88,6 +88,9 @@ export default function ArticlePage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -535,6 +538,7 @@ export default function ArticlePage() {
           </div>
         </div>
       </article>
+      </main>
 
       <RelatedArticles
         articles={blogArticles}

@@ -92,6 +92,9 @@ export default function FeaturesPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Hero Section */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
         <Breadcrumbs
@@ -1123,6 +1126,8 @@ export default function FeaturesPage() {
           </div>
         </div>
       </section>
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

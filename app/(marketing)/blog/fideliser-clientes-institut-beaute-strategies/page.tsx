@@ -67,6 +67,9 @@ export default function ArticlePage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link href="/blog" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8">
           <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -382,6 +385,7 @@ export default function ArticlePage() {
           </div>
         </div>
       </article>
+      </main>
 
       <RelatedArticles articles={blogArticles} currentSlug="fideliser-clientes-institut-beaute-strategies" />
 

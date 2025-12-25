@@ -95,6 +95,9 @@ export default function Article2Page() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -598,6 +601,8 @@ export default function Article2Page() {
         articles={blogArticles}
         currentSlug="erreurs-eviter-devis-institut-beaute"
       />
+
+      </main>
 
       {/* Footer */}
       <footer className="border-t border-foreground/10">

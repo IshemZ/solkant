@@ -94,6 +94,9 @@ export default function ArticlePlanningInstitutPage() {
         </div>
       </nav>
 
+      {/* Main Content */}
+      <main>
+
       {/* Schema.org JSON-LD pour SEO */}
       <script
         type="application/ld+json"
@@ -308,6 +311,7 @@ export default function ArticlePlanningInstitutPage() {
           </dl>
         </div>
       </article>
+      </main>
     </div>
   );
 }

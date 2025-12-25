@@ -33,7 +33,7 @@ function LoginFormWithErrorHandler() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-md space-y-8">
         <div className="text-center">
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
@@ -66,6 +66,6 @@ export default function LoginPage() {
           </a>
         </p>
       </div>
-    </div>
+    </main>
   );
 }
