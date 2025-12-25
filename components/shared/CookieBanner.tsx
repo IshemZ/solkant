@@ -3,13 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 
-// Déclaration globale pour Google Analytics
-declare global {
-  interface Window {
-    gtag?: (...args: unknown[]) => void;
-  }
-}
-
 export function CookieBanner() {
   // Initialiser l'état depuis localStorage si disponible
   const [preferences, setPreferences] = useState(() => {
