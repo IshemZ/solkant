@@ -157,4 +157,10 @@
   select:focus-visible {
     @apply ring-2 ring-primary ring-offset-0;
   }
+
+  /* Performance: Optimize rendering of below-the-fold content */
+  .below-fold-section {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 500px;
+  }
 }
