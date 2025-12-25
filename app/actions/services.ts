@@ -203,6 +203,6 @@ export async function deleteService(id: string): Promise<ActionResult<void>> {
       console.error("Error deleting service:", error);
     }
 
-    return errorResult("Erreur lors de la suppression du service");
+    return errorResult("Erreur lors de l'archivage du service");
   }
 }

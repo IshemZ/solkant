@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { createService, deleteService } from "@/app/actions/services";
+import { deleteService } from "@/app/actions/services";
 import type { Service } from "@prisma/client";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
@@ -15,43 +15,8 @@ interface ServicesListProps {
 
 export default function ServicesList({ initialServices }: ServicesListProps) {
   const [services, setServices] = useState(initialServices);
-  const [showForm, setShowForm] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [serviceToDelete, setServiceToDelete] = useState<string | null>(null);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    const formData = new FormData(e.currentTarget);
-    const data = {
-      name: formData.get("name") as string,
-      description: formData.get("description") as string,
-      price: parseFloat(formData.get("price") as string),
-      duration: formData.get("duration")
-        ? parseInt(formData.get("duration") as string)
-        : undefined,
-      category: formData.get("category") as string,
-      isActive: true,
-    };
-
-    const result = await createService(data);
-
-    if (!result.success) {
-      setError(result.error);
-      toast.error("Erreur lors de la création du service");
-    } else {
-      setServices([result.data, ...services]);
-      setShowForm(false);
-      e.currentTarget.reset();
-      toast.success(`Service "${result.data.name}" créé avec succès`);
-    }
-
-    setIsLoading(false);
-  }
 
   function openDeleteDialog(id: string) {
     setServiceToDelete(id);
@@ -64,9 +29,9 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
     const result = await deleteService(serviceToDelete);
     if (result.success) {
       setServices(services.filter((s) => s.id !== serviceToDelete));
-      toast.success("Service supprimé avec succès");
+      toast.success("Service archivé avec succès");
     } else {
-      toast.error("Erreur lors de la suppression du service");
+      toast.error("Erreur lors de l'archivage du service");
     }
     setServiceToDelete(null);
   }
@@ -74,8 +39,8 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
-        <button
-          onClick={() => setShowForm(!showForm)}
+        <Link
+          href="/dashboard/services/nouveau"
           className="inline-flex items-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
         >
           <svg
@@ -91,122 +56,11 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
               d="M12 4v16m8-8H4"
             />
           </svg>
-          {showForm ? "Annuler" : "Nouveau service"}
-        </button>
+          Nouveau service
+        </Link>
       </div>
 
-      {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="rounded-lg border border-foreground/10 bg-background p-6"
-        >
-          <h2 className="mb-4 text-lg font-semibold text-foreground">
-            Nouveau service
-          </h2>
-
-          {error && (
-            <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
-              {error}
-            </div>
-          )}
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-medium text-foreground"
-              >
-                Nom du service *
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                required
-                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="category"
-                className="block text-sm font-medium text-foreground"
-              >
-                Catégorie
-              </label>
-              <input
-                type="text"
-                id="category"
-                name="category"
-                placeholder="Ex: Soins visage, Épilation..."
-                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="price"
-                className="block text-sm font-medium text-foreground"
-              >
-                Prix (€) *
-              </label>
-              <input
-                type="number"
-                id="price"
-                name="price"
-                step="0.01"
-                min="0"
-                required
-                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="duration"
-                className="block text-sm font-medium text-foreground"
-              >
-                Durée (minutes)
-              </label>
-              <input
-                type="number"
-                id="duration"
-                name="duration"
-                min="0"
-                placeholder="Ex: 60"
-                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-              />
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-foreground"
-            >
-              Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              rows={3}
-              className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
-            />
-          </div>
-
-          <div className="mt-6 flex justify-end">
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="rounded-md bg-foreground px-6 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-            >
-              {isLoading ? "Création..." : "Créer le service"}
-            </button>
-          </div>
-        </form>
-      )}
-
-      {services.length === 0 && !showForm ? (
+      {services.length === 0 ? (
         <EmptyState
           icon={Briefcase}
           title="Aucun service"
@@ -297,9 +151,9 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={confirmDelete}
-        title="Supprimer le service"
-        description="Êtes-vous sûr de vouloir supprimer ce service ? Cette action est irréversible."
-        confirmText="Supprimer"
+        title="Archiver le service"
+        description="Êtes-vous sûr de vouloir archiver ce service ? Il ne sera plus disponible pour de nouveaux devis, mais les devis existants seront préservés."
+        confirmText="Archiver"
         cancelText="Annuler"
         variant="danger"
       />

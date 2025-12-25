@@ -25,7 +25,7 @@ export default function EditServiceError({
 
         <p className="mb-6 text-sm text-muted-foreground">
           Une erreur s&apos;est produite lors du chargement des informations du
-          service. Le service n&apos;existe peut-être pas ou a été supprimé.
+          service. Le service n&apos;existe peut-être pas ou a été archivé.
         </p>
 
         {process.env.NODE_ENV === "development" && error.message && (

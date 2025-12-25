@@ -1,11 +1,35 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { z } from "zod";
+import {
+  Button,
+  Input,
+  Textarea,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  FormField,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui";
 import { createPackage, updatePackage } from "@/app/actions/packages";
 import { getServices } from "@/app/actions/services";
+import {
+  createPackageSchema,
+  type CreatePackageInput,
+} from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
+import { X } from "lucide-react";
 
 interface PackageWithRelations extends Package {
   items: (PackageItem & { service: Service | null })[];
@@ -16,63 +40,71 @@ interface PackageFormProps {
   mode: "create" | "edit";
 }
 
-interface FormItem {
-  serviceId: string;
-  quantity: number;
-}
-
 export default function PackageForm({ initialData, mode }: PackageFormProps) {
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
+  const isEdit = mode === "edit";
+
+  type PackageInput = z.input<typeof createPackageSchema>;
+
+  const form = useForm<PackageInput>({
+    resolver: zodResolver(createPackageSchema),
+    defaultValues: {
+      name: initialData?.name || "",
+      description: initialData?.description || null,
+      discountType: initialData?.discountType || "NONE",
+      discountValue: initialData?.discountValue
+        ? Number(initialData.discountValue)
+        : 0,
+      items:
+        initialData?.items.map((item) => ({
+          serviceId: item.serviceId,
+          quantity: item.quantity,
+        })) || [],
+    },
+    mode: "onChange",
+  });
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    watch,
+    formState: { errors, isSubmitting },
+    setError,
+  } = form;
+
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "items",
+  });
+
   const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(true);
 
-  const [name, setName] = useState(initialData?.name || "");
-  const [description, setDescription] = useState(initialData?.description || "");
-  const [discountType, setDiscountType] = useState<"NONE" | "PERCENTAGE" | "FIXED">(
-    initialData?.discountType || "NONE"
-  );
-  const [discountValue, setDiscountValue] = useState(
-    initialData?.discountValue ? Number(initialData.discountValue) : 0
-  );
-  const [items, setItems] = useState<FormItem[]>(
-    initialData?.items.map(item => ({
-      serviceId: item.serviceId,
-      quantity: item.quantity,
-    })) || []
-  );
-
+  // Load services
   useEffect(() => {
     async function loadServices() {
       const result = await getServices();
       if (result.success) {
         setServices(result.data || []);
+      } else {
+        toast.error("Erreur lors du chargement des services");
       }
+      setServicesLoading(false);
     }
     loadServices();
   }, []);
 
-  function addItem() {
-    if (services.length === 0) return;
-    setItems([...items, { serviceId: services[0].id, quantity: 1 }]);
-  }
+  // Watch form values for price calculation
+  const watchedItems = watch("items");
+  const watchedDiscountType = watch("discountType");
+  const watchedDiscountValue = watch("discountValue");
 
-  function removeItem(index: number) {
-    setItems(items.filter((_, i) => i !== index));
-  }
-
-  function updateItem(index: number, field: "serviceId" | "quantity", value: string | number) {
-    const updated = [...items];
-    if (field === "serviceId") {
-      updated[index].serviceId = value as string;
-    } else {
-      updated[index].quantity = value as number;
-    }
-    setItems(updated);
-  }
-
+  // Calculate prices
   function calculateBasePrice(): number {
-    return items.reduce((sum, item) => {
-      const service = services.find(s => s.id === item.serviceId);
+    if (!watchedItems) return 0;
+    return watchedItems.reduce((sum, item) => {
+      const service = services.find((s) => s.id === item.serviceId);
       if (!service) return sum;
       return sum + Number(service.price) * item.quantity;
     }, 0);
@@ -80,258 +112,353 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
 
   function calculateFinalPrice(): number {
     const basePrice = calculateBasePrice();
-    if (discountType === "NONE") return basePrice;
-    if (discountType === "PERCENTAGE") {
-      return basePrice * (1 - discountValue / 100);
+    if (watchedDiscountType === "NONE") return basePrice;
+    if (watchedDiscountType === "PERCENTAGE") {
+      return basePrice * (1 - watchedDiscountValue / 100);
     }
-    return basePrice - discountValue;
+    return basePrice - watchedDiscountValue;
   }
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-
-    if (items.length === 0) {
-      toast.error("Vous devez ajouter au moins un service");
-      return;
-    }
-
-    setLoading(true);
-
-    const data = {
-      name,
-      description: description || null,
-      discountType,
-      discountValue,
-      items,
-    };
-
+  const onSubmit = async (data: PackageInput) => {
     try {
-      const result = mode === "create"
-        ? await createPackage(data)
-        : await updatePackage(initialData!.id, data);
+      const result =
+        isEdit && initialData
+          ? await updatePackage(initialData.id, data as CreatePackageInput)
+          : await createPackage(data as CreatePackageInput);
 
-      if (result.success) {
+      if (!result.success) {
+        toast.error(result.error);
+        if (result.fieldErrors) {
+          Object.entries(result.fieldErrors).forEach(([key, value]) => {
+            if (Array.isArray(value) && value.length > 0) {
+              setError(key as keyof PackageInput, {
+                type: "server",
+                message: value[0],
+              });
+            }
+          });
+        }
+      } else {
         toast.success(
-          mode === "create"
-            ? "Forfait créé avec succès"
-            : "Forfait modifié avec succès"
+          isEdit
+            ? "Forfait modifié avec succès"
+            : "Forfait créé avec succès"
         );
         router.push("/dashboard/services?tab=packages");
         router.refresh();
-      } else {
-        toast.error(result.error);
       }
     } catch {
       toast.error("Une erreur est survenue");
-    } finally {
-      setLoading(false);
     }
+  };
+
+  function addItem() {
+    if (services.length === 0) {
+      toast.error("Aucun service disponible");
+      return;
+    }
+    append({ serviceId: services[0].id, quantity: 1 });
   }
 
   const basePrice = calculateBasePrice();
   const finalPrice = calculateFinalPrice();
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
-      <div className="rounded-lg border border-foreground/10 bg-background p-6">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">
-          Informations générales
-        </h2>
-
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="name" className="block text-sm font-medium text-foreground mb-1">
-              Nom du forfait *
-            </label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-              className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="description" className="block text-sm font-medium text-foreground mb-1">
-              Description
-            </label>
-            <textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border border-foreground/10 bg-background p-6">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-foreground">Services inclus</h2>
-          <button
-            type="button"
-            onClick={addItem}
-            disabled={services.length === 0}
-            className="inline-flex items-center gap-2 rounded-md bg-foreground px-3 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* General Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Informations générales</CardTitle>
+          <CardDescription>
+            Renseignez les informations de base du forfait
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Name */}
+          <FormField
+            label="Nom du forfait"
+            id="name"
+            required
+            error={errors.name?.message}
           >
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            Ajouter un service
-          </button>
-        </div>
+            <Input
+              id="name"
+              {...register("name")}
+              placeholder="Forfait Soin Complet"
+              aria-invalid={!!errors.name}
+              aria-describedby={errors.name ? "name-error" : undefined}
+            />
+          </FormField>
 
-        {items.length === 0 ? (
-          <p className="text-center py-8 text-muted-foreground">
-            Aucun service ajouté. Cliquez sur &quot;Ajouter un service&quot; pour commencer.
-          </p>
-        ) : (
-          <div className="space-y-3">
-            {items.map((item, index) => {
-              const service = services.find(s => s.id === item.serviceId);
-              const itemTotal = service ? Number(service.price) * item.quantity : 0;
+          {/* Description */}
+          <FormField
+            label="Description"
+            id="description"
+            error={errors.description?.message}
+            hint="Décrivez le forfait en détail"
+          >
+            <Textarea
+              id="description"
+              {...register("description")}
+              placeholder="Description détaillée du forfait..."
+              rows={3}
+              aria-invalid={!!errors.description}
+              aria-describedby={
+                errors.description
+                  ? "description-error"
+                  : "description-hint"
+              }
+            />
+          </FormField>
+        </CardContent>
+      </Card>
 
-              return (
-                <div key={index} className="flex items-center gap-4 rounded-md border border-foreground/10 p-4">
-                  <div className="flex-1">
-                    <label htmlFor={`service-${index}`} className="block text-sm font-medium text-muted-foreground mb-1">
-                      Service
-                    </label>
-                    <select
-                      id={`service-${index}`}
-                      value={item.serviceId}
-                      onChange={(e) => updateItem(index, "serviceId", e.target.value)}
-                      className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
-                    >
-                      {services.map(service => (
-                        <option key={service.id} value={service.id}>
-                          {service.name} - {Number(service.price).toFixed(2)} €
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="w-32">
-                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-muted-foreground mb-1">
-                      Quantité
-                    </label>
-                    <input
-                      id={`quantity-${index}`}
-                      type="number"
-                      min="1"
-                      value={item.quantity}
-                      onChange={(e) => updateItem(index, "quantity", parseInt(e.target.value) || 1)}
-                      className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
-                    />
-                  </div>
-
-                  <div className="w-32 text-right">
-                    <div className="text-sm font-medium text-muted-foreground mb-1">Total</div>
-                    <div className="text-foreground font-medium">{itemTotal.toFixed(2)} €</div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => removeItem(index)}
-                    className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
-                  >
-                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      <div className="rounded-lg border border-foreground/10 bg-background p-6">
-        <h2 className="mb-4 text-lg font-semibold text-foreground">Réduction</h2>
-
-        <div className="space-y-4">
-          <div>
-            <label htmlFor="discount-type" className="block text-sm font-medium text-foreground mb-1">
-              Type de réduction
-            </label>
-            <select
-              id="discount-type"
-              value={discountType}
-              onChange={(e) => {
-                setDiscountType(e.target.value as "NONE" | "PERCENTAGE" | "FIXED");
-                if (e.target.value === "NONE") setDiscountValue(0);
-              }}
-              className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground focus:border-foreground focus:outline-none"
-            >
-              <option value="NONE">Aucune réduction</option>
-              <option value="PERCENTAGE">Pourcentage</option>
-              <option value="FIXED">Montant fixe</option>
-            </select>
-          </div>
-
-          {discountType !== "NONE" && (
+      {/* Services Included */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-1">
-                {discountType === "PERCENTAGE" ? "Pourcentage de réduction" : "Montant de la réduction"}
-              </label>
+              <CardTitle>Services inclus</CardTitle>
+              <CardDescription>
+                Ajoutez les services qui composent ce forfait
+              </CardDescription>
+            </div>
+            <Button
+              type="button"
+              onClick={addItem}
+              disabled={servicesLoading || services.length === 0}
+              size="sm"
+            >
+              <svg
+                className="mr-2 h-4 w-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 4v16m8-8H4"
+                />
+              </svg>
+              Ajouter un service
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {errors.items?.message && (
+            <div className="mb-4 rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+              {errors.items.message}
+            </div>
+          )}
+
+          {fields.length === 0 ? (
+            <p className="py-8 text-center text-muted-foreground">
+              Aucun service ajouté. Cliquez sur &quot;Ajouter un service&quot;
+              pour commencer.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {fields.map((field, index) => {
+                const service = services.find(
+                  (s) => s.id === watchedItems?.[index]?.serviceId
+                );
+                const itemTotal = service
+                  ? Number(service.price) * (watchedItems?.[index]?.quantity || 1)
+                  : 0;
+
+                return (
+                  <div
+                    key={field.id}
+                    className="flex items-start gap-4 rounded-md border border-foreground/10 p-4"
+                  >
+                    <div className="flex-1 space-y-4">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        {/* Service Select */}
+                        <FormField
+                          label="Service"
+                          id={`items.${index}.serviceId`}
+                          required
+                          error={errors.items?.[index]?.serviceId?.message}
+                        >
+                          <Controller
+                            name={`items.${index}.serviceId`}
+                            control={control}
+                            render={({ field }) => (
+                              <Select
+                                value={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Sélectionner un service" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {services.map((service) => (
+                                    <SelectItem
+                                      key={service.id}
+                                      value={service.id}
+                                    >
+                                      {service.name} -{" "}
+                                      {Number(service.price).toFixed(2)} €
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
+                          />
+                        </FormField>
+
+                        {/* Quantity */}
+                        <FormField
+                          label="Quantité"
+                          id={`items.${index}.quantity`}
+                          required
+                          error={errors.items?.[index]?.quantity?.message}
+                        >
+                          <Input
+                            id={`items.${index}.quantity`}
+                            type="number"
+                            min="1"
+                            {...register(`items.${index}.quantity`, {
+                              valueAsNumber: true,
+                            })}
+                            aria-invalid={
+                              !!errors.items?.[index]?.quantity
+                            }
+                          />
+                        </FormField>
+                      </div>
+
+                      <div className="text-sm text-muted-foreground">
+                        Total:{" "}
+                        <span className="font-medium text-foreground">
+                          {itemTotal.toFixed(2)} €
+                        </span>
+                      </div>
+                    </div>
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Discount */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Réduction</CardTitle>
+          <CardDescription>
+            Appliquez une réduction sur le prix de base
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Discount Type */}
+          <FormField
+            label="Type de réduction"
+            id="discountType"
+            error={errors.discountType?.message}
+          >
+            <Controller
+              name="discountType"
+              control={control}
+              render={({ field }) => (
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger id="discountType">
+                    <SelectValue placeholder="Sélectionner un type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE">Aucune réduction</SelectItem>
+                    <SelectItem value="PERCENTAGE">Pourcentage</SelectItem>
+                    <SelectItem value="FIXED">Montant fixe</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            />
+          </FormField>
+
+          {/* Discount Value */}
+          {watchedDiscountType !== "NONE" && (
+            <FormField
+              label={
+                watchedDiscountType === "PERCENTAGE"
+                  ? "Pourcentage de réduction"
+                  : "Montant de la réduction"
+              }
+              id="discountValue"
+              error={errors.discountValue?.message}
+            >
               <div className="relative">
-                <input
+                <Input
+                  id="discountValue"
                   type="number"
                   min="0"
-                  max={discountType === "PERCENTAGE" ? "100" : undefined}
-                  step={discountType === "PERCENTAGE" ? "1" : "0.01"}
-                  value={discountValue}
-                  onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
-                  className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 pr-12 text-foreground focus:border-foreground focus:outline-none"
+                  max={watchedDiscountType === "PERCENTAGE" ? "100" : undefined}
+                  step={watchedDiscountType === "PERCENTAGE" ? "1" : "0.01"}
+                  {...register("discountValue", { valueAsNumber: true })}
+                  aria-invalid={!!errors.discountValue}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                  {discountType === "PERCENTAGE" ? "%" : "€"}
+                  {watchedDiscountType === "PERCENTAGE" ? "%" : "€"}
                 </div>
               </div>
-            </div>
+            </FormField>
           )}
-        </div>
 
-        <div className="mt-6 space-y-2 border-t border-foreground/10 pt-4">
-          <div className="flex justify-between text-foreground">
-            <span>Prix de base:</span>
-            <span className="font-medium">{basePrice.toFixed(2)} €</span>
-          </div>
-          {discountType !== "NONE" && (
-            <div className="flex justify-between text-muted-foreground">
-              <span>Réduction:</span>
-              <span>
-                {discountType === "PERCENTAGE"
-                  ? `-${discountValue}%`
-                  : `-${discountValue.toFixed(2)} €`}
-              </span>
+          {/* Price Summary */}
+          <div className="space-y-2 border-t border-foreground/10 pt-4">
+            <div className="flex justify-between text-foreground">
+              <span>Prix de base:</span>
+              <span className="font-medium">{basePrice.toFixed(2)} €</span>
             </div>
-          )}
-          <div className="flex justify-between text-lg font-bold text-foreground">
-            <span>Prix final:</span>
-            <span>{finalPrice.toFixed(2)} €</span>
+            {watchedDiscountType !== "NONE" && (
+              <div className="flex justify-between text-muted-foreground">
+                <span>Réduction:</span>
+                <span>
+                  {watchedDiscountType === "PERCENTAGE"
+                    ? `-${watchedDiscountValue}%`
+                    : `-${watchedDiscountValue.toFixed(2)} €`}
+                </span>
+              </div>
+            )}
+            <div className="flex justify-between text-lg font-bold text-foreground">
+              <span>Prix final:</span>
+              <span>{finalPrice.toFixed(2)} €</span>
+            </div>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="flex items-center justify-end gap-4">
-        <button
+      {/* Actions */}
+      <div className="flex justify-end gap-3">
+        <Button
           type="button"
+          variant="outline"
           onClick={() => router.push("/dashboard/services?tab=packages")}
-          className="rounded-md border border-foreground/20 px-4 py-2 text-sm font-medium text-foreground hover:bg-foreground/5"
+          disabled={isSubmitting}
         >
           Annuler
-        </button>
-        <button
-          type="submit"
-          disabled={loading || items.length === 0}
-          className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background transition-colors hover:bg-foreground/90 disabled:opacity-50"
-        >
-          {loading ? "En cours..." : mode === "create" ? "Créer le forfait" : "Enregistrer les modifications"}
-        </button>
+        </Button>
+        <Button type="submit" disabled={isSubmitting || fields.length === 0}>
+          {isSubmitting
+            ? isEdit
+              ? "Modification..."
+              : "Création..."
+            : isEdit
+            ? "Modifier"
+            : "Créer"}
+        </Button>
       </div>
     </form>
   );

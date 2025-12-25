@@ -57,8 +57,8 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
     return basePrice - Number(pkg.discountValue);
   }
 
-  function formatDiscount(pkg: PackageWithRelations): string {
-    if (pkg.discountType === "NONE") return "Aucune";
+  function formatDiscount(pkg: PackageWithRelations): string | null {
+    if (pkg.discountType === "NONE") return null;
     if (pkg.discountType === "PERCENTAGE") {
       return `-${pkg.discountValue}%`;
     }
@@ -88,54 +88,98 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
           actionHref="/dashboard/services/forfaits/nouveau"
         />
       ) : (
-        <div className="rounded-lg border border-foreground/10 bg-background">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="border-b border-foreground/10 bg-foreground/5">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Nom</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Services inclus</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Prix de base</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Réduction</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Prix final</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-foreground/10">
-                {packages.map((pkg) => (
-                  <tr key={pkg.id} className="hover:bg-foreground/5">
-                    <td className="whitespace-nowrap px-6 py-4">
-                      <div className="font-medium text-foreground">{pkg.name}</div>
-                      {pkg.description && <div className="text-sm text-muted-foreground">{pkg.description}</div>}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="text-sm text-foreground/80">
-                        {pkg.items.map((item, idx) => (
-                          <div key={item.id}>
-                            {item.service?.name} × {item.quantity}
-                            {idx < pkg.items.length - 1 && ", "}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-foreground">{calculateBasePrice(pkg).toFixed(2)} €</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-muted-foreground">{formatDiscount(pkg)}</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-foreground">{calculateFinalPrice(pkg).toFixed(2)} €</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
-                      <div className="flex items-center justify-end gap-3">
-                        <Link href={`/dashboard/services/forfaits/${pkg.id}/edit`} className="text-muted-foreground hover:text-foreground">
-                          Modifier
-                        </Link>
-                        <button onClick={() => openDeleteDialog(pkg.id)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                          Supprimer
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {packages.map((pkg) => {
+            const basePrice = calculateBasePrice(pkg);
+            const finalPrice = calculateFinalPrice(pkg);
+            const discount = formatDiscount(pkg);
+
+            return (
+              <div
+                key={pkg.id}
+                className="rounded-lg border border-foreground/10 bg-background p-6 hover:border-foreground/20"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-foreground">{pkg.name}</h3>
+                    <p className="mt-1 text-xs text-foreground/40">
+                      {pkg.items.length} service{pkg.items.length > 1 ? "s" : ""} inclus
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Link
+                      href={`/dashboard/services/forfaits/${pkg.id}/edit`}
+                      className="text-primary hover:text-primary/80"
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                    </Link>
+                    <button
+                      onClick={() => openDeleteDialog(pkg.id)}
+                      className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <svg
+                        className="h-5 w-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M6 18L18 6M6 6l12 12"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                {pkg.description && (
+                  <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+                    {pkg.description}
+                  </p>
+                )}
+
+                <div className="mt-3 space-y-1 text-sm text-muted-foreground">
+                  {pkg.items.map((item) => (
+                    <div key={item.id}>
+                      {item.service?.name} × {item.quantity}
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 flex items-center justify-between">
+                  <div>
+                    <span className="text-lg font-bold text-foreground">
+                      {finalPrice.toFixed(2)} €
+                    </span>
+                    {discount && basePrice !== finalPrice && (
+                      <span className="ml-2 text-xs text-muted-foreground line-through">
+                        {basePrice.toFixed(2)} €
+                      </span>
+                    )}
+                  </div>
+                  {discount && (
+                    <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800 dark:bg-green-900/20 dark:text-green-200">
+                      {discount}
+                    </span>
+                  )}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 

@@ -11,14 +11,11 @@ import {
   type UpdatePackageInput,
 } from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
+import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 
 type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
 };
-
-type ActionResult<T> =
-  | { success: true; data: T }
-  | { success: false; error: string };
 
 // Convert Prisma Decimal fields to plain numbers for safe serialization
 function serializePackage(
@@ -51,7 +48,7 @@ export async function getPackages(): Promise<
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
-      return { success: false, error: "Non autorisé" };
+      return errorResult("Non autorisé");
     }
 
     const packages = await prisma.package.findMany({
@@ -70,10 +67,10 @@ export async function getPackages(): Promise<
     });
 
     const serialized = packages.map((p) => serializePackage(p));
-    return { success: true, data: serialized };
+    return successResult(serialized);
   } catch (error) {
     console.error("Error fetching packages:", error);
-    return { success: false, error: "Erreur lors du chargement des forfaits" };
+    return errorResult("Erreur lors du chargement des forfaits");
   }
 }
 
@@ -86,7 +83,7 @@ export async function getPackageById(
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
-      return { success: false, error: "Non autorisé" };
+      return errorResult("Non autorisé");
     }
 
     const packageData = await prisma.package.findFirst({
@@ -104,13 +101,13 @@ export async function getPackageById(
     });
 
     if (!packageData) {
-      return { success: false, error: "Forfait introuvable" };
+      return errorResult("Forfait introuvable");
     }
 
-    return { success: true, data: serializePackage(packageData) };
+    return successResult(serializePackage(packageData));
   } catch (error) {
     console.error("Error fetching package:", error);
-    return { success: false, error: "Erreur lors du chargement du forfait" };
+    return errorResult("Erreur lors du chargement du forfait");
   }
 }
 
@@ -123,16 +120,25 @@ export async function createPackage(
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
-      return { success: false, error: "Non autorisé" };
+      return errorResult("Non autorisé");
     }
 
     // Validate input
     const validation = createPackageSchema.safeParse(input);
     if (!validation.success) {
-      return {
-        success: false,
-        error: validation.error.issues[0]?.message || "Données invalides",
-      };
+      const fieldErrors: Record<string, string[]> = {};
+      validation.error.issues.forEach((issue) => {
+        const path = issue.path.join(".");
+        if (!fieldErrors[path]) {
+          fieldErrors[path] = [];
+        }
+        fieldErrors[path].push(issue.message);
+      });
+      return errorResult(
+        validation.error.issues[0]?.message || "Données invalides",
+        "VALIDATION_ERROR",
+        fieldErrors
+      );
     }
 
     const { items, ...packageData } = validation.data;
@@ -148,10 +154,9 @@ export async function createPackage(
     });
 
     if (services.length !== serviceIds.length) {
-      return {
-        success: false,
-        error: "Un ou plusieurs services sont invalides ou inactifs",
-      };
+      return errorResult(
+        "Un ou plusieurs services sont invalides ou inactifs"
+      );
     }
 
     // Create package and items in a transaction
@@ -173,10 +178,10 @@ export async function createPackage(
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true, data: serializePackage(newPackage) };
+    return successResult(serializePackage(newPackage));
   } catch (error) {
     console.error("Error creating package:", error);
-    return { success: false, error: "Erreur lors de la création du forfait" };
+    return errorResult("Erreur lors de la création du forfait");
   }
 }
 
@@ -190,16 +195,25 @@ export async function updatePackage(
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
-      return { success: false, error: "Non autorisé" };
+      return errorResult("Non autorisé");
     }
 
     // Validate input
     const validation = updatePackageSchema.safeParse(input);
     if (!validation.success) {
-      return {
-        success: false,
-        error: validation.error.issues[0]?.message || "Données invalides",
-      };
+      const fieldErrors: Record<string, string[]> = {};
+      validation.error.issues.forEach((issue) => {
+        const path = issue.path.join(".");
+        if (!fieldErrors[path]) {
+          fieldErrors[path] = [];
+        }
+        fieldErrors[path].push(issue.message);
+      });
+      return errorResult(
+        validation.error.issues[0]?.message || "Données invalides",
+        "VALIDATION_ERROR",
+        fieldErrors
+      );
     }
 
     // Check package exists and belongs to business
@@ -211,7 +225,7 @@ export async function updatePackage(
     });
 
     if (!existingPackage) {
-      return { success: false, error: "Forfait introuvable" };
+      return errorResult("Forfait introuvable");
     }
 
     const { items, ...packageData } = validation.data;
@@ -265,14 +279,14 @@ export async function updatePackage(
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true, data: serializePackage(updatedPackage) };
+    return successResult(serializePackage(updatedPackage));
   } catch (error) {
     console.error("Error updating package:", error);
     const message =
       error instanceof Error
         ? error.message
         : "Erreur lors de la mise à jour du forfait";
-    return { success: false, error: message };
+    return errorResult(message);
   }
 }
 
@@ -285,7 +299,7 @@ export async function deletePackage(
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.businessId) {
-      return { success: false, error: "Non autorisé" };
+      return errorResult("Non autorisé");
     }
 
     // Check package exists and belongs to business
@@ -297,7 +311,7 @@ export async function deletePackage(
     });
 
     if (!existingPackage) {
-      return { success: false, error: "Forfait introuvable" };
+      return errorResult("Forfait introuvable");
     }
 
     // Soft delete
@@ -310,12 +324,9 @@ export async function deletePackage(
     });
 
     revalidatePath("/dashboard/services");
-    return { success: true, data: { id } };
+    return successResult({ id });
   } catch (error) {
     console.error("Error deleting package:", error);
-    return {
-      success: false,
-      error: "Erreur lors de la suppression du forfait",
-    };
+    return errorResult("Erreur lors de l'archivage du forfait");
   }
 }
