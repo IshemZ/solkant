@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { useEffect } from "react";
 import {
   Button,
   Input,
@@ -35,7 +36,7 @@ export default function ClientForm({
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    setError,
+    setValue,
   } = useForm<CreateClientInput>({
     resolver: zodResolver(createClientSchema),
     defaultValues: {
@@ -53,12 +54,52 @@ export default function ClientForm({
     mode: "onChange", // Validation en temps réel
   });
 
+  /**
+   * Auto-parse legacy address on mount if structured fields are empty
+   * This provides seamless migration without changing the UI
+   */
+  useEffect(() => {
+    // Only parse if we have a legacy address but no structured address
+    if (client?.address && !client?.rue && !client?.codePostal && !client?.ville) {
+      const address = client.address.trim();
+
+      // Try to find postal code (5 digits)
+      const postalCodeMatch = address.match(/\b(\d{5})\b/);
+      const postalCode = postalCodeMatch ? postalCodeMatch[1] : "";
+
+      // Try to extract city (word(s) after postal code)
+      let city = "";
+      let street = address;
+
+      if (postalCode && postalCodeMatch) {
+        const parts = address.split(postalCode);
+        street = parts[0].trim();
+        city = parts[1]?.trim() || "";
+      }
+
+      // Set values silently
+      setValue("rue", street || address);
+      if (postalCode) {
+        setValue("codePostal", postalCode);
+      }
+      if (city) {
+        setValue("ville", city);
+      }
+    }
+  }, [client?.address, client?.rue, client?.codePostal, client?.ville, setValue]);
+
   async function onSubmit(data: CreateClientInput) {
     try {
+      // If structured fields are filled, clear legacy address field
+      const submitData = { ...data };
+      if (submitData.rue || submitData.codePostal || submitData.ville) {
+        submitData.address = null;
+      }
+
       const result =
         isEdit && client
-          ? await updateClient(client.id, data)
-          : await createClient(data);
+          ? await updateClient(client.id, submitData)
+          : await createClient(submitData);
 
       if (!result.success) {
         toast.error(result.error);
@@ -157,14 +198,6 @@ export default function ClientForm({
               />
             </FormField>
           </div>
-
-          {/* Legacy Address Display */}
-          {client?.address && !client?.rue && (
-            <div className="rounded-md bg-muted p-3 text-sm">
-              <p className="font-medium">Ancienne adresse :</p>
-              <p className="text-muted-foreground">{client.address}</p>
-            </div>
-          )}
 
           {/* Structured Address Fields */}
           <div className="space-y-4">
