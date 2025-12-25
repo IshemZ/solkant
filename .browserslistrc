@@ -1,0 +1,19 @@
+# Browsers that we support
+# Target modern browsers only to reduce polyfills and legacy JavaScript
+
+# Modern browsers (last 2 versions of major browsers)
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+
+# Browsers with >0.5% market share
+>0.5%
+
+# Exclude dead browsers and IE
+not dead
+not IE 11
+not IE_Mob 11
+
+# Support modern ES2022 features natively
+supports es6-module
