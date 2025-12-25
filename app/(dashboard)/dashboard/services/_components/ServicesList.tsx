@@ -273,7 +273,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
               </div>
 
               {service.description && (
-                <p className="mt-2 text-sm text-foreground/60 line-clamp-2">
+                <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
                   {service.description}
                 </p>
               )}
@@ -283,7 +283,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
                   {service.price.toFixed(2)} €
                 </span>
                 {service.duration && (
-                  <span className="text-sm text-foreground/60">
+                  <span className="text-sm text-muted-foreground">
                     {service.duration} min
                   </span>
                 )}

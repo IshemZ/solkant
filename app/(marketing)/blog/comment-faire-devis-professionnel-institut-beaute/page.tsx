@@ -54,13 +54,13 @@ export default function Article1Page() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -72,7 +72,7 @@ export default function Article1Page() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -81,7 +81,7 @@ export default function Article1Page() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -137,7 +137,7 @@ export default function Article1Page() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -156,7 +156,7 @@ export default function Article1Page() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Guides</span>
             <span>•</span>
             <time dateTime="2024-12-01">1 décembre 2024</time>
@@ -168,7 +168,7 @@ export default function Article1Page() {
             Comment faire un devis professionnel pour votre institut de beauté
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Créer un devis clair et professionnel est essentiel pour rassurer
             vos clients et valoriser votre expertise. Découvrez notre guide
             complet avec toutes les mentions obligatoires et bonnes pratiques.
@@ -447,7 +447,7 @@ export default function Article1Page() {
           <h2 className="text-2xl font-bold text-foreground">
             Créez vos devis professionnels en 2 minutes avec Solkant
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Numérotation automatique, calculs instantanés, PDF élégants,
             historique complet. Tout ce qu&apos;il faut pour gagner du temps et
             paraître professionnel.
@@ -482,36 +482,36 @@ export default function Article1Page() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

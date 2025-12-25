@@ -39,7 +39,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold tracking-tight text-foreground">
             Solkant
           </h1>
-          <p className="mt-2 text-sm text-foreground/60">
+          <p className="mt-2 text-sm text-muted-foreground">
             Connectez-vous à votre compte
           </p>
         </div>
@@ -56,7 +56,7 @@ export default function LoginPage() {
           <LoginFormWithErrorHandler />
         </Suspense>
 
-        <p className="text-center text-sm text-foreground/60">
+        <p className="text-center text-sm text-muted-foreground">
           Pas encore de compte ?{" "}
           <a
             href="/register"

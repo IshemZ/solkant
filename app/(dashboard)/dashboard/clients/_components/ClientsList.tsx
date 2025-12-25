@@ -231,16 +231,16 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
             <table className="w-full">
               <thead className="border-b border-foreground/10 bg-foreground/5">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Nom
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Téléphone
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Actions
                   </th>
                 </tr>
@@ -253,10 +253,10 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
                         {client.firstName} {client.lastName}
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                       {client.email || "-"}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                       {client.phone || "-"}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">

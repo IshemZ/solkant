@@ -43,10 +43,10 @@ export default function ArticlePage() {
                 Solkant
               </Link>
               <div className="hidden md:flex items-center gap-6">
-                <Link href="/fonctionnalites" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+                <Link href="/fonctionnalites" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                   Fonctionnalités
                 </Link>
-                <Link href="/pricing" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+                <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                   Tarifs
                 </Link>
                 <Link href="/blog" className="text-sm font-medium text-foreground hover:text-foreground">
@@ -55,7 +55,7 @@ export default function ArticlePage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                 Connexion
               </Link>
               <Link href="/register" className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90">
@@ -67,7 +67,7 @@ export default function ArticlePage() {
       </nav>
 
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        <Link href="/blog" className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8">
+        <Link href="/blog" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8">
           <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -75,7 +75,7 @@ export default function ArticlePage() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Budget</span>
             <span>•</span>
             <time dateTime="2025-01-12">12 janvier 2025</time>
@@ -87,7 +87,7 @@ export default function ArticlePage() {
             Combien coûte vraiment un logiciel de devis pour petit institut ?
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Entre options gratuites et abonnements premium, découvrez le vrai coût d'un logiciel de devis et calculez votre retour sur investissement.
           </p>
         </header>
@@ -284,7 +284,7 @@ export default function ArticlePage() {
               <p className="text-foreground/70 mb-2">
                 <strong>Idéal si :</strong> Vous débutez ou envoyez &lt; 10 devis/mois
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Testez Solkant gratuitement (10 devis/mois) pour valider l'utilité avant d'investir
               </p>
             </div>
@@ -294,7 +294,7 @@ export default function ArticlePage() {
               <p className="text-foreground/70 mb-2">
                 <strong>Idéal si :</strong> Vous envoyez 10-20 devis/mois, institut solo
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Fonctionnalités essentielles, ROI dès le premier mois
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function ArticlePage() {
               <p className="text-foreground/70 mb-2">
                 <strong>Idéal si :</strong> Vous envoyez &gt; 20 devis/mois, plusieurs employées
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Multi-utilisateurs, statistiques avancées, support prioritaire
               </p>
             </div>
@@ -338,7 +338,7 @@ export default function ArticlePage() {
           <h2 className="text-2xl font-bold text-foreground">
             Testez Solkant gratuitement - 0€, 0 engagement
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             10 devis gratuits par mois, sans carte bancaire. Si ça vous convient, passez à 19€/mois. Sinon, restez en gratuit.
           </p>
           <div className="mt-6">
@@ -353,7 +353,7 @@ export default function ArticlePage() {
 
       <footer className="border-t border-foreground/10">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-foreground/60">© 2025 Solkant. Tous droits réservés.</p>
+          <p className="text-center text-sm text-muted-foreground">© 2025 Solkant. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

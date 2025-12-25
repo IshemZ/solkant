@@ -53,7 +53,7 @@ export default function DashboardNav({
                 className={
                   pathname === "/dashboard/clients"
                     ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
-                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
                 aria-current={
                   pathname === "/dashboard/clients" ? "page" : undefined
@@ -66,7 +66,7 @@ export default function DashboardNav({
                 className={
                   pathname === "/dashboard/services"
                     ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
-                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
                 aria-current={
                   pathname === "/dashboard/services" ? "page" : undefined
@@ -80,7 +80,7 @@ export default function DashboardNav({
                   pathname === "/dashboard/devis" ||
                   pathname.startsWith("/dashboard/devis/")
                     ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
-                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
                 aria-current={
                   pathname === "/dashboard/devis" ||
@@ -96,7 +96,7 @@ export default function DashboardNav({
                 className={
                   pathname === "/dashboard/abonnement"
                     ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
-                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
                 aria-current={
                   pathname === "/dashboard/abonnement" ? "page" : undefined
@@ -109,7 +109,7 @@ export default function DashboardNav({
                 className={
                   pathname === "/dashboard/parametres"
                     ? "text-sm font-semibold text-foreground transition-colors border-b-2 border-foreground pb-1"
-                    : "text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+                    : "text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
                 }
                 aria-current={
                   pathname === "/dashboard/parametres" ? "page" : undefined
@@ -121,7 +121,7 @@ export default function DashboardNav({
           </div>
           <div className="flex items-center gap-4">
             <span
-              className="hidden sm:inline text-sm text-foreground/60"
+              className="hidden sm:inline text-sm text-muted-foreground"
               aria-label={`Connecté en tant que ${userName || userEmail}`}
             >
               {userName || userEmail}

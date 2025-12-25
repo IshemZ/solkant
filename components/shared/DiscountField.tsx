@@ -96,7 +96,7 @@ export default function DiscountField({
             onChange={handleValueChange}
             placeholder={type === "PERCENTAGE" ? "Ex: 20" : "Ex: 15.00"}
           />
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-foreground/60">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
             {type === "PERCENTAGE" ? "%" : "€"}
           </div>
         </div>
@@ -112,7 +112,7 @@ export default function DiscountField({
             </span>
           </div>
           {type === "PERCENTAGE" && (
-            <p className="mt-1 text-xs text-foreground/60">
+            <p className="mt-1 text-xs text-muted-foreground">
               {value}% de {subtotal.toFixed(2)} €
             </p>
           )}

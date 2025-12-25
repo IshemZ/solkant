@@ -26,7 +26,7 @@ export default async function ServicesPage({
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Services</h1>
-          <p className="mt-2 text-foreground/60">
+          <p className="mt-2 text-muted-foreground">
             Gérez votre catalogue de prestations
           </p>
         </div>

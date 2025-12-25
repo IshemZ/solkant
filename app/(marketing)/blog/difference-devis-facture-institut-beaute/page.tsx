@@ -51,13 +51,13 @@ export default function ArticleDevisFacturePage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -69,7 +69,7 @@ export default function ArticleDevisFacturePage() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -78,7 +78,7 @@ export default function ArticleDevisFacturePage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -201,7 +201,7 @@ export default function ArticleDevisFacturePage() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -220,7 +220,7 @@ export default function ArticleDevisFacturePage() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">
               Légal & Pratique
             </span>
@@ -232,7 +232,7 @@ export default function ArticleDevisFacturePage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
             Devis vs Facture : différences et obligations légales pour instituts
           </h1>
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Comprenez les différences entre devis et facture, et les obligations
             légales à respecter dans votre institut de beauté. Évitez les
             erreurs courantes et restez conforme.

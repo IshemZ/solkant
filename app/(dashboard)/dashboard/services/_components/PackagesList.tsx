@@ -93,12 +93,12 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
             <table className="w-full">
               <thead className="border-b border-foreground/10 bg-foreground/5">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">Nom</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">Services inclus</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">Prix de base</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">Réduction</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">Prix final</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Nom</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">Services inclus</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Prix de base</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Réduction</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Prix final</th>
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-foreground/10">
@@ -106,7 +106,7 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
                   <tr key={pkg.id} className="hover:bg-foreground/5">
                     <td className="whitespace-nowrap px-6 py-4">
                       <div className="font-medium text-foreground">{pkg.name}</div>
-                      {pkg.description && <div className="text-sm text-foreground/60">{pkg.description}</div>}
+                      {pkg.description && <div className="text-sm text-muted-foreground">{pkg.description}</div>}
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-foreground/80">
@@ -119,11 +119,11 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
                       </div>
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-foreground">{calculateBasePrice(pkg).toFixed(2)} €</td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-foreground/60">{formatDiscount(pkg)}</td>
+                    <td className="whitespace-nowrap px-6 py-4 text-right text-muted-foreground">{formatDiscount(pkg)}</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-foreground">{calculateFinalPrice(pkg).toFixed(2)} €</td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <div className="flex items-center justify-end gap-3">
-                        <Link href={`/dashboard/services/forfaits/${pkg.id}/edit`} className="text-foreground/60 hover:text-foreground">
+                        <Link href={`/dashboard/services/forfaits/${pkg.id}/edit`} className="text-muted-foreground hover:text-foreground">
                           Modifier
                         </Link>
                         <button onClick={() => openDeleteDialog(pkg.id)} className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">

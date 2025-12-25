@@ -285,7 +285,7 @@ export default function BusinessSettingsForm({
               >
                 Afficher la mention de paiement en plusieurs fois
               </label>
-              <p className="mt-1 text-sm text-foreground/60">
+              <p className="mt-1 text-sm text-muted-foreground">
                 Affiche &quot;Si paiement en 4× sans frais&quot; en bas du devis
               </p>
             </div>
@@ -308,7 +308,7 @@ export default function BusinessSettingsForm({
               placeholder="Ex: Devis Laser Diode"
               className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             />
-            <p className="mt-1 text-sm text-foreground/60">
+            <p className="mt-1 text-sm text-muted-foreground">
               Si défini, les PDF seront nommés &quot;{"{nom générique}"} - {"{Nom}"} {"{Prénom}"}.pdf&quot;.
               Sinon, le numéro de devis sera utilisé.
             </p>

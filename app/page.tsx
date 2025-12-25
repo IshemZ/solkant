@@ -127,25 +127,25 @@ export default function Home() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -154,7 +154,7 @@ export default function Home() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -175,7 +175,7 @@ export default function Home() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
             Logiciel de devis pour instituts de beauté – Solkant
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/60">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
             Solkant simplifie la création de devis professionnels pour les
             instituts de beauté. Gérez vos clients, services et générez des PDF
             personnalisés en quelques clics.
@@ -204,7 +204,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Tout ce dont vous avez besoin
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Des outils simples et puissants pour gérer votre activité
             </p>
           </div>
@@ -230,7 +230,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Devis professionnels
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Créez des devis élégants et personnalisés avec votre logo et vos
                 couleurs en quelques clics.
               </p>
@@ -256,7 +256,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Gestion clients
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Gérez facilement vos clients et leur historique de devis depuis
                 un seul endroit.
               </p>
@@ -282,7 +282,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Catalogue de services
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Créez votre catalogue de prestations avec prix et durées pour
                 générer vos devis rapidement.
               </p>
@@ -308,7 +308,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Personnalisation
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Adaptez les couleurs et le design à l&apos;identité visuelle de
                 votre institut.
               </p>
@@ -334,7 +334,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Simple et rapide
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Interface intuitive pensée pour gagner du temps au quotidien.
                 Pas de complexité inutile.
               </p>
@@ -360,7 +360,7 @@ export default function Home() {
               <h3 className="mt-4 text-xl font-semibold text-foreground">
                 Sécurisé
               </h3>
-              <p className="mt-2 text-foreground/60">
+              <p className="mt-2 text-muted-foreground">
                 Vos données sont protégées et hébergées de manière sécurisée.
                 Confidentiel et fiable.
               </p>
@@ -376,7 +376,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Comment ça marche ?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Créez vos premiers devis professionnels en 3 étapes simples
             </p>
           </div>
@@ -441,7 +441,7 @@ export default function Home() {
             >
               Essayer gratuitement maintenant
             </Link>
-            <p className="mt-4 text-sm text-foreground/60">
+            <p className="mt-4 text-sm text-muted-foreground">
               Aucune carte bancaire requise • Configuration en 2 minutes
             </p>
           </div>
@@ -455,7 +455,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Pourquoi choisir Solkant ?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Parce que créer des devis ne devrait jamais être une corvée
             </p>
           </div>
@@ -480,7 +480,7 @@ export default function Home() {
               <h3 className="mt-6 text-xl font-semibold text-foreground">
                 Gain de temps immédiat
               </h3>
-              <p className="mt-3 text-foreground/60">
+              <p className="mt-3 text-muted-foreground">
                 Créez un devis en 2-3 minutes au lieu de 15-20 minutes. Plus de
                 temps à chercher vos tarifs dans un cahier ou à calculer les
                 totaux manuellement.
@@ -506,7 +506,7 @@ export default function Home() {
               <h3 className="mt-6 text-xl font-semibold text-foreground">
                 Image professionnelle renforcée
               </h3>
-              <p className="mt-3 text-foreground/60">
+              <p className="mt-3 text-muted-foreground">
                 Des devis PDF élégants et soignés qui rassurent vos clients et
                 valorisent votre expertise. Fini les documents Word mal
                 formatés.
@@ -532,7 +532,7 @@ export default function Home() {
               <h3 className="mt-6 text-xl font-semibold text-foreground">
                 Suivi et organisation
               </h3>
-              <p className="mt-3 text-foreground/60">
+              <p className="mt-3 text-muted-foreground">
                 Retrouvez tous vos devis en un coup d&apos;œil. Suivez leur
                 statut (envoyé, accepté, refusé) et accédez à l&apos;historique
                 par client instantanément.
@@ -549,7 +549,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Solkant est fait pour vous
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Que vous soyez seule ou en équipe, Solkant s&apos;adapte à votre
               activité
             </p>
@@ -560,7 +560,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground">
                 Instituts de beauté
               </h3>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Soins visage, épilation, maquillage, manucure, pédicure... Créez
                 des devis pour toutes vos prestations beauté.
               </p>
@@ -570,7 +570,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground">
                 Salons d&apos;esthétique
               </h3>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Esthéticiennes indépendantes ou en salon, simplifiez vos devis
                 et concentrez-vous sur votre cœur de métier.
               </p>
@@ -580,7 +580,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground">
                 Spas et centres bien-être
               </h3>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Massages, soins corporels, forfaits détente... Proposez des
                 devis personnalisés à vos clients.
               </p>
@@ -590,7 +590,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground">
                 Praticiennes à domicile
               </h3>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Vous vous déplacez chez vos clients ? Solkant vous suit partout
                 depuis votre téléphone ou tablette.
               </p>
@@ -606,7 +606,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Pourquoi choisir Solkant plutôt qu&apos;Excel ou Word ?
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Découvrez ce qui fait la différence pour votre institut
             </p>
           </div>
@@ -621,7 +621,7 @@ export default function Home() {
                   <th className="px-6 py-4 text-center text-sm font-semibold text-foreground bg-foreground/5">
                     Solkant
                   </th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-foreground/60">
+                  <th className="px-6 py-4 text-center text-sm font-semibold text-muted-foreground">
                     Excel / Word
                   </th>
                 </tr>
@@ -636,7 +636,7 @@ export default function Home() {
                       2-3 minutes
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-center text-foreground/60">
+                  <td className="px-6 py-4 text-center text-muted-foreground">
                     15-20 minutes
                   </td>
                 </tr>
@@ -800,7 +800,7 @@ export default function Home() {
                     </svg>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <span className="text-sm text-foreground/60">Limité</span>
+                    <span className="text-sm text-muted-foreground">Limité</span>
                   </td>
                 </tr>
                 <tr>
@@ -878,7 +878,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Elles nous font confiance
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Découvrez comment Solkant aide des instituts comme le vôtre au
               quotidien
             </p>
@@ -913,7 +913,7 @@ export default function Home() {
                   <div className="font-semibold text-foreground">
                     Sophie Martin
                   </div>
-                  <div className="text-sm text-foreground/60">
+                  <div className="text-sm text-muted-foreground">
                     Institut Belle Étoile, Paris
                   </div>
                 </div>
@@ -947,7 +947,7 @@ export default function Home() {
                   <div className="font-semibold text-foreground">
                     Camille Lefèvre
                   </div>
-                  <div className="text-sm text-foreground/60">
+                  <div className="text-sm text-muted-foreground">
                     Esthéticienne à domicile, Lyon
                   </div>
                 </div>
@@ -981,7 +981,7 @@ export default function Home() {
                   <div className="font-semibold text-foreground">
                     Émilie Bernard
                   </div>
-                  <div className="text-sm text-foreground/60">
+                  <div className="text-sm text-muted-foreground">
                     Spa Zen & Beauté, Bordeaux
                   </div>
                 </div>
@@ -1095,7 +1095,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Solkant est-il adapté aux petits instituts de beauté ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Oui, Solkant a été conçu spécialement pour les petites
                 structures : instituts de beauté, salons d&apos;esthétique,
                 spas, praticiennes indépendantes. L&apos;interface est simple et
@@ -1107,7 +1107,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Puis-je personnaliser mes devis avec mon logo ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Absolument. Vous pouvez ajouter votre logo, adapter les couleurs
                 à votre charte graphique et personnaliser les mentions légales
                 pour refléter l&apos;identité de votre institut.
@@ -1118,7 +1118,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Mes données sont-elles sécurisées ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Oui, vos données clients et devis sont hébergées de manière
                 sécurisée en Europe et protégées par chiffrement. Nous
                 respectons le RGPD.
@@ -1129,7 +1129,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Combien de temps faut-il pour créer un devis ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 En moyenne, 2 à 3 minutes. Une fois votre catalogue de services
                 créé, il suffit de sélectionner les prestations et Solkant
                 génère automatiquement un PDF professionnel prêt à envoyer.
@@ -1140,7 +1140,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Y a-t-il un essai gratuit ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Oui, vous pouvez commencer gratuitement et tester toutes les
                 fonctionnalités de Solkant sans engagement ni carte bancaire.
               </p>
@@ -1150,7 +1150,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Puis-je utiliser Solkant sur mobile ou tablette ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Oui, Solkant est accessible depuis n&apos;importe quel
                 navigateur web, que ce soit sur ordinateur, tablette ou
                 smartphone. L&apos;interface s&apos;adapte automatiquement à la
@@ -1162,7 +1162,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Combien coûte Solkant ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Solkant propose un plan Gratuit (0€/mois, jusqu&apos;à 10
                 devis/mois) et un plan Pro (19€/mois, devis illimités avec
                 fonctionnalités avancées). Aucun engagement, vous pouvez changer
@@ -1181,7 +1181,7 @@ export default function Home() {
                 Que se passe-t-il avec mes données si j&apos;arrête
                 d&apos;utiliser Solkant ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Vous pouvez exporter toutes vos données (clients, services,
                 devis) à tout moment au format PDF ou CSV. Même après
                 l&apos;arrêt de votre abonnement, vos données restent
@@ -1193,7 +1193,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Ai-je besoin de compétences techniques pour utiliser Solkant ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Non, aucune compétence technique n&apos;est requise. Solkant est
                 conçu pour être intuitif. Si vous savez envoyer un email, vous
                 savez utiliser Solkant. Un guide de démarrage rapide vous
@@ -1205,7 +1205,7 @@ export default function Home() {
               <h3 className="text-xl font-semibold text-foreground mb-2">
                 Puis-je envoyer mes devis directement par email depuis Solkant ?
               </h3>
-              <p className="text-foreground/60">
+              <p className="text-muted-foreground">
                 Oui, vous pouvez envoyer vos devis PDF directement par email à
                 vos clients depuis Solkant. Vous pouvez également les
                 télécharger ou les imprimer selon vos préférences.
@@ -1214,7 +1214,7 @@ export default function Home() {
           </div>
 
           <div className="mt-12 text-center">
-            <p className="text-foreground/60 mb-4">
+            <p className="text-muted-foreground mb-4">
               Vous avez d&apos;autres questions ?
             </p>
             <Link
@@ -1247,7 +1247,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Guides pratiques pour votre institut
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Découvrez nos conseils pour optimiser la gestion de votre activité
             </p>
           </div>
@@ -1260,7 +1260,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Comment faire un devis professionnel pour votre institut
               </h3>
-              <p className="text-sm text-foreground/60 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Guide complet pour créer des devis conformes et professionnels
                 qui rassurent vos clients.
               </p>
@@ -1276,7 +1276,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Comment choisir le bon logiciel de devis
               </h3>
-              <p className="text-sm text-foreground/60 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Critères essentiels pour choisir l&apos;outil qui correspond
                 vraiment aux besoins de votre institut.
               </p>
@@ -1292,7 +1292,7 @@ export default function Home() {
               <h3 className="text-lg font-semibold text-foreground mb-2">
                 Optimiser la gestion de vos clients
               </h3>
-              <p className="text-sm text-foreground/60 mb-4">
+              <p className="text-sm text-muted-foreground mb-4">
                 Stratégies concrètes pour fidéliser votre clientèle et améliorer
                 votre organisation.
               </p>
@@ -1356,36 +1356,36 @@ export default function Home() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; {CURRENT_YEAR} Solkant. Tous droits réservés.
             </p>
           </div>

@@ -44,10 +44,10 @@ export default function ArticlePage() {
                 Solkant
               </Link>
               <div className="hidden md:flex items-center gap-6">
-                <Link href="/fonctionnalites" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+                <Link href="/fonctionnalites" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                   Fonctionnalités
                 </Link>
-                <Link href="/pricing" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+                <Link href="/pricing" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                   Tarifs
                 </Link>
                 <Link href="/blog" className="text-sm font-medium text-foreground hover:text-foreground">
@@ -56,7 +56,7 @@ export default function ArticlePage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/login" className="text-sm font-medium text-foreground/60 hover:text-foreground">
+              <Link href="/login" className="text-sm font-medium text-muted-foreground hover:text-foreground">
                 Connexion
               </Link>
               <Link href="/register" className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background hover:bg-foreground/90">
@@ -68,7 +68,7 @@ export default function ArticlePage() {
       </nav>
 
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
-        <Link href="/blog" className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8">
+        <Link href="/blog" className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8">
           <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
@@ -76,7 +76,7 @@ export default function ArticlePage() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Fidélisation</span>
             <span>•</span>
             <time dateTime="2025-01-15">15 janvier 2025</time>
@@ -88,7 +88,7 @@ export default function ArticlePage() {
             7 stratégies éprouvées pour fidéliser vos clientes d'institut
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Acquérir une nouvelle cliente coûte 5 fois plus cher que fidéliser une cliente existante. Découvrez 7 stratégies concrètes pour transformer vos occasionnelles en fidèles.
           </p>
         </header>
@@ -311,7 +311,7 @@ export default function ArticlePage() {
             <p className="text-foreground/70 mb-2">
               <strong>Pour la filleule :</strong> -20% sur sa première prestation
             </p>
-            <p className="text-sm text-foreground/60 mt-3">
+            <p className="text-sm text-muted-foreground mt-3">
               Condition : La filleule doit venir au moins 1 fois pour que la marraine touche sa récompense
             </p>
           </div>
@@ -372,7 +372,7 @@ export default function ArticlePage() {
           <h2 className="text-2xl font-bold text-foreground">
             Gérez votre fichier clients et automatisez la fidélisation
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Solkant centralise toutes les informations clientes, l'historique complet et vous permet de segmenter facilement pour personnaliser vos relances.
           </p>
           <div className="mt-6">
@@ -387,7 +387,7 @@ export default function ArticlePage() {
 
       <footer className="border-t border-foreground/10">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          <p className="text-center text-sm text-foreground/60">© 2025 Solkant. Tous droits réservés.</p>
+          <p className="text-center text-sm text-muted-foreground">© 2025 Solkant. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

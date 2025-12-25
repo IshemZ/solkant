@@ -84,25 +84,25 @@ export default function GestionInstitutBeauteGuidePage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -111,7 +111,7 @@ export default function GestionInstitutBeauteGuidePage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -144,7 +144,7 @@ export default function GestionInstitutBeauteGuidePage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
             Gestion Institut de Beauté : Le Guide Complet pour 2025
           </h1>
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Maîtrisez tous les aspects de la gestion de votre institut de beauté
             pour gagner du temps, fidéliser vos clientes et développer votre
             chiffre d'affaires. Guide pratique et actionnable.
@@ -1134,7 +1134,7 @@ export default function GestionInstitutBeauteGuidePage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Logiciel de Devis pour Institut de Beauté - Guide Complet
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Tout savoir pour choisir le meilleur logiciel de devis
                 </p>
               </Link>
@@ -1145,7 +1145,7 @@ export default function GestionInstitutBeauteGuidePage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   5 astuces pour optimiser la gestion de vos clients
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Fidélisez et organisez votre fichier clients
                 </p>
               </Link>
@@ -1156,7 +1156,7 @@ export default function GestionInstitutBeauteGuidePage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Pourquoi digitaliser votre institut en 2025
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Les 7 raisons essentielles de passer au numérique
                 </p>
               </Link>
@@ -1167,7 +1167,7 @@ export default function GestionInstitutBeauteGuidePage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Comment faire un devis professionnel
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Mentions obligatoires, structure et conseils
                 </p>
               </Link>
@@ -1183,36 +1183,36 @@ export default function GestionInstitutBeauteGuidePage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

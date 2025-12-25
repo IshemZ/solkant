@@ -185,7 +185,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
         </div>
 
         {items.length === 0 ? (
-          <p className="text-center py-8 text-foreground/60">
+          <p className="text-center py-8 text-muted-foreground">
             Aucun service ajouté. Cliquez sur &quot;Ajouter un service&quot; pour commencer.
           </p>
         ) : (
@@ -197,7 +197,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
               return (
                 <div key={index} className="flex items-center gap-4 rounded-md border border-foreground/10 p-4">
                   <div className="flex-1">
-                    <label htmlFor={`service-${index}`} className="block text-sm font-medium text-foreground/60 mb-1">
+                    <label htmlFor={`service-${index}`} className="block text-sm font-medium text-muted-foreground mb-1">
                       Service
                     </label>
                     <select
@@ -215,7 +215,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                   </div>
 
                   <div className="w-32">
-                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-foreground/60 mb-1">
+                    <label htmlFor={`quantity-${index}`} className="block text-sm font-medium text-muted-foreground mb-1">
                       Quantité
                     </label>
                     <input
@@ -229,7 +229,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                   </div>
 
                   <div className="w-32 text-right">
-                    <div className="text-sm font-medium text-foreground/60 mb-1">Total</div>
+                    <div className="text-sm font-medium text-muted-foreground mb-1">Total</div>
                     <div className="text-foreground font-medium">{itemTotal.toFixed(2)} €</div>
                   </div>
 
@@ -287,7 +287,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                   onChange={(e) => setDiscountValue(parseFloat(e.target.value) || 0)}
                   className="w-full rounded-md border border-foreground/20 bg-background px-3 py-2 pr-12 text-foreground focus:border-foreground focus:outline-none"
                 />
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/60">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                   {discountType === "PERCENTAGE" ? "%" : "€"}
                 </div>
               </div>
@@ -301,7 +301,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
             <span className="font-medium">{basePrice.toFixed(2)} €</span>
           </div>
           {discountType !== "NONE" && (
-            <div className="flex justify-between text-foreground/60">
+            <div className="flex justify-between text-muted-foreground">
               <span>Réduction:</span>
               <span>
                 {discountType === "PERCENTAGE"

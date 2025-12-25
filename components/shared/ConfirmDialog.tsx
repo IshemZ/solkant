@@ -64,7 +64,7 @@ export default function ConfirmDialog({
               <Dialog.Title className="text-lg font-semibold text-foreground">
                 {title}
               </Dialog.Title>
-              <Dialog.Description className="mt-2 text-sm text-foreground/60">
+              <Dialog.Description className="mt-2 text-sm text-muted-foreground">
                 {description}
               </Dialog.Description>
             </div>

@@ -102,7 +102,7 @@ export default function PricingPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
@@ -114,13 +114,13 @@ export default function PricingPage() {
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -129,7 +129,7 @@ export default function PricingPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -157,7 +157,7 @@ export default function PricingPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Tarifs Solkant : logiciel de devis pour instituts de beauté
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Commencez gratuitement et ne payez que lorsque votre activité se
             développe. Pas de frais cachés, pas d&apos;engagement.
           </p>
@@ -171,12 +171,12 @@ export default function PricingPage() {
           <div className="flex flex-col rounded-2xl border border-foreground/10 bg-background p-8 shadow-sm">
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-foreground">Gratuit</h2>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Pour découvrir Solkant et tester toutes les fonctionnalités
               </p>
               <p className="mt-6">
                 <span className="text-4xl font-bold text-foreground">0 €</span>
-                <span className="text-foreground/60">/mois</span>
+                <span className="text-muted-foreground">/mois</span>
               </p>
 
               <ul className="mt-8 space-y-3">
@@ -289,12 +289,12 @@ export default function PricingPage() {
 
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-foreground">Pro</h2>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Pour les instituts qui veulent optimiser leur gestion
               </p>
               <p className="mt-6">
                 <span className="text-4xl font-bold text-foreground">19 €</span>
-                <span className="text-foreground/60">/mois</span>
+                <span className="text-muted-foreground">/mois</span>
               </p>
 
               <ul className="mt-8 space-y-3">
@@ -414,7 +414,7 @@ export default function PricingPage() {
           <div className="flex flex-col rounded-2xl border border-foreground/10 bg-background p-8 shadow-sm">
             <div className="flex-1">
               <h2 className="text-2xl font-bold text-foreground">Entreprise</h2>
-              <p className="mt-2 text-sm text-foreground/60">
+              <p className="mt-2 text-sm text-muted-foreground">
                 Pour les réseaux de salons et grandes structures
               </p>
               <p className="mt-6">
@@ -548,7 +548,7 @@ export default function PricingPage() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Questions fréquentes sur nos tarifs
             </h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
               Tout ce que vous devez savoir sur les prix et abonnements Solkant
             </p>
           </div>
@@ -769,36 +769,36 @@ export default function PricingPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

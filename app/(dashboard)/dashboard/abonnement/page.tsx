@@ -31,7 +31,7 @@ export default async function AbonnementPage() {
         <h1 className="text-3xl font-bold text-foreground">
           Gérer mon abonnement
         </h1>
-        <p className="mt-2 text-foreground/60">
+        <p className="mt-2 text-muted-foreground">
           Consultez votre plan actuel et gérez votre abonnement
         </p>
       </div>
@@ -92,7 +92,7 @@ export default async function AbonnementPage() {
               <h3 className="text-xl font-bold text-foreground">Gratuit</h3>
               <div className="mt-2">
                 <span className="text-3xl font-bold text-foreground">0 €</span>
-                <span className="text-foreground/60">/mois</span>
+                <span className="text-muted-foreground">/mois</span>
               </div>
             </div>
 
@@ -184,7 +184,7 @@ export default async function AbonnementPage() {
               <h3 className="text-xl font-bold text-foreground">Pro</h3>
               <div className="mt-2">
                 <span className="text-3xl font-bold text-foreground">19 €</span>
-                <span className="text-foreground/60">/mois</span>
+                <span className="text-muted-foreground">/mois</span>
               </div>
             </div>
 

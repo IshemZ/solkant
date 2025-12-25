@@ -162,7 +162,7 @@ describe("Hydration Safety", () => {
     it("devrait afficher une date de quote de manière cohérente", () => {
       // Simuler l'affichage d'une date dans QuotesList
       const QuoteDateDisplay = ({ date }: { date: Date | string }) => (
-        <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
+        <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
           {formatDate(date)}
         </td>
       );
@@ -199,7 +199,7 @@ describe("Hydration Safety", () => {
         <div className="rounded-lg border border-foreground/10 bg-background p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-foreground/60">{label}</p>
+              <p className="text-sm font-medium text-muted-foreground">{label}</p>
               <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
             </div>
           </div>
@@ -223,7 +223,7 @@ describe("Hydration Safety", () => {
 
       const Footer = () => (
         <footer className="border-t border-foreground/10">
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-muted-foreground">
             &copy; {CURRENT_YEAR} Solkant. Tous droits réservés.
           </p>
         </footer>

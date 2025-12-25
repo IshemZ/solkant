@@ -57,25 +57,25 @@ export default function MentionsLegalesPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -84,7 +84,7 @@ export default function MentionsLegalesPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -379,7 +379,7 @@ export default function MentionsLegalesPage() {
 
           {/* Date de mise à jour */}
           <section className="pt-8 border-t border-foreground/10">
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               <strong>Dernière mise à jour :</strong> 6 décembre 2024
             </p>
           </section>
@@ -393,31 +393,31 @@ export default function MentionsLegalesPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
@@ -428,7 +428,7 @@ export default function MentionsLegalesPage() {
                 Mentions légales
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2024 Solkant. Tous droits réservés.
             </p>
           </div>

@@ -30,7 +30,7 @@ export default function Error({
           Une erreur est survenue
         </h2>
 
-        <p className="mb-6 text-foreground/60">
+        <p className="mb-6 text-muted-foreground">
           Nous sommes désolés, une erreur inattendue s&apos;est produite lors du
           chargement de cette page.
         </p>

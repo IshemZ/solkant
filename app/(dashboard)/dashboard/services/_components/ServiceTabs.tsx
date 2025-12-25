@@ -21,7 +21,7 @@ export default function ServiceTabs() {
           className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "services"
               ? "border-foreground text-foreground"
-              : "border-transparent text-foreground/60 hover:text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           Services à l&apos;unité
@@ -31,7 +31,7 @@ export default function ServiceTabs() {
           className={`pb-4 px-1 text-sm font-medium border-b-2 transition-colors ${
             activeTab === "packages"
               ? "border-foreground text-foreground"
-              : "border-transparent text-foreground/60 hover:text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
           Forfaits

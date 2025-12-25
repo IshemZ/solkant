@@ -52,13 +52,13 @@ export default function ArticlePage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -73,7 +73,7 @@ export default function ArticlePage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -117,7 +117,7 @@ export default function ArticlePage() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -136,7 +136,7 @@ export default function ArticlePage() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Comparatif</span>
             <span>•</span>
             <time dateTime="2025-01-10">10 janvier 2025</time>
@@ -148,7 +148,7 @@ export default function ArticlePage() {
             Devis en ligne vs devis papier : quel choix pour votre institut ?
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Entre tradition et modernité, faut-il abandonner les devis papier
             pour passer au numérique ? Découvrez notre comparatif complet pour
             faire le choix le plus adapté à votre institut.
@@ -515,7 +515,7 @@ export default function ArticlePage() {
           <h2 className="text-2xl font-bold text-foreground">
             Testez le devis en ligne gratuitement avec Solkant
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Profitez de 10 devis gratuits par mois, sans carte bancaire. Créez
             votre premier devis professionnel en moins de 3 minutes.
           </p>
@@ -544,7 +544,7 @@ export default function ArticlePage() {
       <footer className="border-t border-foreground/10">
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               © 2025 Solkant. Tous droits réservés.
             </p>
           </div>

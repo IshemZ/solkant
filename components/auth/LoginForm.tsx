@@ -156,7 +156,7 @@ function LoginFormContent({ initialError }: LoginFormProps) {
           <div className="w-full border-t border-foreground/20" />
         </div>
         <div className="relative flex justify-center text-sm">
-          <span className="bg-background px-2 text-foreground/60">
+          <span className="bg-background px-2 text-muted-foreground">
             Ou continuer avec
           </span>
         </div>

@@ -81,22 +81,22 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
             <table className="w-full">
               <thead className="border-b border-foreground/10 bg-foreground/5">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Numéro
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Client
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Statut
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Montant
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-foreground/60">
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-muted-foreground">
                     Actions
                   </th>
                 </tr>
@@ -117,7 +117,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                         ? `${quote.client.firstName} ${quote.client.lastName}`
                         : "Client supprimé"}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-foreground/60">
+                    <td className="whitespace-nowrap px-6 py-4 text-sm text-muted-foreground">
                       {formatDate(quote.createdAt)}
                     </td>
                     <td className="whitespace-nowrap px-6 py-4">

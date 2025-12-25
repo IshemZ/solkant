@@ -15,7 +15,7 @@ export default async function DevisPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Mes devis</h1>
-          <p className="mt-2 text-foreground/60">
+          <p className="mt-2 text-muted-foreground">
             Consultez et gérez tous vos devis
           </p>
         </div>

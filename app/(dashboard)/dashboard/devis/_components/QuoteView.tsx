@@ -115,7 +115,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard/devis"
-              className="text-foreground/60 hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground"
             >
               ← Retour
             </Link>
@@ -123,7 +123,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
               {quote.quoteNumber}
             </h1>
           </div>
-          <p className="mt-2 text-sm text-foreground/60">
+          <p className="mt-2 text-sm text-muted-foreground">
             Créé le {formatDate(quote.createdAt)}
           </p>
         </div>

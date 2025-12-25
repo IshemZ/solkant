@@ -26,7 +26,7 @@ export default async function EditPackagePage({
       <div className="mb-8">
         <Link
           href="/dashboard/services?tab=packages"
-          className="inline-flex items-center gap-2 text-sm text-foreground/60 hover:text-foreground"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -36,7 +36,7 @@ export default async function EditPackagePage({
         <h1 className="mt-4 text-3xl font-bold text-foreground">
           Modifier le forfait
         </h1>
-        <p className="mt-2 text-foreground/60">
+        <p className="mt-2 text-muted-foreground">
           Modifiez les informations de votre forfait
         </p>
       </div>

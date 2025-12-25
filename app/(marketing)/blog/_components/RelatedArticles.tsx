@@ -50,7 +50,7 @@ export function RelatedArticles({
                 {article.title}
               </h3>
 
-              <p className="text-sm text-foreground/60 mb-4 line-clamp-3">
+              <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                 {article.description}
               </p>
 

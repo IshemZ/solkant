@@ -25,7 +25,7 @@ export default async function DashboardPage() {
         <h2 className="text-3xl font-bold text-foreground">
           Bienvenue, {session.user?.name?.split(" ")[0] || "Utilisateur"}
         </h2>
-        <p className="mt-2 text-foreground/60">
+        <p className="mt-2 text-muted-foreground">
           Voici votre tableau de bord pour gérer vos devis et clients
         </p>
       </div>
@@ -60,7 +60,7 @@ export default async function DashboardPage() {
             </div>
             <div>
               <p className="font-medium text-foreground">Nouveau devis</p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Créer un nouveau devis
               </p>
             </div>
@@ -87,7 +87,7 @@ export default async function DashboardPage() {
             </div>
             <div>
               <p className="font-medium text-foreground">Nouveau client</p>
-              <p className="text-sm text-foreground/60">Ajouter un client</p>
+              <p className="text-sm text-muted-foreground">Ajouter un client</p>
             </div>
           </Link>
 
@@ -112,7 +112,7 @@ export default async function DashboardPage() {
             </div>
             <div>
               <p className="font-medium text-foreground">Nouveau service</p>
-              <p className="text-sm text-foreground/60">Ajouter un service</p>
+              <p className="text-sm text-muted-foreground">Ajouter un service</p>
             </div>
           </Link>
         </div>
@@ -132,7 +132,7 @@ export default async function DashboardPage() {
               <p className="font-medium text-foreground">
                 Configurez votre entreprise
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Ajoutez les informations de votre institut (nom, adresse, logo)
               </p>
             </div>
@@ -145,7 +145,7 @@ export default async function DashboardPage() {
               <p className="font-medium text-foreground">
                 Créez votre catalogue de services
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Ajoutez vos prestations avec prix et durées
               </p>
             </div>
@@ -156,7 +156,7 @@ export default async function DashboardPage() {
             </div>
             <div>
               <p className="font-medium text-foreground">Ajoutez vos clients</p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Enregistrez les informations de vos clients
               </p>
             </div>
@@ -169,7 +169,7 @@ export default async function DashboardPage() {
               <p className="font-medium text-foreground">
                 Créez votre premier devis
               </p>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Générez un devis professionnel en quelques clics
               </p>
             </div>

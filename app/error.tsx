@@ -38,7 +38,7 @@ export default function GlobalError({
               Une erreur est survenue
             </h1>
 
-            <p className="mb-6 text-lg text-foreground/60">
+            <p className="mb-6 text-lg text-muted-foreground">
               Nous sommes désolés, une erreur inattendue s&apos;est produite
               lors du chargement de cette page.
             </p>

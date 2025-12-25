@@ -151,7 +151,7 @@ export default function LogoUpload({
               ? "Changer le logo"
               : "Ajouter un logo"}
           </label>
-          <p className="mt-2 text-xs text-foreground/60">
+          <p className="mt-2 text-xs text-muted-foreground">
             PNG, JPG ou GIF (max 5MB)
             <br />
             Recommandé : image carrée, fond transparent
@@ -159,7 +159,7 @@ export default function LogoUpload({
         </div>
       </div>
 
-      <p className="text-sm text-foreground/60">
+      <p className="text-sm text-muted-foreground">
         Votre logo apparaîtra sur tous vos devis pour personnaliser votre image
         de marque.
       </p>

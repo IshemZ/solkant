@@ -53,13 +53,13 @@ export default function Article3Page() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -71,7 +71,7 @@ export default function Article3Page() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -80,7 +80,7 @@ export default function Article3Page() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -136,7 +136,7 @@ export default function Article3Page() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -155,7 +155,7 @@ export default function Article3Page() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">
               Transformation digitale
             </span>
@@ -170,7 +170,7 @@ export default function Article3Page() {
             ?
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             La transformation digitale n&apos;est plus réservée aux grandes
             entreprises. Découvrez comment les outils numériques peuvent
             révolutionner votre quotidien, valoriser votre image et booster
@@ -650,7 +650,7 @@ export default function Article3Page() {
             Testez Solkant gratuitement et digitalisez votre institut en 2
             minutes
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
             Sans engagement, sans carte bancaire. Créez votre compte et
             découvrez comment gagner 10 heures par mois sur votre gestion
             administrative.
@@ -685,36 +685,36 @@ export default function Article3Page() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

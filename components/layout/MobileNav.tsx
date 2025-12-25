@@ -60,7 +60,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
               </Dialog.Title>
               <Dialog.Close asChild>
                 <button
-                  className="rounded-md p-2 text-foreground/60 hover:bg-foreground/10 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
+                  className="rounded-md p-2 text-muted-foreground hover:bg-foreground/10 hover:text-foreground focus:outline-none focus:ring-2 focus:ring-foreground/20"
                   aria-label="Fermer le menu"
                 >
                   <svg
@@ -86,7 +86,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                 {userName || userEmail}
               </p>
               {userName && userEmail && (
-                <p className="text-xs text-foreground/60">{userEmail}</p>
+                <p className="text-xs text-muted-foreground">{userEmail}</p>
               )}
             </div>
 
@@ -104,7 +104,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                         ? "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
                         : isActive
                         ? "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors"
-                        : "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-foreground/60 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                        : "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
                     }
                   >
                     {link.primary && (

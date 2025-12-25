@@ -63,7 +63,7 @@
 
   /* Muted - Beige très clair */
   --muted: oklch(0.95 0.008 70);
-  --muted-foreground: oklch(0.45 0.02 55);
+  --muted-foreground: oklch(0.45 0.035 55);
 
   /* Accent - Rose poudré #E8C4B8 */
   --accent: oklch(0.82 0.04 30);

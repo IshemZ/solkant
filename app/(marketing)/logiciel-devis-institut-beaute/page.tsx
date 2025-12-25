@@ -122,25 +122,25 @@ export default function LogicielDevisInstitutPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -149,7 +149,7 @@ export default function LogicielDevisInstitutPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -182,7 +182,7 @@ export default function LogicielDevisInstitutPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
             Logiciel de Devis pour Institut de Beauté : Guide Complet 2025
           </h1>
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Découvrez comment choisir le meilleur logiciel de devis pour votre
             institut de beauté. Ce guide complet vous aide à digitaliser vos
             devis, gagner du temps et professionnaliser votre image.
@@ -573,10 +573,10 @@ export default function LogicielDevisInstitutPage() {
                         2-3 min
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       15-20 min
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       10-15 min
                     </td>
                   </tr>
@@ -587,7 +587,7 @@ export default function LogicielDevisInstitutPage() {
                     <td className="px-6 py-4 text-center">
                       <span className="text-green-600 text-xl">✓</span>
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       Formules manuelles
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -601,7 +601,7 @@ export default function LogicielDevisInstitutPage() {
                     <td className="px-6 py-4 text-center">
                       <span className="text-green-600 text-xl">✓</span>
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       Conversion manuelle
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -643,7 +643,7 @@ export default function LogicielDevisInstitutPage() {
                     <td className="px-6 py-4 text-center">
                       <span className="text-green-600 text-xl">✓</span>
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       Limité
                     </td>
                     <td className="px-6 py-4 text-center">
@@ -657,7 +657,7 @@ export default function LogicielDevisInstitutPage() {
                     <td className="px-6 py-4 text-center text-green-600">
                       Très faible
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       Moyen-Élevé
                     </td>
                     <td className="px-6 py-4 text-center text-red-600">
@@ -671,10 +671,10 @@ export default function LogicielDevisInstitutPage() {
                     <td className="px-6 py-4 text-center text-foreground">
                       0-30€
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       0€ (si licence)
                     </td>
-                    <td className="px-6 py-4 text-center text-foreground/60">
+                    <td className="px-6 py-4 text-center text-muted-foreground">
                       0€
                     </td>
                   </tr>
@@ -818,7 +818,7 @@ export default function LogicielDevisInstitutPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Institut Belle Étoile (Paris 17e)
                 </h3>
-                <p className="text-sm text-foreground/60 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Institut traditionnel, 3 esthéticiennes, 200+ clientes actives
                 </p>
                 <div className="space-y-4">
@@ -861,7 +861,7 @@ export default function LogicielDevisInstitutPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Camille L., Esthéticienne à domicile (Lyon)
                 </h3>
-                <p className="text-sm text-foreground/60 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Auto-entrepreneuse, prestations à domicile, gestion mobile
                 </p>
                 <div className="space-y-4">
@@ -903,7 +903,7 @@ export default function LogicielDevisInstitutPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Spa Zen & Beauté (Bordeaux)
                 </h3>
-                <p className="text-sm text-foreground/60 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Spa haut de gamme, forfaits personnalisés, clientèle entreprise
                 </p>
                 <div className="space-y-4">
@@ -1095,7 +1095,7 @@ export default function LogicielDevisInstitutPage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Comment faire un devis professionnel pour votre institut
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Guide complet avec mentions obligatoires, structure et conseils
                 </p>
               </Link>
@@ -1106,7 +1106,7 @@ export default function LogicielDevisInstitutPage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Comment choisir le bon logiciel de devis
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Critères essentiels pour sélectionner l'outil idéal
                 </p>
               </Link>
@@ -1117,7 +1117,7 @@ export default function LogicielDevisInstitutPage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Gestion institut de beauté : Le guide complet 2025
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Tous les aspects de la gestion d'institut (clients, finances,
                   planning)
                 </p>
@@ -1129,7 +1129,7 @@ export default function LogicielDevisInstitutPage() {
                 <h4 className="font-semibold text-foreground mb-2">
                   Les 10 erreurs fatales dans vos devis
                 </h4>
-                <p className="text-sm text-foreground/60">
+                <p className="text-sm text-muted-foreground">
                   Erreurs courantes qui font fuir les clientes
                 </p>
               </Link>
@@ -1145,36 +1145,36 @@ export default function LogicielDevisInstitutPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

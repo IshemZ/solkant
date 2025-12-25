@@ -170,7 +170,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
         </div>
 
         {items.length === 0 ? (
-          <p className="text-center text-sm text-foreground/60">
+          <p className="text-center text-sm text-muted-foreground">
             Aucun article ajouté
           </p>
         ) : (
@@ -183,7 +183,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
                 <div className="sm:col-span-4">
                   <label
                     htmlFor={`item-name-${index}`}
-                    className="block text-xs font-medium text-foreground/60"
+                    className="block text-xs font-medium text-muted-foreground"
                   >
                     Nom
                   </label>
@@ -200,7 +200,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
                 <div className="sm:col-span-2">
                   <label
                     htmlFor={`item-price-${index}`}
-                    className="block text-xs font-medium text-foreground/60"
+                    className="block text-xs font-medium text-muted-foreground"
                   >
                     Prix unitaire
                   </label>
@@ -224,7 +224,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
                 <div className="sm:col-span-2">
                   <label
                     htmlFor={`item-quantity-${index}`}
-                    className="block text-xs font-medium text-foreground/60"
+                    className="block text-xs font-medium text-muted-foreground"
                   >
                     Quantité
                   </label>
@@ -248,7 +248,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
                 <div className="sm:col-span-3">
                   <label
                     htmlFor={`item-total-${index}`}
-                    className="block text-xs font-medium text-foreground/60"
+                    className="block text-xs font-medium text-muted-foreground"
                   >
                     Total
                   </label>
@@ -286,7 +286,7 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
 
                 {item.description && (
                   <div className="sm:col-span-12">
-                    <p className="text-xs text-foreground/60">
+                    <p className="text-xs text-muted-foreground">
                       {item.description}
                     </p>
                   </div>
@@ -350,14 +350,14 @@ export default function QuoteForm({ clients, services }: QuoteFormProps) {
 
         <div className="mt-6 space-y-2 border-t border-foreground/10 pt-4">
           <div className="flex justify-between text-sm">
-            <span className="text-foreground/60">Sous-total</span>
+            <span className="text-muted-foreground">Sous-total</span>
             <span className="font-medium text-foreground">
               {subtotal.toFixed(2)} €
             </span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between text-sm">
-              <span className="text-foreground/60">
+              <span className="text-muted-foreground">
                 Remise
                 {discountType === "PERCENTAGE" && ` (${discount}%)`}
               </span>

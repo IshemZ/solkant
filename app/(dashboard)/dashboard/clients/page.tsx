@@ -15,7 +15,7 @@ export default async function ClientsPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Clients</h1>
-          <p className="mt-2 text-foreground/60">
+          <p className="mt-2 text-muted-foreground">
             Gérez votre liste de clients
           </p>
         </div>

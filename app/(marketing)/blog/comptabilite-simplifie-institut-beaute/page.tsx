@@ -52,13 +52,13 @@ export default function ArticleComptabiliteInstitutPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -70,7 +70,7 @@ export default function ArticleComptabiliteInstitutPage() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -79,7 +79,7 @@ export default function ArticleComptabiliteInstitutPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -202,7 +202,7 @@ export default function ArticleComptabiliteInstitutPage() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -221,7 +221,7 @@ export default function ArticleComptabiliteInstitutPage() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">
               Comptabilité & Débutants
             </span>
@@ -233,7 +233,7 @@ export default function ArticleComptabiliteInstitutPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
             Comptabilité d'institut de beauté : guide simplifié pour débutants
           </h1>
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             Un guide simplifié pour comprendre la comptabilité de votre institut
             de beauté, destiné aux débutants et aux gérants qui souhaitent mieux
             gérer leurs finances et éviter les erreurs courantes.

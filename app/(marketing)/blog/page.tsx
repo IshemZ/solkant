@@ -51,13 +51,13 @@ export default function BlogPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -69,7 +69,7 @@ export default function BlogPage() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -78,7 +78,7 @@ export default function BlogPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -106,7 +106,7 @@ export default function BlogPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Guides et conseils pour gérer votre institut de beauté
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Guides pratiques et conseils d&apos;experts pour optimiser la
             gestion de votre institut de beauté
           </p>
@@ -121,7 +121,7 @@ export default function BlogPage() {
               key={article.slug}
               className="flex flex-col rounded-2xl border border-foreground/10 bg-background p-8 shadow-sm hover:shadow-md transition-shadow"
             >
-              <div className="flex items-center gap-2 text-sm text-foreground/60">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <span className="font-medium text-foreground">
                   {article.category}
                 </span>
@@ -141,7 +141,7 @@ export default function BlogPage() {
                 {article.title}
               </h2>
 
-              <p className="mt-3 flex-1 text-foreground/60">
+              <p className="mt-3 flex-1 text-muted-foreground">
                 {article.description}
               </p>
 
@@ -173,7 +173,7 @@ export default function BlogPage() {
           <h2 className="text-2xl font-bold text-foreground">
             Recevez nos derniers articles
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-foreground/60">
+          <p className="mx-auto mt-2 max-w-xl text-muted-foreground">
             Inscrivez-vous à notre newsletter pour recevoir nos guides et
             conseils directement dans votre boîte mail.
           </p>
@@ -201,36 +201,36 @@ export default function BlogPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

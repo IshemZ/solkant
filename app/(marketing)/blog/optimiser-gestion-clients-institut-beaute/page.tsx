@@ -54,13 +54,13 @@ export default function Article3Page() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
@@ -72,7 +72,7 @@ export default function Article3Page() {
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -81,7 +81,7 @@ export default function Article3Page() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -137,7 +137,7 @@ export default function Article3Page() {
       <article className="mx-auto max-w-4xl px-4 py-16 sm:px-6 lg:px-8">
         <Link
           href="/blog"
-          className="inline-flex items-center text-sm font-medium text-foreground/60 hover:text-foreground mb-8"
+          className="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-foreground mb-8"
         >
           <svg
             className="mr-2 h-4 w-4"
@@ -156,7 +156,7 @@ export default function Article3Page() {
         </Link>
 
         <header className="mb-12">
-          <div className="flex items-center gap-2 text-sm text-foreground/60 mb-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
             <span className="font-medium text-foreground">Organisation</span>
             <span>•</span>
             <time dateTime="2024-11-25">25 novembre 2024</time>
@@ -168,7 +168,7 @@ export default function Article3Page() {
             5 astuces pour optimiser la gestion de vos clients
           </h1>
 
-          <p className="text-xl text-foreground/60 leading-relaxed">
+          <p className="text-xl text-muted-foreground leading-relaxed">
             La gestion efficace de votre fichier clients est essentielle pour
             développer votre activité. Découvrez 5 astuces pratiques pour mieux
             organiser vos données, suivre l&apos;historique de vos prestations
@@ -518,7 +518,7 @@ export default function Article3Page() {
               <div className="text-2xl font-bold text-foreground mb-4">
                 Solkant
               </div>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Logiciel de devis pour instituts de beauté et salons
               </p>
             </div>
@@ -529,7 +529,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/fonctionnalites"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Fonctionnalités
                   </Link>
@@ -537,7 +537,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/pricing"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Tarifs
                   </Link>
@@ -551,7 +551,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/blog"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Blog
                   </Link>
@@ -559,7 +559,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Contact
                   </Link>
@@ -573,7 +573,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/mentions-legales"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Mentions légales
                   </Link>
@@ -581,7 +581,7 @@ export default function Article3Page() {
                 <li>
                   <Link
                     href="/confidentialite"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Confidentialité
                   </Link>
@@ -590,7 +590,7 @@ export default function Article3Page() {
             </div>
           </div>
 
-          <div className="mt-8 border-t border-foreground/10 pt-8 text-center text-sm text-foreground/60">
+          <div className="mt-8 border-t border-foreground/10 pt-8 text-center text-sm text-muted-foreground">
             <p>
               &copy; {new Date().getFullYear()} Solkant. Tous droits réservés.
             </p>

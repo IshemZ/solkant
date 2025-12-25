@@ -70,7 +70,7 @@ export function DashboardStats() {
       <div className="rounded-lg border border-foreground/10 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-foreground/60">Devis</p>
+            <p className="text-sm font-medium text-muted-foreground">Devis</p>
             <p className="mt-2 text-3xl font-bold text-foreground">
               <Suspense fallback={<StatSkeleton />}>
                 <QuotesCount />
@@ -99,7 +99,7 @@ export function DashboardStats() {
       <div className="rounded-lg border border-foreground/10 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-foreground/60">Clients</p>
+            <p className="text-sm font-medium text-muted-foreground">Clients</p>
             <p className="mt-2 text-3xl font-bold text-foreground">
               <Suspense fallback={<StatSkeleton />}>
                 <ClientsCount />
@@ -128,7 +128,7 @@ export function DashboardStats() {
       <div className="rounded-lg border border-foreground/10 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-foreground/60">Services</p>
+            <p className="text-sm font-medium text-muted-foreground">Services</p>
             <p className="mt-2 text-3xl font-bold text-foreground">
               <Suspense fallback={<StatSkeleton />}>
                 <ServicesCount />
@@ -157,7 +157,7 @@ export function DashboardStats() {
       <div className="rounded-lg border border-foreground/10 bg-background p-6">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-medium text-foreground/60">
+            <p className="text-sm font-medium text-muted-foreground">
               Chiffre d&apos;affaires
             </p>
             <p className="mt-2 text-3xl font-bold text-foreground">

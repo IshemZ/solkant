@@ -49,25 +49,25 @@ export default function AboutPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -76,7 +76,7 @@ export default function AboutPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -104,7 +104,7 @@ export default function AboutPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Simplifier la gestion des instituts de beauté
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-foreground/60">
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
             Solkant est né d&apos;un constat simple : les gérantes
             d&apos;instituts de beauté perdent trop de temps sur des tâches
             administratives qui pourraient être simplifiées.
@@ -187,7 +187,7 @@ export default function AboutPage() {
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   Simplicité
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Nous concevons des outils intuitifs, sans complexité inutile,
                   pour que vous puissiez les utiliser immédiatement.
                 </p>
@@ -212,7 +212,7 @@ export default function AboutPage() {
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   Fiabilité
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Vos données sont précieuses. Nous garantissons leur sécurité
                   et leur disponibilité à tout moment.
                 </p>
@@ -237,7 +237,7 @@ export default function AboutPage() {
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   Écoute
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Nos fonctionnalités sont façonnées par vos retours. Nous
                   restons à l&apos;écoute pour améliorer Solkant en continu.
                 </p>
@@ -262,7 +262,7 @@ export default function AboutPage() {
                 <h3 className="text-xl font-semibold text-foreground mb-2">
                   Excellence
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Nous visons l&apos;excellence dans chaque détail, pour vous
                   offrir une expérience professionnelle de qualité.
                 </p>
@@ -298,7 +298,7 @@ export default function AboutPage() {
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       Conformité RGPD
                     </h3>
-                    <p className="text-foreground/60">
+                    <p className="text-muted-foreground">
                       Solkant est entièrement conforme au Règlement Général sur
                       la Protection des Données (RGPD). Vos données clients sont
                       hébergées en Europe, chiffrées, et protégées selon les
@@ -330,7 +330,7 @@ export default function AboutPage() {
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       Sécurité maximale
                     </h3>
-                    <p className="text-foreground/60">
+                    <p className="text-muted-foreground">
                       Nous utilisons le chiffrement SSL/TLS pour toutes les
                       connexions, des sauvegardes quotidiennes automatiques, et
                       une infrastructure redondante pour garantir que vos
@@ -361,7 +361,7 @@ export default function AboutPage() {
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       Support réactif
                     </h3>
-                    <p className="text-foreground/60">
+                    <p className="text-muted-foreground">
                       Notre équipe est disponible pour répondre à vos questions
                       et vous accompagner dans l&apos;utilisation de Solkant.
                       Nous nous engageons à répondre à toutes les demandes dans
@@ -392,7 +392,7 @@ export default function AboutPage() {
                     <h3 className="text-lg font-semibold text-foreground mb-2">
                       Transparence tarifaire
                     </h3>
-                    <p className="text-foreground/60">
+                    <p className="text-muted-foreground">
                       Pas de frais cachés, pas de mauvaise surprise. Nos tarifs
                       sont clairs et affichés publiquement. Vous payez
                       uniquement ce que vous utilisez, et pouvez annuler à tout
@@ -439,7 +439,7 @@ export default function AboutPage() {
               <div className="text-2xl font-bold text-foreground mb-4">
                 Solkant
               </div>
-              <p className="text-sm text-foreground/60">
+              <p className="text-sm text-muted-foreground">
                 Logiciel de devis pour instituts de beauté et salons
               </p>
             </div>
@@ -450,7 +450,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/fonctionnalites"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Fonctionnalités
                   </Link>
@@ -458,7 +458,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/pricing"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Tarifs
                   </Link>
@@ -472,7 +472,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/a-propos"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     À propos
                   </Link>
@@ -480,7 +480,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/blog"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Blog
                   </Link>
@@ -488,7 +488,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/contact"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Contact
                   </Link>
@@ -502,7 +502,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/mentions-legales"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Mentions légales
                   </Link>
@@ -510,7 +510,7 @@ export default function AboutPage() {
                 <li>
                   <Link
                     href="/confidentialite"
-                    className="text-foreground/60 hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground"
                   >
                     Confidentialité
                   </Link>
@@ -519,7 +519,7 @@ export default function AboutPage() {
             </div>
           </div>
 
-          <div className="mt-8 border-t border-foreground/10 pt-8 text-center text-sm text-foreground/60">
+          <div className="mt-8 border-t border-foreground/10 pt-8 text-center text-sm text-muted-foreground">
             <p>
               &copy; {new Date().getFullYear()} Solkant. Tous droits réservés.
             </p>

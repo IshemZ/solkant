@@ -49,19 +49,19 @@ export default function ContactPage() {
               <div className="hidden md:flex items-center gap-6">
                 <Link
                   href="/fonctionnalites"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Fonctionnalités
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
@@ -76,7 +76,7 @@ export default function ContactPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -104,7 +104,7 @@ export default function ContactPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Contactez Solkant – Support logiciel de devis
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Une question, une demande de démonstration ou besoin d&apos;aide ?
             Notre équipe vous répond rapidement.
           </p>
@@ -229,7 +229,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-foreground">Email</h3>
-                    <p className="mt-1 text-foreground/60">
+                    <p className="mt-1 text-muted-foreground">
                       contact@solkant.com
                     </p>
                     <p className="mt-1 text-sm text-foreground/50">
@@ -258,7 +258,7 @@ export default function ContactPage() {
                     <h3 className="font-semibold text-foreground">
                       Chat en direct
                     </h3>
-                    <p className="mt-1 text-foreground/60">
+                    <p className="mt-1 text-muted-foreground">
                       Disponible du lundi au vendredi
                     </p>
                     <p className="mt-1 text-sm text-foreground/50">
@@ -287,7 +287,7 @@ export default function ContactPage() {
                     <h3 className="font-semibold text-foreground">
                       Documentation
                     </h3>
-                    <p className="mt-1 text-foreground/60">
+                    <p className="mt-1 text-muted-foreground">
                       Centre d&apos;aide et guides
                     </p>
                     <Link
@@ -312,7 +312,7 @@ export default function ContactPage() {
                   <h4 className="font-semibold text-foreground text-sm mb-1">
                     Puis-je tester Solkant gratuitement ?
                   </h4>
-                  <p className="text-sm text-foreground/60">
+                  <p className="text-sm text-muted-foreground">
                     Oui, le plan Gratuit est disponible sans carte bancaire.{" "}
                     <Link
                       href="/register"
@@ -327,7 +327,7 @@ export default function ContactPage() {
                   <h4 className="font-semibold text-foreground text-sm mb-1">
                     Combien coûte Solkant ?
                   </h4>
-                  <p className="text-sm text-foreground/60">
+                  <p className="text-sm text-muted-foreground">
                     À partir de 0€/mois (plan Gratuit) ou 19€/mois (plan Pro).{" "}
                     <Link
                       href="/pricing"
@@ -342,7 +342,7 @@ export default function ContactPage() {
                   <h4 className="font-semibold text-foreground text-sm mb-1">
                     Mes données sont-elles sécurisées ?
                   </h4>
-                  <p className="text-sm text-foreground/60">
+                  <p className="text-sm text-muted-foreground">
                     Oui, hébergement sécurisé en Europe, chiffrement SSL/TLS et
                     conformité RGPD garantie.
                   </p>
@@ -352,7 +352,7 @@ export default function ContactPage() {
                   <h4 className="font-semibold text-foreground text-sm mb-1">
                     Proposez-vous des formations ?
                   </h4>
-                  <p className="text-sm text-foreground/60">
+                  <p className="text-sm text-muted-foreground">
                     L&apos;interface est intuitive, mais nous proposons des
                     guides vidéo et un accompagnement personnalisé sur demande.
                   </p>
@@ -370,7 +370,7 @@ export default function ContactPage() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Prêt à commencer ?
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
               Créez votre compte gratuitement et testez Solkant sans engagement.
             </p>
             <div className="mt-10">
@@ -392,36 +392,36 @@ export default function ContactPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>

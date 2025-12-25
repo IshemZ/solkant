@@ -56,19 +56,19 @@ export default function FeaturesPage() {
                 </Link>
                 <Link
                   href="/pricing"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Tarifs
                 </Link>
                 <Link
                   href="/blog"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Blog
                 </Link>
                 <Link
                   href="/contact"
-                  className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   Contact
                 </Link>
@@ -77,7 +77,7 @@ export default function FeaturesPage() {
             <div className="flex items-center gap-4">
               <Link
                 href="/login"
-                className="text-sm font-medium text-foreground/60 hover:text-foreground"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 Connexion
               </Link>
@@ -105,7 +105,7 @@ export default function FeaturesPage() {
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
             Fonctionnalités du logiciel de devis Solkant pour instituts
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Solkant vous accompagne au quotidien avec des outils simples et
             efficaces, pensés pour les instituts de beauté, salons
             d&apos;esthétique et spas.
@@ -122,7 +122,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Créez des devis élégants en quelques clics
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Générez des devis professionnels en PDF avec un design moderne
                 et épuré. Ajoutez vos prestations depuis votre catalogue,
                 ajustez les quantités et durées, et téléchargez un document prêt
@@ -218,7 +218,7 @@ export default function FeaturesPage() {
                     d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Aperçu de vos devis PDF élégants
                 </p>
               </div>
@@ -242,7 +242,7 @@ export default function FeaturesPage() {
                     d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Centralisez vos contacts clients
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Gérez facilement votre base clients
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Enregistrez toutes les informations importantes de vos clients
                 et accédez à leur historique de devis en un clic. Fini les
                 carnets d&apos;adresses et fichiers Excel dispersés.
@@ -339,7 +339,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Créez votre catalogue de prestations
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Définissez une fois pour toutes vos services avec leurs prix et
                 durées. Utilisez-les ensuite pour générer vos devis en quelques
                 secondes sans ressaisir les informations.
@@ -434,7 +434,7 @@ export default function FeaturesPage() {
                     d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Votre catalogue de services à portée de clic
                 </p>
               </div>
@@ -458,7 +458,7 @@ export default function FeaturesPage() {
                     d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Personnalisez l&apos;apparence de vos devis
                 </p>
               </div>
@@ -467,7 +467,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Personnalisez vos devis à votre image
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Ajoutez votre logo, adaptez les couleurs à votre charte
                 graphique et personnalisez les mentions légales pour que vos
                 devis reflètent parfaitement l&apos;identité de votre institut.
@@ -555,7 +555,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Une interface pensée pour vous
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Pas besoin de formation ni de compétences techniques. Solkant
                 est intuitif et s&apos;adapte à votre façon de travailler. Vous
                 serez autonome dès la première utilisation.
@@ -650,7 +650,7 @@ export default function FeaturesPage() {
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Simple, rapide, efficace
                 </p>
               </div>
@@ -674,7 +674,7 @@ export default function FeaturesPage() {
                     d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                   />
                 </svg>
-                <p className="mt-4 text-sm text-foreground/60">
+                <p className="mt-4 text-sm text-muted-foreground">
                   Vos données protégées et sécurisées
                 </p>
               </div>
@@ -683,7 +683,7 @@ export default function FeaturesPage() {
               <h2 className="text-3xl font-bold text-foreground">
                 Vos données en sécurité
               </h2>
-              <p className="mt-4 text-lg text-foreground/60">
+              <p className="mt-4 text-lg text-muted-foreground">
                 Nous prenons la sécurité de vos données au sérieux. Vos
                 informations clients et vos devis sont protégés et hébergés en
                 Europe selon les normes les plus strictes.
@@ -773,7 +773,7 @@ export default function FeaturesPage() {
           <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
             Cas d&apos;usage concrets par type d&apos;institut
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-lg text-foreground/60">
+          <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground">
             Découvrez comment des professionnelles comme vous utilisent Solkant
             au quotidien pour simplifier leur gestion de devis et gagner du
             temps.
@@ -803,7 +803,7 @@ export default function FeaturesPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Institut de beauté avec équipe
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Salon traditionnel, 3 esthéticiennes, 200+ clientes actives
                 </p>
               </div>
@@ -900,7 +900,7 @@ export default function FeaturesPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Spa & centre bien-être
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Spa haut de gamme, forfaits personnalisés, clientèle
                   entreprise
                 </p>
@@ -995,7 +995,7 @@ export default function FeaturesPage() {
                 <h3 className="text-2xl font-bold text-foreground mb-2">
                   Praticienne indépendante à domicile
                 </h3>
-                <p className="text-foreground/60">
+                <p className="text-muted-foreground">
                   Auto-entrepreneuse, prestations à domicile, gestion mobile
                 </p>
               </div>
@@ -1069,7 +1069,7 @@ export default function FeaturesPage() {
 
         {/* Call to action from use cases */}
         <div className="mt-16 text-center">
-          <p className="text-lg text-foreground/60 mb-6">
+          <p className="text-lg text-muted-foreground mb-6">
             Quel que soit votre type d&apos;activité, Solkant s&apos;adapte à
             vos besoins
           </p>
@@ -1102,7 +1102,7 @@ export default function FeaturesPage() {
             <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
               Prêt à tester Solkant gratuitement ?
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-lg text-foreground/60">
+            <p className="mx-auto mt-4 max-w-xl text-lg text-muted-foreground">
               Créez votre compte en 2 minutes et découvrez comment Solkant peut
               simplifier la gestion de vos devis au quotidien.
             </p>
@@ -1131,36 +1131,36 @@ export default function FeaturesPage() {
             <div className="flex items-center gap-6">
               <Link
                 href="/"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Accueil
               </Link>
               <Link
                 href="/fonctionnalites"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Fonctionnalités
               </Link>
               <Link
                 href="/pricing"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Tarifs
               </Link>
               <Link
                 href="/blog"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Blog
               </Link>
               <Link
                 href="/contact"
-                className="text-sm text-foreground/60 hover:text-foreground"
+                className="text-sm text-muted-foreground hover:text-foreground"
               >
                 Contact
               </Link>
             </div>
-            <p className="text-sm text-foreground/60">
+            <p className="text-sm text-muted-foreground">
               &copy; 2025 Solkant. Tous droits réservés.
             </p>
           </div>
