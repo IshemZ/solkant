@@ -7,8 +7,9 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 })
 
 const nextConfig = {
-  // Source maps uploadées vers Sentry uniquement (pas exposées publiquement)
-  productionBrowserSourceMaps: false,
+  // Source maps activées en production pour meilleur debugging et insights Lighthouse
+  // Note: Cela augmente légèrement la taille du build mais améliore le debugging
+  productionBrowserSourceMaps: true,
 
   // Optimisations Next.js 16
   compiler: {
@@ -80,9 +81,10 @@ export default withSentryConfig(withBundleAnalyzer(nextConfig), {
   // Upload a larger set of source maps for prettier stack traces (increases build time)
   widenClientFileUpload: true,
 
-  // Supprime les source maps après upload pour réduire la taille du déploiement
+  // Conserve les source maps après upload pour debugging et insights Lighthouse
+  // Note: Cela augmente la taille du déploiement mais permet un meilleur debugging en production
   sourcemaps: {
-    deleteSourcemapsAfterUpload: true,
+    deleteSourcemapsAfterUpload: false,
   },
 
   // Uncomment to route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers.
