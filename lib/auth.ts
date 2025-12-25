@@ -221,13 +221,24 @@ export const authOptions: NextAuthOptions = {
         if (user) {
           token.id = user.id;
 
-          // Fetch businessId for the user
+          // Fetch businessId and subscription info for the user
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
-            select: { business: { select: { id: true } } },
+            select: {
+              business: {
+                select: {
+                  id: true,
+                  subscriptionStatus: true,
+                  isPro: true,
+                },
+              },
+            },
           });
 
           token.businessId = dbUser?.business?.id || null;
+          token.subscriptionStatus =
+            dbUser?.business?.subscriptionStatus || null;
+          token.isPro = dbUser?.business?.isPro || null;
 
           if (!token.businessId) {
             console.warn(
@@ -253,6 +264,9 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.businessId = token.businessId as string | null;
+        session.user.subscriptionStatus =
+          token.subscriptionStatus as string | null;
+        session.user.isPro = token.isPro as boolean | null;
       }
       return session;
     },

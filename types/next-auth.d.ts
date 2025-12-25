@@ -12,6 +12,8 @@ declare module 'next-auth' {
       name?: string | null
       image?: string | null
       businessId?: string | null
+      subscriptionStatus?: string | null
+      isPro?: boolean | null
     }
   }
 
@@ -21,6 +23,8 @@ declare module 'next-auth' {
     name?: string | null
     image?: string | null
     businessId?: string | null
+    subscriptionStatus?: string | null
+    isPro?: boolean | null
   }
 }
 
@@ -29,5 +33,7 @@ declare module 'next-auth/jwt' {
     id: string
     provider?: string
     businessId?: string | null
+    subscriptionStatus?: string | null
+    isPro?: boolean | null
   }
 }

@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
+import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
+import { SignUpTracker } from "@/components/analytics/SignUpTracker";
 import { CookieBanner } from "@/components/shared/CookieBanner";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
@@ -161,10 +164,14 @@ export default function RootLayout({
           }}
         />
         <SessionProvider>
-          {children}
-          <Toaster position="top-right" richColors closeButton />
-          <GoogleAnalytics />
-          <CookieBanner />
+          <AnalyticsProvider>
+            {children}
+            <Toaster position="top-right" richColors closeButton />
+            <GoogleAnalytics />
+            <PageViewTracker />
+            <SignUpTracker />
+            <CookieBanner />
+          </AnalyticsProvider>
         </SessionProvider>
       </body>
     </html>

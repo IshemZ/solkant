@@ -130,6 +130,7 @@ export async function POST(request: Request) {
         user,
         message:
           "Compte créé avec succès ! Veuillez vérifier votre email pour activer votre compte.",
+        trackSignUp: true, // Flag pour tracking GA4
       },
       { status: 201 }
     );

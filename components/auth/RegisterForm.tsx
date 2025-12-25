@@ -3,17 +3,35 @@
 import { signIn } from "next-auth/react";
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useAnalytics } from "@/hooks/useAnalytics";
+import {
+  parseSignUpErrorType,
+  sanitizeErrorMessage,
+} from "@/lib/analytics/utils";
 
 function RegisterFormContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const { trackEvent } = useAnalytics();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [formStartTracked, setFormStartTracked] = useState(false);
+
+  // Track form_start_register on first field interaction
+  const trackFormStart = (fieldName: string) => {
+    if (!formStartTracked) {
+      trackEvent("form_start_register", {
+        first_field: fieldName,
+        referrer: typeof document !== "undefined" ? document.referrer || "direct" : "unknown",
+      });
+      setFormStartTracked(true);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,22 +60,61 @@ function RegisterFormContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Une erreur est survenue");
+        const errorMessage = data.error || "Une erreur est survenue";
+        setError(errorMessage);
+
+        // Track sign_up_error
+        trackEvent("sign_up_error", {
+          error_type: parseSignUpErrorType(errorMessage),
+          method: "credentials",
+          error_message: sanitizeErrorMessage(errorMessage),
+        });
+
         setIsLoading(false);
         return;
+      }
+
+      // Track sign_up success
+      if (data.trackSignUp && data.user?.business?.id) {
+        trackEvent("sign_up", {
+          method: "credentials",
+          user_id: data.user.business.id,
+        });
       }
 
       // ✅ NOUVEAU FLOW: Rediriger vers la page de vérification email
       // L'utilisateur doit vérifier son email avant de pouvoir se connecter
       router.push("/check-email");
       router.refresh();
-    } catch {
-      setError("Une erreur est survenue. Veuillez réessayer.");
+    } catch (err) {
+      const errorMessage = "Une erreur est survenue. Veuillez réessayer.";
+      setError(errorMessage);
+
+      // Track sign_up_error
+      trackEvent("sign_up_error", {
+        error_type: "server_error",
+        method: "credentials",
+        error_message: sanitizeErrorMessage(
+          err instanceof Error ? err.message : errorMessage
+        ),
+      });
+
       setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    // Track oauth_button_click
+    trackEvent("oauth_button_click", {
+      provider: "google",
+      page_type: "register",
+    });
+
+    // Store flag for OAuth sign_up tracking after callback
+    if (typeof sessionStorage !== "undefined") {
+      sessionStorage.setItem("new_signup", "google");
+    }
+
     setIsLoading(true);
     await signIn("google", { callbackUrl });
   };
@@ -83,6 +140,7 @@ function RegisterFormContent() {
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            onFocus={() => trackFormStart("name")}
             required
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="Votre nom"
@@ -102,6 +160,7 @@ function RegisterFormContent() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            onFocus={() => trackFormStart("email")}
             required
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="vous@exemple.com"
@@ -121,6 +180,7 @@ function RegisterFormContent() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onFocus={() => trackFormStart("password")}
             required
             minLength={8}
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
