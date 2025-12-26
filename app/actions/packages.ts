@@ -12,6 +12,7 @@ import {
 } from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 
 type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
@@ -21,22 +22,7 @@ type PackageWithRelations = Package & {
 function serializePackage(
   pkg: Package & { items: (PackageItem & { service: Service | null })[] }
 ) {
-  const items = pkg.items || [];
-  return {
-    ...pkg,
-    // Prisma Decimal -> number
-    discountValue: Number((pkg as any).discountValue),
-    // Ensure nested service price is a number (should already be number for Float)
-    items: items.map((item) => ({
-      ...item,
-      service: item.service
-        ? {
-            ...item.service,
-            price: Number((item.service as any).price),
-          }
-        : null,
-    })),
-  } as unknown as PackageWithRelations;
+  return serializeDecimalFields(pkg) as PackageWithRelations;
 }
 
 /**
