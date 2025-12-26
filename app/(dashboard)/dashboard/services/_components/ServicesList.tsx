@@ -134,7 +134,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
 
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-lg font-bold text-foreground">
-                  {service.price.toFixed(2)} €
+                  {Number(service.price).toFixed(2)} €
                 </span>
                 {service.duration && (
                   <span className="text-sm text-muted-foreground">

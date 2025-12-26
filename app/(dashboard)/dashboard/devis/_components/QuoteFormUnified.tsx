@@ -206,7 +206,7 @@ export default function QuoteForm({
                   ) : (
                     services.map((service) => (
                       <SelectItem key={service.id} value={service.id}>
-                        {service.name} • {service.price.toFixed(2)} €
+                        {service.name} • {Number(service.price).toFixed(2)} €
                       </SelectItem>
                     ))
                   )}
@@ -282,7 +282,7 @@ export default function QuoteForm({
                         {item.packageId ? (
                           <div className="flex items-center gap-2 px-3 py-2 text-sm">
                             <PackageIcon className="h-3 w-3 text-muted-foreground" />
-                            <span className="font-medium">{item.price.toFixed(2)} €</span>
+                            <span className="font-medium">{Number(item.price).toFixed(2)} €</span>
                           </div>
                         ) : (
                           <Input
@@ -322,7 +322,7 @@ export default function QuoteForm({
                         )}
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        {item.total.toFixed(2)} €
+                        {Number(item.total).toFixed(2)} €
                       </TableCell>
                       <TableCell>
                         <Button

@@ -124,7 +124,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                       <QuoteStatusBadge status={quote.status} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-foreground">
-                      {quote.total.toFixed(2)} €
+                      {Number(quote.total).toFixed(2)} €
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <div className="flex items-center justify-end gap-3">

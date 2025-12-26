@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import { getServices } from "@/app/actions/services";
 import { getPackages } from "@/app/actions/packages";
-import { serializeDecimalFields } from "@/lib/decimal-utils";
 import ServicesList from "./_components/ServicesList";
 import PackagesList from "./_components/PackagesList";
 import ServiceTabs from "./_components/ServiceTabs";
@@ -22,9 +21,9 @@ export default async function ServicesPage({
   const servicesResult = await getServices();
   const packagesResult = await getPackages();
 
-  // Serialize Decimal fields to numbers for client components
-  const serializedServices = servicesResult.success ? serializeDecimalFields(servicesResult.data) as any : [];
-  const serializedPackages = packagesResult.success ? serializeDecimalFields(packagesResult.data) as any : [];
+  // Server actions already serialize Decimal fields, no need to do it again
+  const services = servicesResult.success ? servicesResult.data : [];
+  const packages = packagesResult.success ? packagesResult.data : [];
 
   return (
     <div className="mx-auto max-w-6xl">
@@ -45,7 +44,7 @@ export default async function ServicesPage({
             {servicesResult.error}
           </div>
         ) : (
-          <ServicesList initialServices={serializedServices} />
+          <ServicesList initialServices={services} />
         )
       ) : (
         !packagesResult.success ? (
@@ -53,7 +52,7 @@ export default async function ServicesPage({
             {packagesResult.error}
           </div>
         ) : (
-          <PackagesList initialPackages={serializedPackages} />
+          <PackagesList initialPackages={packages} />
         )
       )}
     </div>

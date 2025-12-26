@@ -7,8 +7,18 @@
  * Formate une date de manière cohérente entre serveur et client
  * Utilise UTC pour éviter les problèmes de timezone lors de l'hydratation
  */
-export function formatDate(date: Date | string): string {
+export function formatDate(date: Date | string | null | undefined): string {
+  // Gérer les valeurs nulles/undefined
+  if (!date) {
+    return "—";
+  }
+
   const d = typeof date === "string" ? new Date(date) : date;
+
+  // Vérifier que d est bien un objet Date valide
+  if (!(d instanceof Date) || isNaN(d.getTime())) {
+    return "—";
+  }
 
   // Extraire les composants en UTC pour avoir le même résultat serveur/client
   const year = d.getUTCFullYear();
@@ -21,8 +31,18 @@ export function formatDate(date: Date | string): string {
 /**
  * Formate une date avec l'heure de manière cohérente
  */
-export function formatDateTime(date: Date | string): string {
+export function formatDateTime(date: Date | string | null | undefined): string {
+  // Gérer les valeurs nulles/undefined
+  if (!date) {
+    return "—";
+  }
+
   const d = typeof date === "string" ? new Date(date) : date;
+
+  // Vérifier que d est bien un objet Date valide
+  if (!(d instanceof Date) || isNaN(d.getTime())) {
+    return "—";
+  }
 
   const dateStr = formatDate(d);
   const hours = String(d.getUTCHours()).padStart(2, "0");
@@ -34,8 +54,18 @@ export function formatDateTime(date: Date | string): string {
 /**
  * Formate une date au format ISO (YYYY-MM-DD) pour les inputs
  */
-export function formatDateISO(date: Date | string): string {
+export function formatDateISO(date: Date | string | null | undefined): string {
+  // Gérer les valeurs nulles/undefined
+  if (!date) {
+    return "";
+  }
+
   const d = typeof date === "string" ? new Date(date) : date;
+
+  // Vérifier que d est bien un objet Date valide
+  if (!(d instanceof Date) || isNaN(d.getTime())) {
+    return "";
+  }
 
   const year = d.getUTCFullYear();
   const month = String(d.getUTCMonth() + 1).padStart(2, "0");

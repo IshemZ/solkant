@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 import ServiceForm from "../../_components/ServiceForm";
 import prisma from "@/lib/prisma";
 
@@ -40,7 +41,7 @@ export async function generateMetadata({
     title: `Modifier ${service.name} | Solkant`,
     description: `Modification du service ${
       service.name
-    } - ${service.price.toFixed(2)} € - ${service.duration} min`,
+    } - ${Number(service.price).toFixed(2)} € - ${service.duration} min`,
   };
 }
 
@@ -64,6 +65,9 @@ export default async function EditServicePage({ params }: PageProps) {
     notFound();
   }
 
+  // Serialize Decimal fields for Client Component
+  const serializedService = serializeDecimalFields(service);
+
   return (
     <div className="mx-auto max-w-2xl py-8">
       <div className="mb-6">
@@ -73,7 +77,7 @@ export default async function EditServicePage({ params }: PageProps) {
         <p className="mt-2 text-muted-foreground">{service.name}</p>
       </div>
 
-      <ServiceForm service={service} mode="edit" />
+      <ServiceForm service={serializedService} mode="edit" />
     </div>
   );
 }

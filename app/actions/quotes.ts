@@ -436,7 +436,7 @@ export const sendQuote = withAuth(
         console.log(`   → À: ${quote.client.email}`);
         console.log(`   → Devis: ${quote.quoteNumber}`);
         console.log(`   → Client: ${quote.client.firstName} ${quote.client.lastName}`);
-        console.log(`   → Total: ${quote.total.toFixed(2)} €\n`);
+        console.log(`   → Total: ${Number(quote.total).toFixed(2)} €\n`);
 
         // Mettre à jour le devis même en mode simulation
         await prisma.quote.update({
