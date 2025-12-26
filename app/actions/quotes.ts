@@ -600,12 +600,12 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
         name: item.name,
         description: item.description || undefined,
         quantity: item.quantity,
-        price: item.price,
-        total: item.total,
+        price: item.price as any,
+        total: item.total as any,
       })),
-      subtotal: quote.subtotal,
-      discount: quote.discount,
-      total: quote.total,
+      subtotal: quote.subtotal as any,
+      discount: quote.discount as any,
+      total: quote.total as any,
       notes: quote.notes || undefined,
     });
 

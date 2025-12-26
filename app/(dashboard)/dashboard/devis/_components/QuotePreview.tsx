@@ -154,7 +154,7 @@ export default function QuotePreview({ quote }: QuotePreviewProps) {
               {quote.subtotal.toFixed(2)} €
             </span>
           </div>
-          {quote.discount > 0 && (
+          {(quote.discount as any) > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">
                 Remise
@@ -165,7 +165,7 @@ export default function QuotePreview({ quote }: QuotePreviewProps) {
               <span className="font-medium text-red-600">
                 -
                 {(quote.discountType === "PERCENTAGE"
-                  ? quote.subtotal * (quote.discount / 100)
+                  ? (quote.subtotal as any) * ((quote.discount as any) / 100)
                   : quote.discount
                 ).toFixed(2)}{" "}
                 €
@@ -175,12 +175,12 @@ export default function QuotePreview({ quote }: QuotePreviewProps) {
           <div className="flex justify-between border-t-2 border-gray-300 pt-2">
             <span className="font-semibold text-gray-900">Total TTC</span>
             <span className="text-xl font-bold text-gray-900">
-              {quote.total.toFixed(2)} €
+              {(quote.total as any).toFixed(2)} €
             </span>
           </div>
           {quote.business.showInstallmentPayment && (
             <p className="pt-2 text-xs italic text-gray-600">
-              Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
+              Si paiement en 4× sans frais : {((quote.total as any) / 4).toFixed(2)} € ×
               4
             </p>
           )}

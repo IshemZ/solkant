@@ -42,7 +42,7 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
 
   function calculateBasePrice(pkg: PackageWithRelations): number {
     return pkg.items.reduce((sum, item) => {
-      const price = item.service?.price || 0;
+      const price = (item.service?.price as any) || 0;
       return sum + price * item.quantity;
     }, 0);
   }

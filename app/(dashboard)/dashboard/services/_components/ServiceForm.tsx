@@ -50,7 +50,7 @@ export default function ServiceForm({
     defaultValues: {
       name: service?.name || "",
       description: service?.description || null,
-      price: service?.price || 0,
+      price: (service?.price as any) || 0,
       duration: service?.duration || null,
       category: service?.category || null,
       isActive: service?.isActive ?? true,

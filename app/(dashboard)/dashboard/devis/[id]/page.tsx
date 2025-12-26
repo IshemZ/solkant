@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { getQuote } from "@/app/actions/quotes";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { redirect } from "next/navigation";
 import QuoteView from "../_components/QuoteView";
 
@@ -29,7 +30,7 @@ export async function generateMetadata({
     title: `Devis ${quote.quoteNumber} - ${clientName} | Solkant`,
     description: `Devis ${
       quote.quoteNumber
-    } pour ${clientName} - Montant: ${quote.total.toFixed(2)} € - Statut: ${
+    } pour ${clientName} - Montant: ${(quote.total as any).toFixed(2)} € - Statut: ${
       quote.status
     }`,
   };
@@ -43,9 +44,12 @@ export default async function QuotePage({ params }: QuotePageProps) {
     redirect("/dashboard/devis");
   }
 
+  // Serialize Decimal fields to numbers for client component
+  const serializedQuote = serializeDecimalFields(result.data) as any;
+
   return (
     <div className="mx-auto max-w-5xl">
-      <QuoteView quote={result.data} />
+      <QuoteView quote={serializedQuote} />
     </div>
   );
 }

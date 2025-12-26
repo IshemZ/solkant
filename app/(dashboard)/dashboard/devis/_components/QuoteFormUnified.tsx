@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { X, Plus, AlertCircle, Package as PackageIcon } from "lucide-react";
 import {
   Button,
@@ -28,217 +26,63 @@ import {
   Alert,
   AlertDescription,
 } from "@/components/ui";
-import { createQuote } from "@/app/actions/quotes";
-import DiscountField, { type DiscountType } from "@/components/shared/DiscountField";
-import type { Client, Service, Package, PackageItem } from "@prisma/client";
-
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
+import DiscountField from "@/components/shared/DiscountField";
+import { useQuoteForm } from "./hooks/useQuoteForm";
+import { calculatePackageBasePrice } from "@/lib/package-utils";
+import type { Client } from "@prisma/client";
+import type {
+  SerializedService,
+  SerializedPackage,
+  QuoteWithItems,
+} from "@/types/quote";
 
 interface QuoteFormProps {
+  mode: 'create' | 'edit';
   clients: Client[];
-  services: Service[];
-  packages: PackageWithRelations[];
+  services: SerializedService[];
+  packages: SerializedPackage[];
+  initialQuote?: QuoteWithItems;
 }
 
-interface QuoteItem {
-  serviceId?: string;
-  packageId?: string;
-  name: string;
-  description?: string;
-  price: number;
-  quantity: number;
-  total: number;
-  packageDiscount?: number; // NEW: Montant de la remise du forfait
-}
-
-export default function QuoteFormNew({
+export default function QuoteForm({
+  mode,
   clients,
   services,
   packages,
+  initialQuote,
 }: QuoteFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [items, setItems] = useState<QuoteItem[]>([]);
-  const [discount, setDiscount] = useState(0);
-  const [discountType, setDiscountType] = useState<DiscountType>("FIXED");
-  const [notes, setNotes] = useState("");
-  const [clientSearch, setClientSearch] = useState("");
 
-  // Filtered clients for search
-  const filteredClients = useMemo(() => {
-    if (!clientSearch) return clients;
-    const search = clientSearch.toLowerCase();
-    return clients.filter(
-      (client) =>
-        client.firstName.toLowerCase().includes(search) ||
-        client.lastName.toLowerCase().includes(search) ||
-        client.email?.toLowerCase().includes(search)
-    );
-  }, [clients, clientSearch]);
-
-  // Get selected client object
-  const selectedClient = useMemo(
-    () => clients.find((c) => c.id === selectedClientId),
-    [clients, selectedClientId]
-  );
-
-  // Calculate totals in real-time
-  const subtotal = useMemo(() => {
-    // Calculate raw sum first
-    const rawSum = items.reduce((sum, item) => sum + item.total, 0);
-    // Round once to 2 decimals to avoid Float display issues (99.99000001)
-    // Server will recalculate with Decimal precision
-    return Math.round(rawSum * 100) / 100;
-  }, [items]);
-
-  // NEW: Calculate total package discounts
-  const packageDiscountsTotal = useMemo(
-    () => items.reduce((sum, item) => sum + (item.packageDiscount || 0), 0),
-    [items]
-  );
-
-  // NEW: Calculate subtotal after package discounts
-  const subtotalAfterPackageDiscounts = useMemo(
-    () => subtotal - packageDiscountsTotal,
-    [subtotal, packageDiscountsTotal]
-  );
-
-  const discountAmount = useMemo(() => {
-    return discountType === "PERCENTAGE"
-      ? subtotalAfterPackageDiscounts * (discount / 100)
-      : discount;
-  }, [discount, discountType, subtotalAfterPackageDiscounts]);
-
-  const total = useMemo(
-    () => subtotalAfterPackageDiscounts - discountAmount,
-    [subtotalAfterPackageDiscounts, discountAmount]
-  );
-
-  // Clear client selection
-  function clearClient() {
-    setSelectedClientId("");
-    setClientSearch("");
-  }
-
-  function addServiceItem(serviceId: string) {
-    const service = services.find((s) => s.id === serviceId);
-    if (!service) return;
-
-    const newItem: QuoteItem = {
-      serviceId: service.id,
-      name: service.name,
-      description: service.description || undefined,
-      price: service.price,
-      quantity: 1,
-      total: service.price,
-    };
-
-    setItems([...items, newItem]);
-  }
-
-  function addPackageItem(packageId: string) {
-    const pkg = packages.find((p) => p.id === packageId);
-    if (!pkg) return;
-
-    // Calculate base price from all services in the package
-    const basePrice = pkg.items.reduce((sum, item) => {
-      const price = item.service?.price || 0;
-      return sum + price * item.quantity;
-    }, 0);
-
-    // Calculate package discount separately
-    let packageDiscount = 0;
-
-    if (pkg.discountType === "PERCENTAGE" && Number(pkg.discountValue) > 0) {
-      const discountValue = Number(pkg.discountValue);
-      packageDiscount = basePrice * (discountValue / 100);
-    } else if (pkg.discountType === "FIXED" && Number(pkg.discountValue) > 0) {
-      packageDiscount = Math.min(Number(pkg.discountValue), basePrice); // Limit to basePrice
-    }
-
-    // Create description with included services
-    const servicesDescription = pkg.items
-      .map((item) => `${item.service?.name} × ${item.quantity}`)
-      .join(", ");
-
-    const newItem: QuoteItem = {
-      packageId: pkg.id,
-      name: pkg.name,
-      description: servicesDescription,
-      price: basePrice, // Use FULL price, not discounted
-      quantity: 1,
-      total: basePrice,
-      packageDiscount: packageDiscount, // Store discount separately
-    };
-
-    setItems([...items, newItem]);
-  }
-
-  function updateItem(
-    index: number,
-    field: keyof QuoteItem,
-    value: string | number
-  ) {
-    // Block price and quantity modifications for packages
-    if (items[index].packageId && (field === "price" || field === "quantity")) {
-      return; // Silently ignore modifications
-    }
-
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
-
-    // Recalculate total for this item
-    if (field === "price" || field === "quantity") {
-      newItems[index].total = newItems[index].price * newItems[index].quantity;
-    }
-
-    setItems(newItems);
-  }
-
-  function removeItem(index: number) {
-    setItems(items.filter((_, i) => i !== index));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    if (!selectedClientId) {
-      setError("Veuillez sélectionner un client");
-      setIsLoading(false);
-      return;
-    }
-
-    if (items.length === 0) {
-      setError("Veuillez ajouter au moins un article");
-      setIsLoading(false);
-      return;
-    }
-
-    const quoteData = {
-      clientId: selectedClientId,
-      items,
-      discount,
-      discountType,
-      notes: notes || undefined,
-    };
-
-    const result = await createQuote(quoteData);
-
-    if (!result.success) {
-      setError(result.error);
-      toast.error("Erreur lors de la création du devis");
-      setIsLoading(false);
-    } else {
-      toast.success(`Devis ${result.data.quoteNumber} créé avec succès`);
-      router.push(`/dashboard/devis/${result.data.id}`);
-    }
-  }
+  const {
+    selectedClientId,
+    setSelectedClientId,
+    selectedClient,
+    clientSearch,
+    setClientSearch,
+    filteredClients,
+    clearClient,
+    items,
+    addServiceItem,
+    addPackageItem,
+    updateItem,
+    removeItem,
+    subtotal,
+    packageDiscountsTotal,
+    subtotalAfterPackageDiscounts,
+    discountAmount,
+    total,
+    discount,
+    setDiscount,
+    discountType,
+    setDiscountType,
+    notes,
+    setNotes,
+    validUntil,
+    setValidUntil,
+    handleSubmit,
+    isLoading,
+    error,
+  } = useQuoteForm({ mode, initialQuote, clients, services, packages, router });
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -248,6 +92,7 @@ export default function QuoteFormNew({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
       {/* Client Selection */}
       <Card>
         <CardHeader>
@@ -378,18 +223,11 @@ export default function QuoteFormNew({
                       Aucun forfait disponible
                     </div>
                   ) : (
-                    packages.map((pkg) => {
-                      // Calculate base price (without discount)
-                      const basePrice = pkg.items.reduce((sum, item) => {
-                        const price = item.service?.price || 0;
-                        return sum + price * item.quantity;
-                      }, 0);
-                      return (
-                        <SelectItem key={pkg.id} value={pkg.id}>
-                          {pkg.name} • {basePrice.toFixed(2)} €
-                        </SelectItem>
-                      );
-                    })
+                    packages.map((pkg) => (
+                      <SelectItem key={pkg.id} value={pkg.id}>
+                        {pkg.name} • {calculatePackageBasePrice(pkg).toFixed(2)} €
+                      </SelectItem>
+                    ))
                   )}
                 </SelectContent>
               </Select>
@@ -521,6 +359,21 @@ export default function QuoteFormNew({
             }}
           />
 
+          {mode === 'create' && (
+            <FormField
+              label="Valable jusqu'au"
+              id="validUntil"
+              hint="Date limite de validité du devis"
+            >
+              <Input
+                type="date"
+                id="validUntil"
+                value={validUntil}
+                onChange={(e) => setValidUntil(e.target.value)}
+              />
+            </FormField>
+          )}
+
           <FormField
             label="Notes"
             id="notes"
@@ -579,13 +432,23 @@ export default function QuoteFormNew({
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push("/dashboard/devis")}
+          onClick={() =>
+            mode === 'create'
+              ? router.push("/dashboard/devis")
+              : router.push(`/dashboard/devis/${initialQuote!.id}`)
+          }
           disabled={isLoading}
         >
           Annuler
         </Button>
         <Button type="submit" disabled={isLoading || items.length === 0}>
-          {isLoading ? "Création..." : "Créer le devis"}
+          {isLoading
+            ? mode === 'create'
+              ? "Création..."
+              : "Enregistrement..."
+            : mode === 'create'
+            ? "Créer le devis"
+            : "Enregistrer les modifications"}
         </Button>
       </div>
     </form>

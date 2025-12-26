@@ -61,6 +61,58 @@ export function calculateDiscount(
 /**
  * Sérialise récursivement les Decimal en number dans un objet
  * Utilisé pour les retours de Server Actions Next.js
+ *
+ * ## Quand utiliser serializeDecimalFields ?
+ *
+ * **TOUJOURS** utiliser pour les retours de Server Actions qui contiennent des modèles Prisma
+ * avec des champs Decimal (price, amount, discount, etc.)
+ *
+ * ### Modèles concernés (ont des champs Decimal) :
+ * - `Service` (price: Decimal)
+ * - `Package` (discountValue: Decimal)
+ * - `Quote` (subtotal, discount, total: Decimal)
+ * - `QuoteItem` (price, total: Decimal)
+ *
+ * ### Modèles NON concernés (pas de Decimal) :
+ * - `Client` (aucun champ Decimal)
+ * - `Business` (aucun champ Decimal)
+ * - `User` (aucun champ Decimal)
+ *
+ * ### Exemples d'utilisation :
+ *
+ * ```typescript
+ * // ✅ CORRECT - Service a des Decimals
+ * export async function getServices() {
+ *   const services = await prisma.service.findMany(...)
+ *   return successResult(serializeDecimalFields(services))
+ * }
+ *
+ * // ✅ CORRECT - Quote a des Decimals
+ * export async function getQuote(id: string) {
+ *   const quote = await prisma.quote.findUnique(...)
+ *   return successResult(serializeDecimalFields(quote))
+ * }
+ *
+ * // ❌ INUTILE - Client n'a pas de Decimals
+ * export async function getClients() {
+ *   const clients = await prisma.client.findMany(...)
+ *   return successResult(clients) // Pas besoin de serializer
+ * }
+ * ```
+ *
+ * ### Pourquoi c'est nécessaire ?
+ *
+ * Next.js Server Actions ne peuvent pas sérialiser les objets Decimal de Prisma.
+ * Cette fonction les convertit en `number` pour la transmission client/serveur.
+ *
+ * ### Types correspondants :
+ *
+ * Utilisez les types `Serialized*` pour les données après sérialisation :
+ * - `SerializedService` pour Service avec price: number
+ * - `SerializedPackage` pour Package avec discountValue: number
+ *
+ * @param data - Objet à sérialiser (peut être un objet, tableau, ou primitif)
+ * @returns Objet sérialisé avec Decimals convertis en numbers
  */
 export function serializeDecimalFields<T>(data: T): T {
   if (data === null || data === undefined) {

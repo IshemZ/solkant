@@ -1,8 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
   createPackageSchema,
@@ -10,9 +8,12 @@ import {
   type CreatePackageInput,
   type UpdatePackageInput,
 } from "@/lib/validations";
+import { formatZodFieldErrors } from "@/lib/validations/helpers";
 import type { Package, PackageItem, Service } from "@prisma/client";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import { serializeDecimalFields } from "@/lib/decimal-utils";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import * as Sentry from "@sentry/nextjs";
 
 type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
@@ -31,15 +32,18 @@ function serializePackage(
 export async function getPackages(): Promise<
   ActionResult<PackageWithRelations[]>
 > {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
+  const validatedSession = await validateSessionWithEmail();
 
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  try {
     const packages = await prisma.package.findMany({
       where: {
-        businessId: session.user.businessId,
+        businessId,
         isActive: true,
       },
       include: {
@@ -55,7 +59,14 @@ export async function getPackages(): Promise<
     const serialized = packages.map((p) => serializePackage(p));
     return successResult(serialized);
   } catch (error) {
-    console.error("Error fetching packages:", error);
+    Sentry.captureException(error, {
+      tags: { action: "getPackages", businessId },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching packages:", error);
+    }
+
     return errorResult("Erreur lors du chargement des forfaits");
   }
 }
@@ -66,16 +77,19 @@ export async function getPackages(): Promise<
 export async function getPackageById(
   id: string
 ): Promise<ActionResult<PackageWithRelations>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
+  const validatedSession = await validateSessionWithEmail();
 
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  try {
     const packageData = await prisma.package.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
       include: {
         items: {
@@ -87,12 +101,20 @@ export async function getPackageById(
     });
 
     if (!packageData) {
-      return errorResult("Forfait introuvable");
+      return errorResult("Forfait introuvable", "NOT_FOUND");
     }
 
     return successResult(serializePackage(packageData));
   } catch (error) {
-    console.error("Error fetching package:", error);
+    Sentry.captureException(error, {
+      tags: { action: "getPackageById", businessId },
+      extra: { packageId: id },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching package:", error);
+    }
+
     return errorResult("Erreur lors du chargement du forfait");
   }
 }
@@ -103,38 +125,33 @@ export async function getPackageById(
 export async function createPackage(
   input: CreatePackageInput
 ): Promise<ActionResult<Package>> {
+  const validatedSession = await validateSessionWithEmail();
+
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  // Validate input
+  const validation = createPackageSchema.safeParse(input);
+  if (!validation.success) {
+    return errorResult(
+      validation.error.issues[0]?.message || "Données invalides",
+      "VALIDATION_ERROR",
+      formatZodFieldErrors(validation.error)
+    );
+  }
+
+  const { items, ...packageData } = validation.data;
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
-    // Validate input
-    const validation = createPackageSchema.safeParse(input);
-    if (!validation.success) {
-      const fieldErrors: Record<string, string[]> = {};
-      validation.error.issues.forEach((issue) => {
-        const path = issue.path.join(".");
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = [];
-        }
-        fieldErrors[path].push(issue.message);
-      });
-      return errorResult(
-        validation.error.issues[0]?.message || "Données invalides",
-        "VALIDATION_ERROR",
-        fieldErrors
-      );
-    }
-
-    const { items, ...packageData } = validation.data;
-
     // Verify all services exist and belong to the business
     const serviceIds = items.map((item) => item.serviceId);
     const services = await prisma.service.findMany({
       where: {
         id: { in: serviceIds },
-        businessId: session.user.businessId,
+        businessId,
         isActive: true,
       },
     });
@@ -149,7 +166,7 @@ export async function createPackage(
     const newPackage = await prisma.package.create({
       data: {
         ...packageData,
-        businessId: session.user.businessId,
+        businessId,
         items: {
           create: items,
         },
@@ -166,7 +183,15 @@ export async function createPackage(
     revalidatePath("/dashboard/services");
     return successResult(serializePackage(newPackage));
   } catch (error) {
-    console.error("Error creating package:", error);
+    Sentry.captureException(error, {
+      tags: { action: "createPackage", businessId },
+      extra: { input },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error creating package:", error);
+    }
+
     return errorResult("Erreur lors de la création du forfait");
   }
 }
@@ -178,40 +203,35 @@ export async function updatePackage(
   id: string,
   input: UpdatePackageInput
 ): Promise<ActionResult<Package>> {
+  const validatedSession = await validateSessionWithEmail();
+
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  // Validate input
+  const validation = updatePackageSchema.safeParse(input);
+  if (!validation.success) {
+    return errorResult(
+      validation.error.issues[0]?.message || "Données invalides",
+      "VALIDATION_ERROR",
+      formatZodFieldErrors(validation.error)
+    );
+  }
+
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
-    // Validate input
-    const validation = updatePackageSchema.safeParse(input);
-    if (!validation.success) {
-      const fieldErrors: Record<string, string[]> = {};
-      validation.error.issues.forEach((issue) => {
-        const path = issue.path.join(".");
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = [];
-        }
-        fieldErrors[path].push(issue.message);
-      });
-      return errorResult(
-        validation.error.issues[0]?.message || "Données invalides",
-        "VALIDATION_ERROR",
-        fieldErrors
-      );
-    }
-
     // Check package exists and belongs to business
     const existingPackage = await prisma.package.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
     if (!existingPackage) {
-      return errorResult("Forfait introuvable");
+      return errorResult("Forfait introuvable", "NOT_FOUND");
     }
 
     const { items, ...packageData } = validation.data;
@@ -225,7 +245,7 @@ export async function updatePackage(
         const services = await tx.service.findMany({
           where: {
             id: { in: serviceIds },
-            businessId: session.user.businessId!,
+            businessId,
             isActive: true,
           },
         });
@@ -267,7 +287,15 @@ export async function updatePackage(
     revalidatePath("/dashboard/services");
     return successResult(serializePackage(updatedPackage));
   } catch (error) {
-    console.error("Error updating package:", error);
+    Sentry.captureException(error, {
+      tags: { action: "updatePackage", businessId },
+      extra: { packageId: id, input },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error updating package:", error);
+    }
+
     const message =
       error instanceof Error
         ? error.message
@@ -282,22 +310,25 @@ export async function updatePackage(
 export async function deletePackage(
   id: string
 ): Promise<ActionResult<{ id: string }>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
+  const validatedSession = await validateSessionWithEmail();
 
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  try {
     // Check package exists and belongs to business
     const existingPackage = await prisma.package.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId,
       },
     });
 
     if (!existingPackage) {
-      return errorResult("Forfait introuvable");
+      return errorResult("Forfait introuvable", "NOT_FOUND");
     }
 
     // Soft delete
@@ -312,7 +343,15 @@ export async function deletePackage(
     revalidatePath("/dashboard/services");
     return successResult({ id });
   } catch (error) {
-    console.error("Error deleting package:", error);
+    Sentry.captureException(error, {
+      tags: { action: "deletePackage", businessId },
+      extra: { packageId: id },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error deleting package:", error);
+    }
+
     return errorResult("Erreur lors de l'archivage du forfait");
   }
 }

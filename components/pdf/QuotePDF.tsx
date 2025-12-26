@@ -362,14 +362,14 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
               </Text>
             </View>
 
-            {quote.discount > 0 && (
+            {(quote.discount as any) > 0 && (
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>
                   Remise{quote.discountType === 'PERCENTAGE' ? ` (${quote.discount}%)` : ''}
                 </Text>
                 <Text style={[styles.totalValue, { color: "#dc2626" }]}>
                   -{(quote.discountType === 'PERCENTAGE'
-                    ? quote.subtotal * (quote.discount / 100)
+                    ? (quote.subtotal as any) * ((quote.discount as any) / 100)
                     : quote.discount).toFixed(2)} €
                 </Text>
               </View>
@@ -378,12 +378,12 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
             <View style={styles.grandTotalRow}>
               <Text style={styles.grandTotalLabel}>Total TTC</Text>
               <Text style={styles.grandTotalValue}>
-                {quote.total.toFixed(2)} €
+                {(quote.total as any).toFixed(2)} €
               </Text>
             </View>
             {quote.business.showInstallmentPayment && (
               <Text style={styles.installmentPayment}>
-                Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
+                Si paiement en 4× sans frais : {((quote.total as any) / 4).toFixed(2)} € ×
                 4
               </Text>
             )}
