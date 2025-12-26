@@ -30,7 +30,7 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
   async function confirmDelete() {
     if (!packageToDelete) return;
 
-    const result = await deletePackage(packageToDelete);
+    const result = await deletePackage({ id: packageToDelete });
     if (result.success) {
       setPackages(packages.filter((p) => p.id !== packageToDelete));
       toast.success("Forfait archivé avec succès");

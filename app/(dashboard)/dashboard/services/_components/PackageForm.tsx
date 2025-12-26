@@ -123,7 +123,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     try {
       const result =
         isEdit && initialData
-          ? await updatePackage(initialData.id, data as CreatePackageInput)
+          ? await updatePackage({ id: initialData.id, ...data } as CreatePackageInput & { id: string })
           : await createPackage(data as CreatePackageInput);
 
       if (!result.success) {
