@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { getQuotes } from "@/app/actions/quotes";
-import { serializeDecimalFields } from "@/lib/decimal-utils";
 import QuotesList from "./_components/QuotesList";
 
 export const metadata: Metadata = {
@@ -27,7 +26,7 @@ export default async function DevisPage() {
           {result.error}
         </div>
       ) : (
-        <QuotesList initialQuotes={serializeDecimalFields(result.data)} />
+        <QuotesList initialQuotes={result.data} />
       )}
     </div>
   );

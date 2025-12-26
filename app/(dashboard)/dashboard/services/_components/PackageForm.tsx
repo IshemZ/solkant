@@ -28,15 +28,11 @@ import {
   createPackageSchema,
   type CreatePackageInput,
 } from "@/lib/validations";
-import type { Package, PackageItem, Service } from "@prisma/client";
+import type { SerializedPackage, SerializedService } from "@/types/quote";
 import { X } from "lucide-react";
 
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
-
 interface PackageFormProps {
-  initialData?: PackageWithRelations;
+  initialData?: SerializedPackage;
   mode: "create" | "edit";
 }
 
@@ -78,7 +74,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     name: "items",
   });
 
-  const [services, setServices] = useState<Service[]>([]);
+  const [services, setServices] = useState<SerializedService[]>([]);
   const [servicesLoading, setServicesLoading] = useState(true);
 
   // Load services

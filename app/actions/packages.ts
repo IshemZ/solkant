@@ -9,11 +9,12 @@ import {
   type UpdatePackageInput,
 } from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
-import { successResult, errorResult } from "@/lib/action-types";
+import { successResult, errorResult, type ActionResult } from "@/lib/action-types";
 import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { sanitizeObject } from "@/lib/security";
 import { z } from "zod";
+import type { SerializedPackage } from "@/types/quote";
 
 export type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
@@ -22,15 +23,15 @@ export type PackageWithRelations = Package & {
 // Convert Prisma Decimal fields to plain numbers for safe serialization
 function serializePackage(
   pkg: Package & { items: (PackageItem & { service: Service | null })[] }
-) {
-  return serializeDecimalFields(pkg) as PackageWithRelations;
+): SerializedPackage {
+  return serializeDecimalFields(pkg) as unknown as SerializedPackage;
 }
 
 /**
  * Get all active packages for the current business
  */
 export const getPackages = withAuth(
-  async (_input: void, session) => {
+  async (_input: void, session): Promise<ActionResult<SerializedPackage[]>> => {
     const packages = await prisma.package.findMany({
       where: {
         businessId: session.businessId,
@@ -54,7 +55,7 @@ export const getPackages = withAuth(
  * Get a single package by ID
  */
 export const getPackageById = withAuth(
-  async (input: { id: string }, session) => {
+  async (input: { id: string }, session): Promise<ActionResult<SerializedPackage>> => {
     const packageData = await prisma.package.findFirst({
       where: {
         id: input.id,

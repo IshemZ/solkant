@@ -4,13 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { deleteService } from "@/app/actions/services";
-import type { Service } from "@prisma/client";
+import type { SerializedService } from "@/types/quote";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Briefcase } from "lucide-react";
 
 interface ServicesListProps {
-  initialServices: Service[];
+  initialServices: SerializedService[];
 }
 
 export default function ServicesList({ initialServices }: ServicesListProps) {

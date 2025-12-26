@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPackageById, type PackageWithRelations } from "@/app/actions/packages";
+import { getPackageById } from "@/app/actions/packages";
 import PackageForm from "../../../_components/PackageForm";
 
 export const metadata: Metadata = {
@@ -41,7 +41,7 @@ export default async function EditPackagePage({
         </p>
       </div>
 
-      <PackageForm mode="edit" initialData={result.data as PackageWithRelations} />
+      <PackageForm mode="edit" initialData={result.data} />
     </div>
   );
 }

@@ -10,13 +10,13 @@ import {
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { successResult, errorResult } from "@/lib/action-types";
+import { successResult, errorResult, type ActionResult } from "@/lib/action-types";
 import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { z } from "zod";
 
 export const getServices = withAuth(
-  async (_input: void, session) => {
+  async (_input: void, session): Promise<ActionResult<import('@/types/quote').SerializedService[]>> => {
     const services = await prisma.service.findMany({
       where: {
         businessId: session.businessId,
@@ -25,7 +25,7 @@ export const getServices = withAuth(
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(serializeDecimalFields(services));
+    return successResult(serializeDecimalFields(services) as unknown as import('@/types/quote').SerializedService[]);
   },
   "getServices"
 );

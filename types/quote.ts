@@ -26,6 +26,23 @@ export type SerializedPackage = Omit<Package, 'discountValue'> & {
   items: SerializedPackageItem[];
 };
 
+export type SerializedQuoteItem = Omit<PrismaQuoteItem, 'price' | 'total'> & {
+  price: number;
+  total: number;
+  service: SerializedService | null;
+};
+
+export type SerializedQuote = Omit<Quote, 'discount' | 'subtotal' | 'total'> & {
+  discount: number;
+  subtotal: number;
+  total: number;
+};
+
+export type SerializedQuoteWithRelations = SerializedQuote & {
+  client: Client | null;
+  items: SerializedQuoteItem[];
+};
+
 // Quote with relations (for edit mode)
 export type QuoteWithItems = Quote & {
   items: PrismaQuoteItem[];

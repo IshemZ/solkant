@@ -30,7 +30,7 @@ type QuoteWithFullRelations = Quote & {
 };
 
 export const getQuotes = withAuth(
-  async (_input: void, session): Promise<ActionResult<QuoteWithRelations[]>> => {
+  async (_input: void, session): Promise<ActionResult<import('@/types/quote').SerializedQuoteWithRelations[]>> => {
     const quotes = await prisma.quote.findMany({
       where: { businessId: session.businessId },
       include: {
@@ -44,7 +44,8 @@ export const getQuotes = withAuth(
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(serializeDecimalFields(quotes));
+    const serialized = serializeDecimalFields(quotes);
+    return successResult(serialized as unknown as import('@/types/quote').SerializedQuoteWithRelations[]);
   },
   "getQuotes"
 );
