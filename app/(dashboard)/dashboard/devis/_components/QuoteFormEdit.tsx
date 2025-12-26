@@ -105,10 +105,13 @@ export default function QuoteFormEdit({
   );
 
   // Calculate totals in real-time
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.total, 0),
-    [items]
-  );
+  const subtotal = useMemo(() => {
+    // Calculate raw sum first
+    const rawSum = items.reduce((sum, item) => sum + item.total, 0);
+    // Round once to 2 decimals to avoid Float display issues (99.99000001)
+    // Server will recalculate with Decimal precision
+    return Math.round(rawSum * 100) / 100;
+  }, [items]);
 
   // Calculate total package discounts
   const packageDiscountsTotal = useMemo(
