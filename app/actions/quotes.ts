@@ -10,6 +10,12 @@ import { validateSessionWithEmail } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
+import { Decimal } from '@prisma/client/runtime/library';
+import {
+  toDecimal,
+  calculateDiscount,
+  serializeDecimalFields
+} from '@/lib/decimal-utils';
 
 // Types pour les quotes avec relations
 type QuoteWithRelations = Quote & {
@@ -46,7 +52,7 @@ export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(quotes);
+    return successResult(serializeDecimalFields(quotes));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getQuotes", businessId },
@@ -90,7 +96,7 @@ export async function getQuote(id: string): Promise<ActionResult<QuoteWithFullRe
       return errorResult("Devis introuvable", "NOT_FOUND");
     }
 
-    return successResult(quote);
+    return successResult(serializeDecimalFields(quote));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getQuote", businessId },
@@ -152,17 +158,23 @@ async function createQuoteWithRetry(
       // Generate quote number
       const quoteNumber = await generateQuoteNumber(businessId);
 
-      // Calculate totals
-      const subtotal = items.reduce((sum, item) => sum + item.total, 0);
+      // Calculate totals with Decimal precision
+      const subtotal = items.reduce(
+        (sum, item) => sum.add(toDecimal(item.total)),
+        new Decimal(0)
+      );
 
       // Calculate discount amount based on type
       const discountType = quoteData.discountType || 'FIXED';
       const discountValue = quoteData.discount || 0;
-      const discountAmount = discountType === 'PERCENTAGE'
-        ? subtotal * (discountValue / 100)
-        : discountValue;
 
-      const total = subtotal - discountAmount;
+      const discountAmount = calculateDiscount(
+        subtotal,
+        discountType,
+        discountValue
+      );
+
+      const total = subtotal.minus(discountAmount);
 
       // Create quote with items in a transaction
       const quote = await prisma.quote.create({
@@ -244,7 +256,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<ActionResult
     });
 
     revalidatePath("/dashboard/devis");
-    return successResult(quote);
+    return successResult(serializeDecimalFields(quote));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createQuote", businessId },
@@ -373,11 +385,14 @@ export async function updateQuote(
     const { items, ...quoteData } = validation.data;
 
     // Si des items sont fournis, calculer les nouveaux totaux
-    let subtotal: number | undefined;
-    let total: number | undefined;
+    let subtotal: Decimal | undefined;
+    let total: Decimal | undefined;
 
     if (items && items.length > 0) {
-      subtotal = items.reduce((sum, item) => sum + item.total, 0);
+      subtotal = items.reduce(
+        (sum, item) => sum.add(toDecimal(item.total)),
+        new Decimal(0)
+      );
 
       // Calculate discount amount based on type
       // Use existing values as fallback if not provided in update
@@ -385,11 +400,14 @@ export async function updateQuote(
       const discountValue = quoteData.discount !== undefined
         ? quoteData.discount
         : existingQuote.discount;
-      const discountAmount = discountType === 'PERCENTAGE'
-        ? subtotal * (discountValue / 100)
-        : discountValue;
 
-      total = subtotal - discountAmount;
+      const discountAmount = calculateDiscount(
+        subtotal,
+        discountType,
+        discountValue
+      );
+
+      total = subtotal.minus(discountAmount);
     }
 
     // Mettre à jour le devis dans une transaction
@@ -455,7 +473,7 @@ export async function updateQuote(
     revalidatePath("/dashboard/devis");
     revalidatePath(`/dashboard/devis/${id}`);
 
-    return successResult(updatedQuote);
+    return successResult(serializeDecimalFields(updatedQuote));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "updateQuote", businessId },
@@ -545,11 +563,11 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
 
         revalidatePath("/dashboard/devis");
         // Retourner le quote avec les relations mis à jour
-        return successResult({
+        return successResult(serializeDecimalFields({
           ...quote,
           status: "SENT" as const,
           sentAt: new Date(),
-        });
+        }));
       }
 
       return errorResult(
@@ -646,7 +664,7 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
     });
 
     revalidatePath("/dashboard/devis");
-    return successResult(updatedQuote);
+    return successResult(serializeDecimalFields(updatedQuote));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "sendQuote", businessId },
