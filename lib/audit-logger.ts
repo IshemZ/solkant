@@ -5,8 +5,6 @@
  * @module lib/audit-logger
  */
 
-import * as Sentry from "@sentry/nextjs";
-
 /**
  * Types d'actions auditées
  */
@@ -109,8 +107,10 @@ export async function auditLog(
     });
   }
 
-  // Envoyer à Sentry pour monitoring centralisé
+  // Envoyer à Sentry pour monitoring centralisé (lazy import to avoid bundling in client components)
   try {
+    const Sentry = await import("@sentry/nextjs");
+
     Sentry.addBreadcrumb({
       type: "audit",
       category: "audit-log",

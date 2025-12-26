@@ -206,7 +206,7 @@ export default function QuoteForm({
                   ) : (
                     services.map((service) => (
                       <SelectItem key={service.id} value={service.id}>
-                        {service.name} • {Number(service.price).toFixed(2)} €
+                        {service.name} • {Number.isFinite(Number(service.price)) ? Number(service.price).toFixed(2) : '0.00'} €
                       </SelectItem>
                     ))
                   )}

@@ -26,13 +26,17 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
     setIsLoading(true);
     setError(null);
 
-    const formData = new FormData(e.currentTarget);
+    const form = e.currentTarget;
+    const formData = new FormData(form);
     const data = {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
       phone: formData.get("phone") as string,
-      address: formData.get("address") as string,
+      rue: formData.get("rue") as string,
+      complement: formData.get("complement") as string,
+      codePostal: formData.get("codePostal") as string,
+      ville: formData.get("ville") as string,
       notes: formData.get("notes") as string,
     };
 
@@ -45,7 +49,7 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
       const client = result.data;
       setClients([client, ...clients]);
       setShowForm(false);
-      e.currentTarget.reset();
+      form.reset();
       toast.success(
         `Client ${client.firstName} ${client.lastName} créé avec succès`
       );
@@ -177,17 +181,65 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
 
           <div className="mt-4">
             <label
-              htmlFor="address"
+              htmlFor="rue"
               className="block text-sm font-medium text-foreground"
             >
-              Adresse
+              Rue
             </label>
-            <textarea
-              id="address"
-              name="address"
-              rows={2}
+            <input
+              type="text"
+              id="rue"
+              name="rue"
               className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             />
+          </div>
+
+          <div className="mt-4">
+            <label
+              htmlFor="complement"
+              className="block text-sm font-medium text-foreground"
+            >
+              Complément d&apos;adresse
+            </label>
+            <input
+              type="text"
+              id="complement"
+              name="complement"
+              className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+            />
+          </div>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div>
+              <label
+                htmlFor="codePostal"
+                className="block text-sm font-medium text-foreground"
+              >
+                Code postal
+              </label>
+              <input
+                type="text"
+                id="codePostal"
+                name="codePostal"
+                maxLength={5}
+                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="ville"
+                className="block text-sm font-medium text-foreground"
+              >
+                Ville
+              </label>
+              <input
+                type="text"
+                id="ville"
+                name="ville"
+                className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/40 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
+              />
+            </div>
           </div>
 
           <div className="mt-4">

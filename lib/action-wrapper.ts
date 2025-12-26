@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
 import {
   validateSessionWithEmail,
   type ValidatedSession,
@@ -46,7 +45,8 @@ export function withAuth<TInput, TOutput>(
       // Call the wrapped handler
       return await handler(input, validatedSession);
     } catch (error) {
-      // Log to Sentry
+      // Log to Sentry (lazy import to avoid bundling in client components)
+      const Sentry = await import("@sentry/nextjs");
       Sentry.captureException(error, {
         tags: { action: actionName, businessId: validatedSession.businessId },
         extra: { input },
@@ -120,7 +120,8 @@ export function withAuthAndValidation<TInput, TOutput>(
       // Call the wrapped handler with validated input
       return await handler(validation.data, validatedSession);
     } catch (error) {
-      // Log to Sentry
+      // Log to Sentry (lazy import to avoid bundling in client components)
+      const Sentry = await import("@sentry/nextjs");
       Sentry.captureException(error, {
         tags: { action: actionName, businessId: validatedSession.businessId },
         extra: { input },

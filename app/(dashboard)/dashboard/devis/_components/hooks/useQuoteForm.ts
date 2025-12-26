@@ -16,6 +16,7 @@ import {
   calculatePackageDiscount,
   createPackageServicesDescription,
 } from "@/lib/package-utils";
+import { safeParsePrice } from "@/lib/decimal-utils";
 
 interface UseQuoteFormProps {
   mode: 'create' | 'edit';
@@ -55,14 +56,16 @@ export function useQuoteForm({
       setItems(
         initialQuote.items.map((item) => ({
           serviceId: item.serviceId || undefined,
+          packageId: item.packageId || undefined,
           name: item.name,
           description: item.description || undefined,
-          price: item.price as unknown as number,
-          quantity: item.quantity,
-          total: item.total as unknown as number,
+          price: safeParsePrice(item.price),
+          quantity: Number(item.quantity) || 1,
+          total: safeParsePrice(item.total),
+          packageDiscount: safeParsePrice((item as any).packageDiscount),
         }))
       );
-      setDiscount(initialQuote.discount as unknown as number);
+      setDiscount(Number(initialQuote.discount));
       setDiscountType(initialQuote.discountType as DiscountType);
       setNotes(initialQuote.notes || "");
     }
@@ -129,13 +132,16 @@ export function useQuoteForm({
     const service = services.find((s) => s.id === serviceId);
     if (!service) return;
 
+    const price = safeParsePrice(service.price);
+    const quantity = 1;
+
     const newItem: QuoteItemInput = {
       serviceId: service.id,
       name: service.name,
       description: service.description || undefined,
-      price: service.price,
-      quantity: 1,
-      total: service.price,
+      price,
+      quantity,
+      total: price * quantity,
     };
 
     setItems([...items, newItem]);
@@ -147,17 +153,18 @@ export function useQuoteForm({
     if (!pkg) return;
 
     // Use shared utilities for package calculations
-    const basePrice = calculatePackageBasePrice(pkg);
-    const packageDiscount = calculatePackageDiscount(pkg, basePrice);
+    const basePrice = safeParsePrice(calculatePackageBasePrice(pkg));
+    const packageDiscount = safeParsePrice(calculatePackageDiscount(pkg, basePrice));
     const servicesDescription = createPackageServicesDescription(pkg);
+    const quantity = 1;
 
     const newItem: QuoteItemInput = {
       packageId: pkg.id,
       name: pkg.name,
       description: servicesDescription,
       price: basePrice,
-      quantity: 1,
-      total: basePrice,
+      quantity,
+      total: basePrice * quantity,
       packageDiscount,
     };
 
@@ -176,11 +183,17 @@ export function useQuoteForm({
     }
 
     const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
+
+    // Ensure numeric fields are always stored as numbers, not strings
+    if (field === "price" || field === "quantity" || field === "total") {
+      newItems[index] = { ...newItems[index], [field]: Number(value) };
+    } else {
+      newItems[index] = { ...newItems[index], [field]: value };
+    }
 
     // Recalculate total for this item
     if (field === "price" || field === "quantity") {
-      newItems[index].total = newItems[index].price * newItems[index].quantity;
+      newItems[index].total = Number(newItems[index].price) * Number(newItems[index].quantity);
     }
 
     setItems(newItems);

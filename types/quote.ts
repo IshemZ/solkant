@@ -12,34 +12,55 @@ export interface QuoteItemInput {
   packageDiscount?: number;
 }
 
-// Serialized types (after Decimal conversion)
-export type SerializedService = Omit<Service, 'price'> & {
+// Serialized types (after Decimal and Date conversion)
+export type SerializedService = Omit<Service, 'price' | 'createdAt' | 'updatedAt' | 'deletedAt'> & {
   price: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
 };
 
-export type SerializedPackageItem = Omit<PackageItem, never> & {
+export type SerializedPackageItem = Omit<PackageItem, 'createdAt' | 'updatedAt'> & {
+  createdAt: string;
+  updatedAt: string;
   service: SerializedService | null;
 };
 
-export type SerializedPackage = Omit<Package, 'discountValue'> & {
+export type SerializedPackage = Omit<Package, 'discountValue' | 'createdAt' | 'updatedAt' | 'deletedAt'> & {
   discountValue: number;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
   items: SerializedPackageItem[];
 };
 
-export type SerializedQuoteItem = Omit<PrismaQuoteItem, 'price' | 'total'> & {
+export type SerializedQuoteItem = Omit<PrismaQuoteItem, 'price' | 'total' | 'packageDiscount' | 'createdAt' | 'updatedAt'> & {
   price: number;
   total: number;
+  packageDiscount: number;
+  createdAt: string;
+  updatedAt: string;
   service: SerializedService | null;
 };
 
-export type SerializedQuote = Omit<Quote, 'discount' | 'subtotal' | 'total'> & {
+export type SerializedClient = Omit<Client, 'createdAt' | 'updatedAt' | 'deletedAt' | 'lastContactDate'> & {
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+  lastContactDate: string | null;
+};
+
+export type SerializedQuote = Omit<Quote, 'discount' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'validUntil'> & {
   discount: number;
   subtotal: number;
   total: number;
+  createdAt: string;
+  updatedAt: string;
+  validUntil: string | null;
 };
 
 export type SerializedQuoteWithRelations = SerializedQuote & {
-  client: Client | null;
+  client: SerializedClient | null;
   items: SerializedQuoteItem[];
 };
 

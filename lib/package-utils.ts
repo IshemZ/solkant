@@ -1,4 +1,5 @@
 import type { SerializedPackage } from "@/types/quote";
+import { safeParsePrice } from "@/lib/decimal-utils";
 
 /**
  * Calculate the base price of a package from all its services
@@ -14,7 +15,7 @@ import type { SerializedPackage } from "@/types/quote";
  */
 export function calculatePackageBasePrice(pkg: SerializedPackage): number {
   return pkg.items.reduce((sum, item) => {
-    const price = item.service?.price || 0;
+    const price = safeParsePrice(item.service?.price);
     return sum + price * item.quantity;
   }, 0);
 }
@@ -42,7 +43,7 @@ export function calculatePackageDiscount(
   basePrice?: number
 ): number {
   const price = basePrice ?? calculatePackageBasePrice(pkg);
-  const discountValue = Number(pkg.discountValue);
+  const discountValue = safeParsePrice(pkg.discountValue);
 
   if (discountValue <= 0) {
     return 0;

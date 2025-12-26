@@ -16,6 +16,15 @@ export function toDecimal(value: number | string | Decimal): Decimal {
 }
 
 /**
+ * Parse de manière sécurisée un prix en number
+ * Retourne 0 si la valeur est invalide (NaN, null, undefined, négative)
+ */
+export function safeParsePrice(value: unknown): number {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
+}
+
+/**
  * Formate un montant Decimal en euros (ex: "123.45 €")
  */
 export function formatCurrency(amount: Decimal | number): string {
@@ -59,51 +68,50 @@ export function calculateDiscount(
 }
 
 /**
- * Sérialise récursivement les Decimal en number dans un objet
+ * Sérialise récursivement les Decimal et Date dans un objet
  * Utilisé pour les retours de Server Actions Next.js
  *
  * ## Quand utiliser serializeDecimalFields ?
  *
  * **TOUJOURS** utiliser pour les retours de Server Actions qui contiennent des modèles Prisma
- * avec des champs Decimal (price, amount, discount, etc.)
+ * avec des champs Decimal (price, amount, discount, etc.) ou Date (createdAt, updatedAt, etc.)
  *
- * ### Modèles concernés (ont des champs Decimal) :
- * - `Service` (price: Decimal)
- * - `Package` (discountValue: Decimal)
- * - `Quote` (subtotal, discount, total: Decimal)
- * - `QuoteItem` (price, total: Decimal)
- *
- * ### Modèles NON concernés (pas de Decimal) :
- * - `Client` (aucun champ Decimal)
- * - `Business` (aucun champ Decimal)
- * - `User` (aucun champ Decimal)
+ * ### Modèles concernés (ont des champs Decimal ou Date) :
+ * - `Service` (price: Decimal, createdAt/updatedAt: Date)
+ * - `Package` (discountValue: Decimal, createdAt/updatedAt: Date)
+ * - `Quote` (subtotal, discount, total: Decimal, createdAt/updatedAt/validUntil: Date)
+ * - `QuoteItem` (price, total: Decimal, createdAt/updatedAt: Date)
+ * - `Client` (createdAt/updatedAt: Date)
+ * - `Business` (createdAt/updatedAt: Date)
  *
  * ### Exemples d'utilisation :
  *
  * ```typescript
- * // ✅ CORRECT - Service a des Decimals
+ * // ✅ CORRECT - Service a des Decimals et Dates
  * export async function getServices() {
  *   const services = await prisma.service.findMany(...)
  *   return successResult(serializeDecimalFields(services))
  * }
  *
- * // ✅ CORRECT - Quote a des Decimals
+ * // ✅ CORRECT - Quote a des Decimals et Dates
  * export async function getQuote(id: string) {
  *   const quote = await prisma.quote.findUnique(...)
  *   return successResult(serializeDecimalFields(quote))
  * }
  *
- * // ❌ INUTILE - Client n'a pas de Decimals
+ * // ✅ RECOMMANDÉ - Client a des Dates
  * export async function getClients() {
  *   const clients = await prisma.client.findMany(...)
- *   return successResult(clients) // Pas besoin de serializer
+ *   return successResult(serializeDecimalFields(clients))
  * }
  * ```
  *
  * ### Pourquoi c'est nécessaire ?
  *
- * Next.js Server Actions ne peuvent pas sérialiser les objets Decimal de Prisma.
- * Cette fonction les convertit en `number` pour la transmission client/serveur.
+ * Next.js Server Actions ne peuvent pas sérialiser les objets avec méthode toJSON()
+ * (comme Decimal et Date de Prisma). Cette fonction les convertit :
+ * - Decimal → number (via toJSON())
+ * - Date → string (ISO 8601 via toJSON())
  *
  * ### Types correspondants :
  *
@@ -112,28 +120,42 @@ export function calculateDiscount(
  * - `SerializedPackage` pour Package avec discountValue: number
  *
  * @param data - Objet à sérialiser (peut être un objet, tableau, ou primitif)
- * @returns Objet sérialisé avec Decimals convertis en numbers
+ * @returns Objet sérialisé avec Decimals → number et Dates → string
  */
 export function serializeDecimalFields<T>(data: T): T {
+  // Handle null and undefined
   if (data === null || data === undefined) {
     return data;
   }
 
+  // Handle Decimal - convert to number
   if (data instanceof Decimal) {
-    return data.toNumber() as unknown as T;
+    return data.toNumber() as T;
   }
 
+  // Handle Date - convert to ISO string
+  if (data instanceof Date) {
+    return data.toISOString() as T;
+  }
+
+  // Handle arrays - recursively serialize each element
   if (Array.isArray(data)) {
-    return data.map(item => serializeDecimalFields(item)) as unknown as T;
+    return data.map(item => serializeDecimalFields(item)) as T;
   }
 
+  // Handle objects - recursively serialize each property
   if (typeof data === 'object') {
-    const result: any = {};
-    for (const key in data) {
-      result[key] = serializeDecimalFields(data[key]);
+    const result: Record<string, any> = {};
+    for (const [key, value] of Object.entries(data)) {
+      // Skip functions (like JSON.stringify does)
+      if (typeof value === 'function') {
+        continue;
+      }
+      result[key] = serializeDecimalFields(value);
     }
-    return result;
+    return result as T;
   }
 
+  // Primitives (string, number, boolean) - return as-is
   return data;
 }

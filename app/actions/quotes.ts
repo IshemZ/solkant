@@ -130,17 +130,26 @@ async function createQuoteWithRetry(
         new Decimal(0)
       );
 
-      // Calculate discount amount based on type
+      // Calculate total package discounts
+      const packageDiscountsTotal = items.reduce(
+        (sum, item) => sum.add(toDecimal(item.packageDiscount || 0)),
+        new Decimal(0)
+      );
+
+      // Calculate subtotal after package discounts
+      const subtotalAfterPackageDiscounts = subtotal.minus(packageDiscountsTotal);
+
+      // Calculate discount amount based on type (applied on subtotal AFTER package discounts)
       const discountType = quoteData.discountType || 'FIXED';
       const discountValue = quoteData.discount || 0;
 
       const discountAmount = calculateDiscount(
-        subtotal,
+        subtotalAfterPackageDiscounts,
         discountType,
         discountValue
       );
 
-      const total = subtotal.minus(discountAmount);
+      const total = subtotalAfterPackageDiscounts.minus(discountAmount);
 
       // Create quote with items in a transaction
       const quote = await prisma.quote.create({
@@ -153,11 +162,13 @@ async function createQuoteWithRetry(
           items: {
             create: items.map((item) => ({
               serviceId: item.serviceId,
+              packageId: item.packageId,
               name: item.name,
               description: item.description,
               price: item.price,
               quantity: item.quantity,
               total: item.total,
+              packageDiscount: item.packageDiscount || 0,
             })),
           },
         },
@@ -309,7 +320,16 @@ export const updateQuote = withAuthAndValidation(
         new Decimal(0)
       );
 
-      // Calculate discount amount based on type
+      // Calculate total package discounts
+      const packageDiscountsTotal = items.reduce(
+        (sum, item) => sum.add(toDecimal(item.packageDiscount || 0)),
+        new Decimal(0)
+      );
+
+      // Calculate subtotal after package discounts
+      const subtotalAfterPackageDiscounts = subtotal.minus(packageDiscountsTotal);
+
+      // Calculate discount amount based on type (applied on subtotal AFTER package discounts)
       // Use existing values as fallback if not provided in update
       const discountType = quoteData.discountType || existingQuote.discountType;
       const discountValue = quoteData.discount !== undefined
@@ -317,12 +337,12 @@ export const updateQuote = withAuthAndValidation(
         : existingQuote.discount;
 
       const discountAmount = calculateDiscount(
-        subtotal,
+        subtotalAfterPackageDiscounts,
         discountType,
         discountValue
       );
 
-      total = subtotal.minus(discountAmount);
+      total = subtotalAfterPackageDiscounts.minus(discountAmount);
     }
 
     // Mettre à jour le devis dans une transaction
@@ -349,11 +369,13 @@ export const updateQuote = withAuthAndValidation(
               items: {
                 create: items.map((item) => ({
                   serviceId: item.serviceId,
+                  packageId: item.packageId,
                   name: item.name,
                   description: item.description,
                   price: item.price,
                   quantity: item.quantity,
                   total: item.total,
+                  packageDiscount: item.packageDiscount || 0,
                 })),
               },
             }),

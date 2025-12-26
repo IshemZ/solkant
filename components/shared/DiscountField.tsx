@@ -28,8 +28,10 @@ export default function DiscountField({
   }, [value]);
 
   // Calculate the actual discount amount in euros
+  // Protect against NaN when subtotal is invalid
+  const safeSubtotal = Number.isFinite(subtotal) ? subtotal : 0;
   const discountAmount =
-    type === "PERCENTAGE" ? subtotal * (value / 100) : value;
+    type === "PERCENTAGE" ? safeSubtotal * (value / 100) : value;
 
   const handleTypeChange = (newType: DiscountType) => {
     // Reset value to 0 when switching types
@@ -49,8 +51,9 @@ export default function DiscountField({
       const validValue = Math.min(100, Math.max(0, numValue));
       onChange(validValue, type);
     } else {
-      // Max subtotal for fixed amount
-      const validValue = Math.min(subtotal, Math.max(0, numValue));
+      // Max subtotal for fixed amount (protect against NaN)
+      const maxValue = Number.isFinite(subtotal) ? subtotal : 0;
+      const validValue = Math.min(maxValue, Math.max(0, numValue));
       onChange(validValue, type);
     }
   };
@@ -90,7 +93,7 @@ export default function DiscountField({
             id="discount-value"
             type="number"
             min="0"
-            max={type === "PERCENTAGE" ? 100 : subtotal}
+            max={type === "PERCENTAGE" ? 100 : (Number.isFinite(subtotal) ? subtotal : undefined)}
             step={type === "PERCENTAGE" ? 1 : 0.01}
             value={localValue}
             onChange={handleValueChange}
@@ -111,9 +114,9 @@ export default function DiscountField({
               -{discountAmount.toFixed(2)} €
             </span>
           </div>
-          {type === "PERCENTAGE" && (
+          {type === "PERCENTAGE" && Number.isFinite(safeSubtotal) && (
             <p className="mt-1 text-xs text-muted-foreground">
-              {value}% de {subtotal.toFixed(2)} €
+              {value}% de {safeSubtotal.toFixed(2)} €
             </p>
           )}
         </div>
@@ -125,7 +128,7 @@ export default function DiscountField({
           La remise en pourcentage ne peut pas dépasser 100%
         </p>
       )}
-      {type === "FIXED" && value > subtotal && (
+      {type === "FIXED" && Number.isFinite(subtotal) && value > subtotal && (
         <p className="text-sm text-red-600">
           La remise ne peut pas dépasser le sous-total ({subtotal.toFixed(2)} €)
         </p>

@@ -13,6 +13,7 @@ import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { successResult, errorResult } from "@/lib/action-types";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 
 export const getClients = withAuth(
   async (_input: void, session) => {
@@ -21,7 +22,7 @@ export const getClients = withAuth(
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(clients);
+    return successResult(serializeDecimalFields(clients));
   },
   "getClients"
 );
@@ -52,7 +53,7 @@ export const createClient = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/clients");
-    return successResult(client);
+    return successResult(serializeDecimalFields(client));
   },
   "createClient",
   createClientSchema
@@ -73,7 +74,7 @@ export const updateClient = withAuthAndValidation(
 
     revalidatePath("/dashboard/clients");
     revalidatePath(`/dashboard/clients/${id}`);
-    return successResult(client);
+    return successResult(serializeDecimalFields(client));
   },
   "updateClient",
   updateClientSchema.extend({ id: z.string().min(1) })

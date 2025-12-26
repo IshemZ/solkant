@@ -8,7 +8,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import * as Sentry from "@sentry/nextjs";
 
 /**
  * Type retourné par validateSessionWithEmail
@@ -75,6 +74,8 @@ export async function validateSessionWithEmail(): Promise<
       });
 
       if (!user?.business?.id) {
+        // Lazy import Sentry to avoid bundling in client components
+        const Sentry = await import("@sentry/nextjs");
         Sentry.captureMessage("User sans businessId détecté", {
           level: "error",
           tags: { action: "validateSessionWithEmail" },
@@ -95,7 +96,8 @@ export async function validateSessionWithEmail(): Promise<
         };
       }
 
-      // Ajouter contexte Sentry
+      // Ajouter contexte Sentry (lazy import)
+      const Sentry = await import("@sentry/nextjs");
       Sentry.setContext("user", {
         userId: session.user.id,
         businessId: user.business.id,
@@ -130,7 +132,8 @@ export async function validateSessionWithEmail(): Promise<
       };
     }
 
-    // 4. Tout est OK - ajouter contexte Sentry pour traçabilité
+    // 4. Tout est OK - ajouter contexte Sentry pour traçabilité (lazy import)
+    const Sentry = await import("@sentry/nextjs");
     Sentry.setContext("user", {
       userId: session.user.id,
       businessId: session.user.businessId,
@@ -143,7 +146,8 @@ export async function validateSessionWithEmail(): Promise<
       businessId: session.user.businessId,
     };
   } catch (error) {
-    // Logger l'erreur dans Sentry
+    // Logger l'erreur dans Sentry (lazy import)
+    const Sentry = await import("@sentry/nextjs");
     Sentry.captureException(error, {
       tags: { action: "validateSessionWithEmail" },
     });
@@ -178,6 +182,8 @@ export async function validateSession(): Promise<ValidatedSession | AuthError> {
       };
     }
 
+    // Lazy import Sentry to avoid bundling in client components
+    const Sentry = await import("@sentry/nextjs");
     Sentry.setContext("user", {
       userId: session.user.id,
       businessId: session.user.businessId,
@@ -190,6 +196,8 @@ export async function validateSession(): Promise<ValidatedSession | AuthError> {
       businessId: session.user.businessId,
     };
   } catch (error) {
+    // Lazy import Sentry to avoid bundling in client components
+    const Sentry = await import("@sentry/nextjs");
     Sentry.captureException(error, {
       tags: { action: "validateSession" },
     });
