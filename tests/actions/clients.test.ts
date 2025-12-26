@@ -69,6 +69,10 @@ describe("Client Server Actions", () => {
           businessId: "business_123",
           createdAt: new Date(),
           updatedAt: new Date(),
+          codePostal: null,
+          complement: null,
+          rue: null,
+          ville: null,
         },
       ]);
 
@@ -137,7 +141,7 @@ describe("Client Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la récupération des clients");
+        expect(result.error).toBe("Erreur lors de getClients");
       }
     });
   });
@@ -162,6 +166,10 @@ describe("Client Server Actions", () => {
         businessId: "business_123",
         createdAt: new Date(),
         updatedAt: new Date(),
+        codePostal: null,
+        complement: null,
+        rue: null,
+        ville: null,
       };
 
       vi.mocked(prisma.client.create).mockResolvedValue(createdClient);
@@ -235,6 +243,10 @@ describe("Client Server Actions", () => {
         businessId: "business_123",
         createdAt: new Date(),
         updatedAt: new Date(),
+        codePostal: null,
+        complement: null,
+        rue: null,
+        ville: null,
       });
 
       vi.mocked(prisma.client.delete).mockResolvedValue({
@@ -248,9 +260,13 @@ describe("Client Server Actions", () => {
         businessId: "business_123",
         createdAt: new Date(),
         updatedAt: new Date(),
+        codePostal: null,
+        complement: null,
+        rue: null,
+        ville: null,
       });
 
-      await deleteClient("client_123");
+      await deleteClient({ id: "client_123" });
 
       // ✅ CRITIQUE: Vérifier filtrage businessId dans findFirst
       expect(prisma.client.findFirst).toHaveBeenCalledWith({
@@ -277,7 +293,7 @@ describe("Client Server Actions", () => {
       // Mock findFirst retourne null (client inexistant ou autre business)
       vi.mocked(prisma.client.findFirst).mockResolvedValue(null);
 
-      const result = await deleteClient("client_other");
+      const result = await deleteClient({ id: "client_other" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
