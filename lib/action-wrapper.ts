@@ -4,7 +4,7 @@ import {
   type ValidatedSession,
 } from "@/lib/auth-helpers";
 import { errorResult, type ActionResult } from "@/lib/action-types";
-import { type ZodSchema } from "zod";
+import { type ZodType } from "zod";
 import { formatZodFieldErrors } from "@/lib/validations/helpers";
 
 /**
@@ -12,6 +12,7 @@ import { formatZodFieldErrors } from "@/lib/validations/helpers";
  *
  * @param handler - The server action handler function that receives input and validated session
  * @param actionName - Name of the action for error logging and messages
+ * @param errorMessage - Optional custom error message (defaults to "Erreur lors de {actionName}")
  * @returns Wrapped function that handles auth, errors, and Sentry logging
  *
  * @example
@@ -22,7 +23,8 @@ import { formatZodFieldErrors } from "@/lib/validations/helpers";
  *     });
  *     return successResult({ id: input.id });
  *   },
- *   "deleteClient"
+ *   "deleteClient",
+ *   "Erreur lors de la suppression du client"
  * );
  */
 export function withAuth<TInput, TOutput>(
@@ -30,7 +32,8 @@ export function withAuth<TInput, TOutput>(
     input: TInput,
     session: ValidatedSession
   ) => Promise<ActionResult<TOutput>>,
-  actionName: string
+  actionName: string,
+  errorMessage?: string
 ) {
   return async (input: TInput): Promise<ActionResult<TOutput>> => {
     // Validate session
@@ -54,7 +57,7 @@ export function withAuth<TInput, TOutput>(
         console.error(`Error in ${actionName}:`, error);
       }
 
-      return errorResult(`Erreur lors de ${actionName}`);
+      return errorResult(errorMessage || `Erreur lors de ${actionName}`);
     }
   };
 }
@@ -66,6 +69,7 @@ export function withAuth<TInput, TOutput>(
  * @param handler - The server action handler function
  * @param actionName - Name of the action for error logging
  * @param schema - Zod schema for input validation
+ * @param errorMessage - Optional custom error message (defaults to "Erreur lors de {actionName}")
  * @returns Wrapped function with auth, validation, and error handling
  *
  * @example
@@ -82,7 +86,8 @@ export function withAuth<TInput, TOutput>(
  *     return successResult(client);
  *   },
  *   "createClient",
- *   createClientSchema
+ *   createClientSchema,
+ *   "Erreur lors de la création du client"
  * );
  */
 export function withAuthAndValidation<TInput, TOutput>(
@@ -91,7 +96,8 @@ export function withAuthAndValidation<TInput, TOutput>(
     session: ValidatedSession
   ) => Promise<ActionResult<TOutput>>,
   actionName: string,
-  schema: ZodSchema<TInput>
+  schema: ZodType<TInput>,
+  errorMessage?: string
 ) {
   return async (input: unknown): Promise<ActionResult<TOutput>> => {
     // Validate session
@@ -125,7 +131,7 @@ export function withAuthAndValidation<TInput, TOutput>(
         console.error(`Error in ${actionName}:`, error);
       }
 
-      return errorResult(`Erreur lors de ${actionName}`);
+      return errorResult(errorMessage || `Erreur lors de ${actionName}`);
     }
   };
 }
