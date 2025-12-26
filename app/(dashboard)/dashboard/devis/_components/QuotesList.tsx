@@ -33,7 +33,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
   async function confirmDelete() {
     if (!quoteToDelete) return;
 
-    const result = await deleteQuote(quoteToDelete);
+    const result = await deleteQuote({ id: quoteToDelete });
     if (result.success) {
       setQuotes(quotes.filter((q) => q.id !== quoteToDelete));
       toast.success("Devis supprimé avec succès");

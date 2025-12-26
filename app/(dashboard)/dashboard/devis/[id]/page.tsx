@@ -12,7 +12,7 @@ export async function generateMetadata({
   params,
 }: QuotePageProps): Promise<Metadata> {
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success) {
     return {
@@ -38,7 +38,7 @@ export async function generateMetadata({
 
 export default async function QuotePage({ params }: QuotePageProps) {
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success) {
     redirect("/dashboard/devis");

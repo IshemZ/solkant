@@ -223,7 +223,7 @@ export function useQuoteForm({
     // Call appropriate action
     const result = mode === 'create'
       ? await createQuote(quoteData)
-      : await updateQuote(initialQuote!.id, quoteData);
+      : await updateQuote({ ...quoteData, id: initialQuote!.id });
 
     if (!result.success) {
       setError(result.error);

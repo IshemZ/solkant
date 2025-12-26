@@ -4,9 +4,7 @@ import prisma from "@/lib/prisma";
 import { createQuoteSchema, updateQuoteSchema, type CreateQuoteInput, type UpdateQuoteInput } from "@/lib/validations";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
-import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { validateSessionWithEmail } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
@@ -16,6 +14,8 @@ import {
   calculateDiscount,
   serializeDecimalFields
 } from '@/lib/decimal-utils';
+import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
+import { z } from "zod";
 
 // Types pour les quotes avec relations
 type QuoteWithRelations = Quote & {
@@ -29,18 +29,10 @@ type QuoteWithFullRelations = Quote & {
   items: (QuoteItem & { service: Service | null })[];
 };
 
-export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
-  const validatedSession = await validateSessionWithEmail();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
+export const getQuotes = withAuth(
+  async (_input: void, session): Promise<ActionResult<QuoteWithRelations[]>> => {
     const quotes = await prisma.quote.findMany({
-      where: { businessId },
+      where: { businessId: session.businessId },
       include: {
         client: true,
         items: {
@@ -53,33 +45,16 @@ export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
     });
 
     return successResult(serializeDecimalFields(quotes));
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getQuotes", businessId },
-    });
+  },
+  "getQuotes"
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching quotes:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération des devis");
-  }
-}
-
-export async function getQuote(id: string): Promise<ActionResult<QuoteWithFullRelations>> {
-  const validatedSession = await validateSessionWithEmail();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
+export const getQuote = withAuth(
+  async (input: { id: string }, session): Promise<ActionResult<QuoteWithFullRelations>> => {
     const quote = await prisma.quote.findFirst({
       where: {
-        id,
-        businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
       include: {
         client: true,
@@ -97,19 +72,9 @@ export async function getQuote(id: string): Promise<ActionResult<QuoteWithFullRe
     }
 
     return successResult(serializeDecimalFields(quote));
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getQuote", businessId },
-      extra: { quoteId: id },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching quote:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération du devis");
-  }
-}
+  },
+  "getQuote"
+);
 
 async function generateQuoteNumber(businessId: string): Promise<string> {
   const year = new Date().getFullYear();
@@ -219,33 +184,20 @@ async function createQuoteWithRetry(
   throw new Error("Failed to create quote after maximum retries");
 }
 
-export async function createQuote(input: CreateQuoteInput): Promise<ActionResult<QuoteWithRelations>> {
-  const validatedSession = await validateSessionWithEmail();
+export const createQuote = withAuthAndValidation(
+  async (input: CreateQuoteInput, session): Promise<ActionResult<QuoteWithRelations>> => {
+    // Sanitize input
+    const sanitized = sanitizeObject(input);
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = createQuoteSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     // Use retry logic to handle race conditions
-    const quote = await createQuoteWithRetry(validation.data, businessId);
+    const quote = await createQuoteWithRetry(sanitized, session.businessId);
 
     // Log d'audit pour traçabilité
     await auditLog({
       action: AuditAction.QUOTE_CREATED,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: quote.id,
       resourceType: "Quote",
       metadata: {
@@ -257,35 +209,18 @@ export async function createQuote(input: CreateQuoteInput): Promise<ActionResult
 
     revalidatePath("/dashboard/devis");
     return successResult(serializeDecimalFields(quote));
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "createQuote", businessId },
-      extra: { input },
-    });
+  },
+  "createQuote",
+  createQuoteSchema
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error creating quote:", error);
-    }
-
-    return errorResult("Erreur lors de la création du devis");
-  }
-}
-
-export async function deleteQuote(id: string): Promise<ActionResult<void>> {
-  const validatedSession = await validateSessionWithEmail();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  try {
+export const deleteQuote = withAuth(
+  async (input: { id: string }, session): Promise<ActionResult<void>> => {
     // Récupérer les infos du devis avant suppression pour l'audit
     const quote = await prisma.quote.findFirst({
       where: {
-        id,
-        businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
       select: { quoteNumber: true, clientId: true, total: true },
     });
@@ -296,8 +231,8 @@ export async function deleteQuote(id: string): Promise<ActionResult<void>> {
 
     await prisma.quote.delete({
       where: {
-        id,
-        businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
     });
 
@@ -305,9 +240,9 @@ export async function deleteQuote(id: string): Promise<ActionResult<void>> {
     await auditLog({
       action: AuditAction.QUOTE_DELETED,
       level: AuditLevel.CRITICAL,
-      userId,
-      businessId,
-      resourceId: id,
+      userId: session.userId,
+      businessId: session.businessId,
+      resourceId: input.id,
       resourceType: "Quote",
       metadata: {
         quoteNumber: quote.quoteNumber,
@@ -318,50 +253,29 @@ export async function deleteQuote(id: string): Promise<ActionResult<void>> {
 
     revalidatePath("/dashboard/devis");
     return successResult(undefined);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "deleteQuote", businessId },
-      extra: { quoteId: id },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error deleting quote:", error);
-    }
-
-    return errorResult("Erreur lors de la suppression du devis");
-  }
-}
+  },
+  "deleteQuote"
+);
 
 /**
  * Met à jour un devis existant
  * IMPORTANT : Seuls les devis avec le statut DRAFT peuvent être modifiés
  */
-export async function updateQuote(
-  id: string,
-  input: UpdateQuoteInput
-): Promise<ActionResult<QuoteWithRelations>> {
-  const validatedSession = await validateSessionWithEmail();
+const updateQuoteWithIdSchema = z.intersection(
+  updateQuoteSchema,
+  z.object({ id: z.string().min(1) })
+);
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
+export const updateQuote = withAuthAndValidation(
+  async (input: UpdateQuoteInput & { id: string }, session): Promise<ActionResult<QuoteWithRelations>> => {
+    // Sanitize input
+    const sanitized = sanitizeObject(input);
 
-  const { businessId, userId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = updateQuoteSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     // Vérifier que le devis existe et est en statut DRAFT
     const existingQuote = await prisma.quote.findFirst({
       where: {
-        id,
-        businessId,
+        id: sanitized.id,
+        businessId: session.businessId,
       },
       select: {
         status: true,
@@ -382,7 +296,7 @@ export async function updateQuote(
       );
     }
 
-    const { items, ...quoteData } = validation.data;
+    const { id, items, ...quoteData } = sanitized;
 
     // Si des items sont fournis, calculer les nouveaux totaux
     let subtotal: Decimal | undefined;
@@ -423,7 +337,7 @@ export async function updateQuote(
       const quote = await tx.quote.update({
         where: {
           id,
-          businessId,
+          businessId: session.businessId,
         },
         data: {
           ...quoteData,
@@ -460,8 +374,8 @@ export async function updateQuote(
     await auditLog({
       action: AuditAction.QUOTE_UPDATED,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: id,
       resourceType: "Quote",
       metadata: {
@@ -474,39 +388,25 @@ export async function updateQuote(
     revalidatePath(`/dashboard/devis/${id}`);
 
     return successResult(serializeDecimalFields(updatedQuote));
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "updateQuote", businessId },
-      extra: { quoteId: id, input },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error updating quote:", error);
-    }
-
-    return errorResult("Erreur lors de la mise à jour du devis");
-  }
-}
+  },
+  "updateQuote",
+  updateQuoteWithIdSchema
+);
 
 /**
  * Envoie un devis par email au client
  * Met à jour le statut à SENT et enregistre la date d'envoi
  */
-export async function sendQuote(id: string): Promise<ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>> {
-  const validatedSession = await validateSessionWithEmail();
+export const sendQuote = withAuth(
+  async (input: { id: string }, session): Promise<ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>> => {
+    // Import Sentry for email-specific error handling
+    const Sentry = await import("@sentry/nextjs");
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { userId, businessId } = validatedSession;
-
-  try {
     // Récupérer le devis complet avec toutes les relations
     const quote = await prisma.quote.findFirst({
       where: {
-        id,
-        businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
       include: {
         client: true,
@@ -540,7 +440,7 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
 
         // Mettre à jour le devis même en mode simulation
         await prisma.quote.update({
-          where: { id },
+          where: { id: input.id },
           data: {
             status: "SENT",
             sentAt: new Date(),
@@ -550,9 +450,9 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
         await auditLog({
           action: AuditAction.QUOTE_SENT,
           level: AuditLevel.INFO,
-          userId,
-          businessId,
-          resourceId: id,
+          userId: session.userId,
+          businessId: session.businessId,
+          resourceId: input.id,
           resourceType: "Quote",
           metadata: {
             quoteNumber: quote.quoteNumber,
@@ -625,8 +525,8 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
 
     if (emailError) {
       Sentry.captureException(emailError, {
-        tags: { action: "sendQuote", businessId },
-        extra: { quoteId: id, clientEmail: quote.client.email },
+        tags: { action: "sendQuote", businessId: session.businessId },
+        extra: { quoteId: input.id, clientEmail: quote.client.email },
       });
 
       return errorResult(
@@ -637,7 +537,7 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
 
     // Mettre à jour le devis avec le statut SENT et la date d'envoi
     const updatedQuote = await prisma.quote.update({
-      where: { id },
+      where: { id: input.id },
       data: {
         status: "SENT",
         sentAt: new Date(),
@@ -652,9 +552,9 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
     await auditLog({
       action: AuditAction.QUOTE_SENT,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
-      resourceId: id,
+      userId: session.userId,
+      businessId: session.businessId,
+      resourceId: input.id,
       resourceType: "Quote",
       metadata: {
         quoteNumber: quote.quoteNumber,
@@ -665,16 +565,6 @@ export async function sendQuote(id: string): Promise<ActionResult<Quote & { clie
 
     revalidatePath("/dashboard/devis");
     return successResult(serializeDecimalFields(updatedQuote));
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "sendQuote", businessId },
-      extra: { quoteId: id },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error sending quote:", error);
-    }
-
-    return errorResult("Erreur lors de l'envoi du devis");
-  }
-}
+  },
+  "sendQuote"
+);

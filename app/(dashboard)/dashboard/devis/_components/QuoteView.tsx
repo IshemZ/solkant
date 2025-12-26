@@ -99,7 +99,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
   }
 
   async function handleDelete() {
-    const result = await deleteQuote(quote.id);
+    const result = await deleteQuote({ id: quote.id });
     if (result.success) {
       toast.success("Devis supprimé avec succès");
       router.push("/dashboard/devis");
