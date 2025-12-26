@@ -1,6 +1,5 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { Decimal } from '@prisma/client/runtime/library';
-import type { Quote, QuoteItem, Package } from '@prisma/client';
 
 // Mock Prisma client
 vi.mock('@/lib/prisma', () => ({
@@ -13,53 +12,8 @@ vi.mock('@/lib/prisma', () => ({
   }
 }));
 
-type QuoteWithRelations = Quote & {
-  items: Array<QuoteItem & {
-    package: Package | null;
-  }>;
-};
-
-// Import the calculation function (will be exported from script)
-function calculateQuoteTotals(quote: QuoteWithRelations) {
-  // Calculate subtotal
-  const subtotal = quote.items.reduce(
-    (sum, item) => sum.add(new Decimal(item.total)),
-    new Decimal(0)
-  );
-
-  // Calculate package discounts
-  const packageDiscountsTotal = quote.items.reduce((sum, item) => {
-    if (!item.packageId || !item.package) return sum;
-
-    const basePrice = new Decimal(item.price);
-    let discount = new Decimal(0);
-
-    if (item.package.discountType === 'PERCENTAGE') {
-      discount = basePrice.times(item.package.discountValue).div(100);
-    } else if (item.package.discountType === 'FIXED') {
-      discount = new Decimal(item.package.discountValue);
-    }
-
-    return sum.add(discount);
-  }, new Decimal(0));
-
-  // Subtotal after package discounts
-  const subtotalAfterPackageDiscounts = subtotal.minus(packageDiscountsTotal);
-
-  // Calculate global discount
-  const discountValue = new Decimal(quote.discount);
-  const discountAmount = quote.discountType === 'PERCENTAGE'
-    ? subtotalAfterPackageDiscounts.times(discountValue).div(100)
-    : discountValue;
-
-  // Final total
-  const total = subtotalAfterPackageDiscounts.minus(discountAmount);
-
-  return {
-    newSubtotal: subtotal,
-    newTotal: total
-  };
-}
+// Import the actual calculation function from the script
+import { calculateQuoteTotals } from '../../scripts/recalculate-quote-totals';
 
 describe('calculateQuoteTotals', () => {
   it('should calculate simple quote without discounts', () => {

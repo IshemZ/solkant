@@ -1,7 +1,5 @@
-import { PrismaClient } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma';
 
 type QuoteWithRelations = {
   id: string;
@@ -23,7 +21,7 @@ type QuoteWithRelations = {
 /**
  * Calcule les totaux d'un quote avec précision Decimal
  */
-function calculateQuoteTotals(quote: QuoteWithRelations) {
+export function calculateQuoteTotals(quote: QuoteWithRelations) {
   // 1. Calculer subtotal des items
   const subtotal = quote.items.reduce(
     (sum, item) => sum.add(new Decimal(item.total)),
@@ -40,7 +38,9 @@ function calculateQuoteTotals(quote: QuoteWithRelations) {
     if (item.package.discountType === 'PERCENTAGE') {
       discount = basePrice.times(item.package.discountValue).div(100);
     } else if (item.package.discountType === 'FIXED') {
-      discount = new Decimal(item.package.discountValue);
+      const fixedDiscount = new Decimal(item.package.discountValue);
+      // Ensure FIXED discount cannot exceed item price
+      discount = fixedDiscount.greaterThan(basePrice) ? basePrice : fixedDiscount;
     }
 
     return sum.add(discount);
@@ -51,9 +51,15 @@ function calculateQuoteTotals(quote: QuoteWithRelations) {
 
   // 4. Calculer remise globale
   const discountValue = new Decimal(quote.discount);
-  const discountAmount = quote.discountType === 'PERCENTAGE'
-    ? subtotalAfterPackageDiscounts.times(discountValue).div(100)
-    : discountValue;
+  let discountAmount: Decimal;
+  if (quote.discountType === 'PERCENTAGE') {
+    discountAmount = subtotalAfterPackageDiscounts.times(discountValue).div(100);
+  } else {
+    // Ensure FIXED discount cannot exceed subtotal
+    discountAmount = discountValue.greaterThan(subtotalAfterPackageDiscounts)
+      ? subtotalAfterPackageDiscounts
+      : discountValue;
+  }
 
   // 5. Total final
   const total = subtotalAfterPackageDiscounts.minus(discountAmount);
@@ -67,7 +73,10 @@ function calculateQuoteTotals(quote: QuoteWithRelations) {
 /**
  * Recalcule tous les quotes existants
  */
-async function recalculateQuoteTotals() {
+async function recalculateQuoteTotals(dryRun = false) {
+  if (dryRun) {
+    console.log('🔍 MODE DRY-RUN : Aucune modification ne sera appliquée\n');
+  }
   console.log('🔄 Début du recalcul des totaux de quotes...\n');
 
   const quotes = await prisma.quote.findMany({
@@ -93,13 +102,15 @@ async function recalculateQuoteTotals() {
     const delta = newTotal.minus(new Decimal(quote.total)).abs();
 
     if (!delta.isZero()) {
-      await prisma.quote.update({
-        where: { id: quote.id },
-        data: {
-          subtotal: newSubtotal,
-          total: newTotal
-        }
-      });
+      if (!dryRun) {
+        await prisma.quote.update({
+          where: { id: quote.id },
+          data: {
+            subtotal: newSubtotal,
+            total: newTotal
+          }
+        });
+      }
 
       updatedCount++;
       totalDelta = totalDelta.plus(delta);
@@ -110,10 +121,10 @@ async function recalculateQuoteTotals() {
     }
   }
 
-  console.log('\n✅ Migration terminée\n');
+  console.log(dryRun ? '\n✅ Analyse terminée (DRY-RUN)\n' : '\n✅ Migration terminée\n');
   console.log('📈 Statistiques :');
   console.log(`   • Quotes traités : ${quotes.length}`);
-  console.log(`   • Quotes mis à jour : ${updatedCount}`);
+  console.log(`   • Quotes ${dryRun ? 'à mettre à jour' : 'mis à jour'} : ${updatedCount}`);
   console.log(`   • Quotes inchangés : ${quotes.length - updatedCount}`);
 
   if (updatedCount > 0) {
@@ -125,7 +136,12 @@ async function recalculateQuoteTotals() {
   await prisma.$disconnect();
 }
 
-recalculateQuoteTotals().catch((error) => {
-  console.error('❌ Erreur lors du recalcul :', error);
-  process.exit(1);
-});
+// Only run if this file is executed directly (not imported as module)
+if (require.main === module) {
+  const dryRun = process.argv.includes('--dry-run');
+
+  recalculateQuoteTotals(dryRun).catch((error) => {
+    console.error('❌ Erreur lors du recalcul :', error);
+    process.exit(1);
+  });
+}
