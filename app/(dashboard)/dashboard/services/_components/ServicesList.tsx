@@ -26,7 +26,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
   async function confirmDelete() {
     if (!serviceToDelete) return;
 
-    const result = await deleteService(serviceToDelete);
+    const result = await deleteService({ id: serviceToDelete });
     if (result.success) {
       setServices(services.filter((s) => s.id !== serviceToDelete));
       toast.success("Service archivé avec succès");

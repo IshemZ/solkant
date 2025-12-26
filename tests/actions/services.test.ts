@@ -143,7 +143,7 @@ describe("Service Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la récupération des services");
+        expect(result.error).toBe("Erreur lors de getServices");
       }
     });
   });
@@ -281,7 +281,7 @@ describe("Service Server Actions", () => {
 
       vi.mocked(prisma.service.update).mockResolvedValue(updatedService);
 
-      const result = await updateService("service_1", updateData);
+      const result = await updateService({ id: "service_1", ...updateData });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -323,7 +323,7 @@ describe("Service Server Actions", () => {
 
       vi.mocked(prisma.service.update).mockResolvedValue(updatedService);
 
-      const result = await updateService("service_1", partialUpdate);
+      const result = await updateService({ id: "service_1", ...partialUpdate });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -342,7 +342,8 @@ describe("Service Server Actions", () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
-      const result = await updateService("service_1", {
+      const result = await updateService({
+        id: "service_1",
         price: -50, // Prix négatif
       });
 
@@ -360,11 +361,11 @@ describe("Service Server Actions", () => {
         new Error("Record not found")
       );
 
-      const result = await updateService("service_other", { name: "Test" });
+      const result = await updateService({ id: "service_other", name: "Test" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la mise à jour du service");
+        expect(result.error).toBe("Erreur lors de updateService");
       }
     });
   });
@@ -401,7 +402,7 @@ describe("Service Server Actions", () => {
         updatedAt: new Date(),
       });
 
-      await deleteService("service_123");
+      await deleteService({ id: "service_123" });
 
       // ✅ CRITIQUE: Vérifier filtrage businessId dans findFirst
       expect(prisma.service.findFirst).toHaveBeenCalledWith({
@@ -428,7 +429,7 @@ describe("Service Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await deleteService("service_123");
+      const result = await deleteService({ id: "service_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -444,7 +445,7 @@ describe("Service Server Actions", () => {
       // Mock findFirst retourne null (service inexistant ou autre business)
       vi.mocked(prisma.service.findFirst).mockResolvedValue(null);
 
-      const result = await deleteService("service_other");
+      const result = await deleteService({ id: "service_other" });
 
       expect(result.success).toBe(false);
       if (!result.success) {

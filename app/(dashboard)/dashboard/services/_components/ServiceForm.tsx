@@ -72,7 +72,7 @@ export default function ServiceForm({
       // Donc data.isActive sera toujours défini après résolution
       const result =
         isEdit && service
-          ? await updateService(service.id, data as CreateServiceInput)
+          ? await updateService({ id: service.id, ...(data as CreateServiceInput) })
           : await createService(data as CreateServiceInput);
 
       if (!result.success) {
