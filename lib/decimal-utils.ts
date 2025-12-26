@@ -54,7 +54,8 @@ export function calculateDiscount(
     return base.times(discount).div(100);
   }
 
-  return discount; // FIXED
+  // Ensure FIXED discount cannot exceed subtotal
+  return discount.greaterThan(base) ? base : discount;
 }
 
 /**

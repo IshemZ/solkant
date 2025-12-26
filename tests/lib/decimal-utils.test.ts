@@ -104,6 +104,11 @@ describe('decimal-utils', () => {
       );
       expect(result.toNumber()).toBe(10);
     });
+
+    it('should cap FIXED discount at subtotal', () => {
+      const result = calculateDiscount(50, 'FIXED', 100);
+      expect(result.toNumber()).toBe(50); // Should cap at subtotal
+    });
   });
 
   describe('serializeDecimalFields', () => {
