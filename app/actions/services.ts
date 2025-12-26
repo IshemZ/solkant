@@ -14,6 +14,7 @@ import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { validateSessionWithEmail } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Service } from "@prisma/client";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 
 export async function getServices(): Promise<ActionResult<Service[]>> {
   const validatedSession = await validateSessionWithEmail();
@@ -33,7 +34,7 @@ export async function getServices(): Promise<ActionResult<Service[]>> {
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(services);
+    return successResult(serializeDecimalFields(services));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "getServices", businessId },
@@ -87,7 +88,7 @@ export async function createService(input: CreateServiceInput): Promise<ActionRe
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(service);
+    return successResult(serializeDecimalFields(service));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "createService", businessId },
@@ -129,7 +130,7 @@ export async function updateService(id: string, input: UpdateServiceInput): Prom
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(service);
+    return successResult(serializeDecimalFields(service));
   } catch (error) {
     Sentry.captureException(error, {
       tags: { action: "updateService", businessId },
