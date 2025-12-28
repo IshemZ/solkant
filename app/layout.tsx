@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Toaster } from "sonner";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
@@ -173,6 +174,7 @@ export default function RootLayout({
             <CookieBanner />
           </AnalyticsProvider>
         </SessionProvider>
+        <SpeedInsights />
       </body>
     </html>
   );
