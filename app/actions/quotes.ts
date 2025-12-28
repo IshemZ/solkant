@@ -6,7 +6,7 @@ import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { validateSession } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
@@ -24,7 +24,7 @@ type QuoteWithFullRelations = Quote & {
 };
 
 export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -61,7 +61,7 @@ export async function getQuotes(): Promise<ActionResult<QuoteWithRelations[]>> {
 }
 
 export async function getQuote(id: string): Promise<ActionResult<QuoteWithFullRelations>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -208,7 +208,7 @@ async function createQuoteWithRetry(
 }
 
 export async function createQuote(input: CreateQuoteInput): Promise<ActionResult<QuoteWithRelations>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -260,7 +260,7 @@ export async function createQuote(input: CreateQuoteInput): Promise<ActionResult
 }
 
 export async function deleteQuote(id: string): Promise<ActionResult<void>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -328,7 +328,7 @@ export async function updateQuote(
   id: string,
   input: UpdateQuoteInput
 ): Promise<ActionResult<QuoteWithRelations>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -475,7 +475,7 @@ export async function updateQuote(
  * Met à jour le statut à SENT et enregistre la date d'envoi
  */
 export async function sendQuote(id: string): Promise<ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);

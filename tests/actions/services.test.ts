@@ -114,19 +114,13 @@ describe("Service Server Actions", () => {
         },
       });
 
-      // Mock fallback: user sans business
-      vi.mocked(prisma.user.findUnique).mockResolvedValue({
-        ...mockUser,
-        business: null,
-      } as any);
-
       const result = await getServices();
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
+        expect(result.error).toBe("Non autorisé");
         if ("code" in result && result.code) {
-          expect(result.code).toBe("NO_BUSINESS");
+          expect(result.code).toBe("UNAUTHORIZED");
         }
       }
       expect(prisma.service.findMany).not.toHaveBeenCalled();

@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import DashboardNav from "./dashboard/_components/DashboardNav";
 import { SkipLink } from "@/components/shared/SkipLink";
-import prisma from "@/lib/prisma";
 
 /**
  * Force Dynamic Rendering pour toutes les routes dashboard
@@ -36,22 +35,6 @@ export default async function DashboardLayout({
 
   if (!session) {
     redirect("/login");
-  }
-
-  // ✅ SÉCURITÉ: Vérifier que l'email est vérifié
-  // Les utilisateurs OAuth (Google) ont emailVerified automatiquement
-  // Les utilisateurs credentials DOIVENT vérifier leur email
-  const user = await prisma.user.findUnique({
-    where: { email: session.user?.email || "" },
-    select: {
-      emailVerified: true,
-      email: true,
-    },
-  });
-
-  // Si l'utilisateur n'existe pas ou n'a pas vérifié son email, bloquer l'accès
-  if (!user || !user.emailVerified) {
-    redirect("/login?error=email_not_verified");
   }
 
   return (

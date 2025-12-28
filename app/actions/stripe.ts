@@ -4,7 +4,7 @@ import { stripe, STRIPE_PRICE_ID_PRO } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import * as Sentry from "@sentry/nextjs";
-import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { validateSession } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 
 // Types pour les résultats Stripe
@@ -20,7 +20,7 @@ type CustomerPortalResult = { url: string };
 export async function createCheckoutSession(): Promise<ActionResult<CheckoutSessionResult>> {
   try {
     // 1. Vérifier l'authentification ET email vérifié
-    const validatedSession = await validateSessionWithEmail();
+    const validatedSession = await validateSession();
 
     if ("error" in validatedSession) {
       return errorResult(validatedSession.error);
@@ -109,7 +109,7 @@ export async function createCheckoutSession(): Promise<ActionResult<CheckoutSess
 
 export async function getSubscriptionStatus(): Promise<ActionResult<SubscriptionStatus>> {
   try {
-    const validatedSession = await validateSessionWithEmail();
+    const validatedSession = await validateSession();
 
     if ("error" in validatedSession) {
       return errorResult(validatedSession.error);
@@ -175,7 +175,7 @@ export async function getSubscriptionStatus(): Promise<ActionResult<Subscription
 
 export async function createCustomerPortalSession(): Promise<ActionResult<CustomerPortalResult>> {
   try {
-    const validatedSession = await validateSessionWithEmail();
+    const validatedSession = await validateSession();
 
     if ("error" in validatedSession) {
       return errorResult(validatedSession.error);

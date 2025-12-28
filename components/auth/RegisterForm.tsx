@@ -82,9 +82,9 @@ function RegisterFormContent() {
         });
       }
 
-      // ✅ NOUVEAU FLOW: Rediriger vers la page de vérification email
-      // L'utilisateur doit vérifier son email avant de pouvoir se connecter
-      router.push("/check-email");
+      // Rediriger vers la page de connexion
+      // L'utilisateur peut maintenant se connecter directement sans vérifier son email
+      router.push("/login?registered=success");
       router.refresh();
     } catch (err) {
       const errorMessage = "Une erreur est survenue. Veuillez réessayer.";

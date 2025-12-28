@@ -11,12 +11,12 @@ import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { validateSession } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Service } from "@prisma/client";
 
 export async function getServices(): Promise<ActionResult<Service[]>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -48,7 +48,7 @@ export async function getServices(): Promise<ActionResult<Service[]>> {
 }
 
 export async function createService(input: CreateServiceInput): Promise<ActionResult<Service>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -103,7 +103,7 @@ export async function createService(input: CreateServiceInput): Promise<ActionRe
 }
 
 export async function updateService(id: string, input: UpdateServiceInput): Promise<ActionResult<Service>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -145,7 +145,7 @@ export async function updateService(id: string, input: UpdateServiceInput): Prom
 }
 
 export async function deleteService(id: string): Promise<ActionResult<void>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);

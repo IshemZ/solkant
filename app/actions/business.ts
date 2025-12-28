@@ -8,12 +8,12 @@ import {
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import * as Sentry from "@sentry/nextjs";
-import { validateSessionWithEmail } from "@/lib/auth-helpers";
+import { validateSession } from "@/lib/auth-helpers";
 import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
 import type { Business } from "@prisma/client";
 
 export async function getBusinessInfo(): Promise<ActionResult<Business | null>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -41,7 +41,7 @@ export async function getBusinessInfo(): Promise<ActionResult<Business | null>> 
 }
 
 export async function updateBusiness(input: UpdateBusinessInput): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -85,7 +85,7 @@ export async function updateBusiness(input: UpdateBusinessInput): Promise<Action
 }
 
 export async function uploadBusinessLogo(logoData: string): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);
@@ -125,7 +125,7 @@ export async function uploadBusinessLogo(logoData: string): Promise<ActionResult
 }
 
 export async function deleteBusinessLogo(): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSessionWithEmail();
+  const validatedSession = await validateSession();
 
   if ("error" in validatedSession) {
     return errorResult(validatedSession.error);

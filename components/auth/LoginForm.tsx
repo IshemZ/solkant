@@ -14,26 +14,22 @@ function LoginFormContent({ initialError }: LoginFormProps) {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
   const verified = searchParams.get("verified");
-  const errorParam = searchParams.get("error");
   const resetParam = searchParams.get("reset");
+  const registeredParam = searchParams.get("registered");
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(initialError || "");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Afficher message de succès si email vient d'être vérifié
+  // Afficher message de succès
   const successMessage =
     verified === "true"
       ? "✅ Email vérifié ! Vous pouvez maintenant vous connecter."
       : resetParam === "success"
       ? "✅ Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter."
-      : "";
-
-  // Afficher message d'erreur si email non vérifié
-  const emailNotVerifiedError =
-    errorParam === "email_not_verified"
-      ? "Veuillez vérifier votre email avant de vous connecter. Consultez votre boîte de réception."
+      : registeredParam === "success"
+      ? "✅ Compte créé avec succès ! Vous pouvez maintenant vous connecter."
       : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,12 +77,6 @@ function LoginFormContent({ initialError }: LoginFormProps) {
         {successMessage && (
           <div className="rounded-md bg-green-50 p-3 text-sm text-green-800 border border-green-200">
             {successMessage}
-          </div>
-        )}
-
-        {emailNotVerifiedError && (
-          <div className="rounded-md bg-orange-50 p-3 text-sm text-orange-800 border border-orange-200">
-            {emailNotVerifiedError}
           </div>
         )}
 
