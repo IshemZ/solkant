@@ -18,6 +18,9 @@ const nextConfig = {
       : false,
   },
 
+  // Packages qui ne doivent JAMAIS être bundlés côté client
+  serverExternalPackages: ['sanitize-html'],
+
   experimental: {
     serverActions: {
       bodySizeLimit: '8mb', // Permet l'upload de logos jusqu'à 5MB (+ marge pour base64)
