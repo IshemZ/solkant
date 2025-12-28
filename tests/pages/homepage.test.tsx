@@ -77,7 +77,7 @@ describe("Homepage", () => {
       render(<Home />);
 
       const startButtons = screen.getAllByRole("link", { name: /commencer gratuitement/i });
-      const learnMoreButton = screen.getByRole("link", { name: /en savoir plus/i });
+      const learnMoreButton = screen.getByRole("link", { name: /découvrir les fonctionnalités/i });
 
       // Au moins un bouton "Commencer gratuitement"
       expect(startButtons.length).toBeGreaterThanOrEqual(1);

@@ -310,7 +310,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         expect(result.error).toBeDefined();
-        expect(result.error).toBe("Erreur lors de la création du devis");
+        // withAuthAndValidation() retourne un message générique pour les erreurs techniques
+        expect(result.error).toBe("Erreur lors de l'exécution de createQuote");
       }
 
       // Vérifie qu'il y a eu exactement 4 tentatives

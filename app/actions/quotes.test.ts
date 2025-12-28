@@ -169,7 +169,8 @@ describe("Quote Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la récupération des devis");
+        // withAuth() retourne un message générique pour les erreurs techniques
+        expect(result.error).toBe("Erreur lors de l'exécution de getQuotes");
       }
     });
   });
@@ -246,7 +247,7 @@ describe("Quote Server Actions", () => {
         ],
       });
 
-      const result = await getQuote("quote_1");
+      const result = await getQuote({ id: "quote_1" });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -278,7 +279,7 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await getQuote("quote_not_found");
+      const result = await getQuote({ id: "quote_not_found" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -289,7 +290,7 @@ describe("Quote Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await getQuote("quote_1");
+      const result = await getQuote({ id: "quote_1" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -777,7 +778,7 @@ describe("Quote Server Actions", () => {
         updatedAt: new Date(),
       });
 
-      const result = await deleteQuote("quote_123");
+      const result = await deleteQuote({ id: "quote_123" });
 
       expect(result.success).toBe(true);
 
@@ -802,7 +803,7 @@ describe("Quote Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await deleteQuote("quote_123");
+      const result = await deleteQuote({ id: "quote_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -818,7 +819,7 @@ describe("Quote Server Actions", () => {
       // Mock findFirst retourne null (quote inexistant ou autre business)
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await deleteQuote("quote_other");
+      const result = await deleteQuote({ id: "quote_other" });
 
       expect(result.success).toBe(false);
       if (!result.success) {

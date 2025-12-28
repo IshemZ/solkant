@@ -124,7 +124,6 @@ describe('Client Validation Schemas', () => {
   describe('updateClientSchema', () => {
     it('should allow partial updates', () => {
       const partialData = {
-        id: 'client-123',
         phone: '0699999999', // Seulement le téléphone
       };
 
@@ -132,33 +131,30 @@ describe('Client Validation Schemas', () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.id).toBe('client-123');
         expect(result.data.phone).toBe('0699999999');
       }
     });
 
-    it('should require id field', () => {
-      const dataWithoutId = {
-        firstName: 'Marie',
+    it('should allow empty update', () => {
+      const emptyData = {};
+
+      const result = updateClientSchema.safeParse(emptyData);
+
+      expect(result.success).toBe(true);
+    });
+
+    it('should validate fields when provided', () => {
+      const invalidData = {
+        email: 'invalid-email',
       };
 
-      const result = updateClientSchema.safeParse(dataWithoutId);
+      const result = updateClientSchema.safeParse(invalidData);
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error.issues.some(i => i.path.includes('id'))).toBe(true);
+        const emailError = result.error.issues.find(i => i.path.includes('email'));
+        expect(emailError).toBeDefined();
       }
-    });
-
-    it('should validate CUID format for id', () => {
-      const validData = {
-        id: 'cljk9x8v00000l308abc123xyz', // Format CUID
-        firstName: 'Marie',
-      };
-
-      const result = updateClientSchema.safeParse(validData);
-
-      expect(result.success).toBe(true);
     });
   });
 

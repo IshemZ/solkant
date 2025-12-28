@@ -13,7 +13,9 @@ import { describe, it, expect } from 'vitest';
 
 // Exemple 1: Formatage prix français
 function formatPrice(price: number): string {
-  return `${price.toFixed(2).replace('.', ',')} €`;
+  // Arrondir correctement avant toFixed pour éviter les problèmes de précision
+  const rounded = Math.round(price * 100) / 100;
+  return `${rounded.toFixed(2).replace('.', ',')} €`;
 }
 
 // Exemple 2: Formatage date française
@@ -55,8 +57,8 @@ describe('Formatting Utils', () => {
 
   describe('formatPhone', () => {
     it('should format French phone numbers', () => {
-      expect(formatPhone('0612345678')).toBe('06 12 34 56 78 ');
-      expect(formatPhone('0123456789')).toBe('01 23 45 67 89 ');
+      expect(formatPhone('0612345678')).toBe('06 12 34 56 78');
+      expect(formatPhone('0123456789')).toBe('01 23 45 67 89');
     });
 
     it('should handle already formatted numbers', () => {
