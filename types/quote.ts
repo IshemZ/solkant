@@ -2,6 +2,7 @@ import type { Client, Service, Package, PackageItem, Quote, QuoteItem as PrismaQ
 
 // Input type for quote items (used in forms)
 export interface QuoteItemInput {
+  id: string; // Temporary UI-only ID for React keys
   serviceId?: string;
   packageId?: string;
   name: string;

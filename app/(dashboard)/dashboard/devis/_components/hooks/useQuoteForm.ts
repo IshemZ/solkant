@@ -55,6 +55,7 @@ export function useQuoteForm({
       setSelectedClientId(initialQuote.clientId || "");
       setItems(
         initialQuote.items.map((item) => ({
+          id: crypto.randomUUID(), // Generate unique ID for React keys
           serviceId: item.serviceId || undefined,
           packageId: item.packageId || undefined,
           name: item.name,
@@ -136,6 +137,7 @@ export function useQuoteForm({
     const quantity = 1;
 
     const newItem: QuoteItemInput = {
+      id: crypto.randomUUID(), // Generate unique ID for React keys
       serviceId: service.id,
       name: service.name,
       description: service.description || undefined,
@@ -159,6 +161,7 @@ export function useQuoteForm({
     const quantity = 1;
 
     const newItem: QuoteItemInput = {
+      id: crypto.randomUUID(), // Generate unique ID for React keys
       packageId: pkg.id,
       name: pkg.name,
       description: servicesDescription,
@@ -223,10 +226,10 @@ export function useQuoteForm({
       return;
     }
 
-    // Build payload
+    // Build payload - strip UI-only id field from items
     const quoteData = {
       clientId: selectedClientId,
-      items,
+      items: items.map(({ id: _id, ...item }) => item), // eslint-disable-line @typescript-eslint/no-unused-vars
       discount,
       discountType,
       notes: notes || undefined,

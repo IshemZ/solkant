@@ -84,6 +84,13 @@ export default function QuoteForm({
     error,
   } = useQuoteForm({ mode, initialQuote, clients, services, packages, router });
 
+  const getSubmitButtonText = () => {
+    if (isLoading) {
+      return mode === 'create' ? "Création..." : "Enregistrement...";
+    }
+    return mode === 'create' ? "Créer le devis" : "Enregistrer les modifications";
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {error && (
@@ -261,7 +268,7 @@ export default function QuoteForm({
                 </TableHeader>
                 <TableBody>
                   {items.map((item, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={item.id}>
                       <TableCell>
                         <div className="space-y-1">
                           <Input
@@ -293,7 +300,7 @@ export default function QuoteForm({
                               updateItem(
                                 index,
                                 "price",
-                                parseFloat(e.target.value) || 0
+                                Number.parseFloat(e.target.value) || 0
                               )
                             }
                             className="w-full"
@@ -314,7 +321,7 @@ export default function QuoteForm({
                               updateItem(
                                 index,
                                 "quantity",
-                                parseInt(e.target.value) || 1
+                                Number.parseInt(e.target.value) || 1
                               )
                             }
                             className="w-full"
@@ -442,13 +449,7 @@ export default function QuoteForm({
           Annuler
         </Button>
         <Button type="submit" disabled={isLoading || items.length === 0}>
-          {isLoading
-            ? mode === 'create'
-              ? "Création..."
-              : "Enregistrement..."
-            : mode === 'create'
-            ? "Créer le devis"
-            : "Enregistrer les modifications"}
+          {getSubmitButtonText()}
         </Button>
       </div>
     </form>

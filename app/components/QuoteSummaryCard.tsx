@@ -12,7 +12,7 @@ interface QuoteSummaryCardProps {
   onDelete?: (quoteNumber: string) => void;
 }
 
-export default function QuoteSummaryCard({ quote, onDelete }: QuoteSummaryCardProps) {
+export default function QuoteSummaryCard({ quote, onDelete }: Readonly<QuoteSummaryCardProps>) {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // Format date with French locale
@@ -72,14 +72,7 @@ export default function QuoteSummaryCard({ quote, onDelete }: QuoteSummaryCardPr
 
         {/* Delete Button and Confirmation */}
         <div className="pt-4 border-t">
-          {!showConfirmation ? (
-            <button
-              onClick={handleDeleteClick}
-              className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
-            >
-              Supprimer
-            </button>
-          ) : (
+          {showConfirmation ? (
             <div className="space-y-3">
               <p className="text-center text-gray-700 font-medium">
                 Supprimer ce devis ?
@@ -99,6 +92,13 @@ export default function QuoteSummaryCard({ quote, onDelete }: QuoteSummaryCardPr
                 </button>
               </div>
             </div>
+          ) : (
+            <button
+              onClick={handleDeleteClick}
+              className="w-full px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
+            >
+              Supprimer
+            </button>
           )}
         </div>
       </div>

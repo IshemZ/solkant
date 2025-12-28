@@ -15,7 +15,6 @@ import type {
   QuoteItem,
   Service,
   Client,
-  Business,
 } from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
 import { Decimal } from "@prisma/client/runtime/library";
@@ -29,16 +28,11 @@ import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { BusinessError } from "@/lib/errors";
 import { sanitizeObject } from "@/lib/security";
 import { z } from "zod";
+import { randomInt } from "node:crypto";
 
 // Types pour les quotes avec relations
 type QuoteWithRelations = Quote & {
   client: Client | null;
-  items: (QuoteItem & { service: Service | null })[];
-};
-
-type QuoteWithFullRelations = Quote & {
-  client: Client | null;
-  business: Business;
   items: (QuoteItem & { service: Service | null })[];
 };
 
@@ -127,7 +121,7 @@ async function generateQuoteNumber(businessId: string): Promise<string> {
 
   let nextNumber = 1;
   if (lastQuote) {
-    const lastNumber = parseInt(lastQuote.quoteNumber.split("-").pop() || "0");
+    const lastNumber = Number.parseInt(lastQuote.quoteNumber.split("-").pop() || "0");
     nextNumber = lastNumber + 1;
   }
 
@@ -216,7 +210,7 @@ async function createQuoteWithRetry(
       if (prismaError.code === "P2002" && attempt < maxRetries) {
         // Attendre un délai aléatoire entre 50-200ms avant de réessayer
         await new Promise((resolve) =>
-          setTimeout(resolve, 50 + Math.random() * 150)
+          setTimeout(resolve, 50 + randomInt(0, 151))
         );
         continue;
       }
@@ -369,10 +363,7 @@ export const updateQuote = withAuthAndValidation(
       // Calculate discount amount based on type (applied on subtotal AFTER package discounts)
       // Use existing values as fallback if not provided in update
       const discountType = quoteData.discountType || existingQuote.discountType;
-      const discountValue =
-        quoteData.discount !== undefined
-          ? quoteData.discount
-          : existingQuote.discount;
+      const discountValue = quoteData.discount ?? existingQuote.discount;
 
       const discountAmount = calculateDiscount(
         subtotalAfterPackageDiscounts,

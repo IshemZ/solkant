@@ -16,7 +16,7 @@ export function formatDate(date: Date | string | null | undefined): string {
   const d = typeof date === "string" ? new Date(date) : date;
 
   // Vérifier que d est bien un objet Date valide
-  if (!(d instanceof Date) || isNaN(d.getTime())) {
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) {
     return "—";
   }
 
@@ -40,7 +40,7 @@ export function formatDateTime(date: Date | string | null | undefined): string {
   const d = typeof date === "string" ? new Date(date) : date;
 
   // Vérifier que d est bien un objet Date valide
-  if (!(d instanceof Date) || isNaN(d.getTime())) {
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) {
     return "—";
   }
 
@@ -63,7 +63,7 @@ export function formatDateISO(date: Date | string | null | undefined): string {
   const d = typeof date === "string" ? new Date(date) : date;
 
   // Vérifier que d est bien un objet Date valide
-  if (!(d instanceof Date) || isNaN(d.getTime())) {
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) {
     return "";
   }
 

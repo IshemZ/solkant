@@ -11,7 +11,7 @@ import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import * as Sentry from "@sentry/nextjs";
 import {
   type ActionResult,
@@ -136,7 +136,7 @@ export async function verifyEmailToken(
   token: string
 ): Promise<ActionResult<VerifyEmailResult>> {
   try {
-    if (!token || token.length !== 64) {
+    if (token?.length !== 64) {
       return errorResult("Token invalide", "INVALID_TOKEN");
     }
 
@@ -325,8 +325,8 @@ export async function requestPasswordReset(input: {
       },
     });
 
-    // Générer un code OTP à 6 chiffres
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Générer un code OTP à 6 chiffres (cryptographiquement sécurisé)
+    const code = randomInt(100000, 1000000).toString();
 
     // Créer le token avec expiration de 15 minutes
     const expiresAt = new Date();

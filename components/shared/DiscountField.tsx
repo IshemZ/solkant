@@ -43,7 +43,7 @@ export default function DiscountField({
     const inputValue = e.target.value;
     setLocalValue(inputValue);
 
-    const numValue = parseFloat(inputValue) || 0;
+    const numValue = Number.parseFloat(inputValue) || 0;
 
     // Validate based on type
     if (type === "PERCENTAGE") {
