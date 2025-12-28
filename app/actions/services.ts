@@ -206,3 +206,76 @@ export async function deleteService(id: string): Promise<ActionResult<void>> {
     return errorResult("Erreur lors de l'archivage du service");
   }
 }
+
+interface ServiceWithQuoteCount extends Service {
+  quoteCount: number;
+}
+
+export async function getTopServices(): Promise<ActionResult<ServiceWithQuoteCount[]>> {
+  const validatedSession = await validateSession();
+
+  if ("error" in validatedSession) {
+    return errorResult(validatedSession.error);
+  }
+
+  const { businessId } = validatedSession;
+
+  try {
+    // Use raw SQL to efficiently count quotes per service with multi-tenant security
+    const result = await prisma.$queryRaw<
+      Array<{ serviceId: string; quoteCount: bigint }>
+    >`
+      SELECT
+        qi."serviceId",
+        COUNT(DISTINCT qi."quoteId") AS "quoteCount"
+      FROM "quote_items" qi
+      INNER JOIN "quotes" q ON qi."quoteId" = q."id"
+      WHERE q."businessId" = ${businessId} AND qi."serviceId" IS NOT NULL
+      GROUP BY qi."serviceId"
+      ORDER BY "quoteCount" DESC
+      LIMIT 10
+    `;
+
+    // Fetch the top services with their quote counts
+    const serviceIds = result.map((r) => r.serviceId);
+
+    if (serviceIds.length === 0) {
+      return successResult([]);
+    }
+
+    const services = await prisma.service.findMany({
+      where: {
+        id: { in: serviceIds },
+        businessId,
+        isActive: true,
+      },
+    });
+
+    // Merge quote counts with services
+    const serviceCounts = new Map(
+      result.map((r) => [r.serviceId, Number(r.quoteCount)])
+    );
+
+    const servicesWithCounts: ServiceWithQuoteCount[] = services.map(
+      (service) => ({
+        ...service,
+        quoteCount: serviceCounts.get(service.id) || 0,
+      })
+    );
+
+    // Sort by quote count descending
+    servicesWithCounts.sort((a, b) => b.quoteCount - a.quoteCount);
+
+    return successResult(servicesWithCounts);
+  } catch (error) {
+    Sentry.captureException(error, {
+      tags: { action: "getTopServices", businessId },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error fetching top services:", error);
+    }
+
+    return errorResult("Erreur lors de la récupération des services populaires");
+  }
+}

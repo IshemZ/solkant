@@ -56,6 +56,27 @@ export async function getBusinessId(): Promise<string> {
 }
 
 /**
+ * Format a revenue number for UI display in French locale
+ * Adds thousands separator and euro symbol with proper spacing
+ *
+ * Examples:
+ * - formatRevenue(1250.5) → "1 250,50 €"
+ * - formatRevenue(15000.75) → "15 000,75 €"
+ * - formatRevenue(125) → "125,00 €"
+ *
+ * @param revenue - The revenue amount (float)
+ * @returns Formatted string with thousands separator and euro symbol
+ */
+export function formatRevenue(revenue: number): string {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(revenue);
+}
+
+/**
  * Format an address from structured fields or legacy field
  * Returns a multi-line string suitable for display in PDFs, emails, etc.
  *
