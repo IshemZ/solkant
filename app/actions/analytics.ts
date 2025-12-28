@@ -3,6 +3,8 @@
 import prisma from "@/lib/prisma";
 import { QuoteStatus } from "@prisma/client";
 import { withAuth } from "@/lib/action-wrapper";
+import { successResult } from "@/lib/action-types";
+import { toNumber } from "@/lib/decimal-utils";
 
 /**
  * Get monthly revenue analytics for the current business
@@ -41,7 +43,7 @@ export const getMonthlyRevenue = withAuth(
           acc[monthKey] = { month: monthKey, revenue: 0, count: 0 };
         }
 
-        acc[monthKey].revenue += quote.total;
+        acc[monthKey].revenue += toNumber(quote.total);
         acc[monthKey].count += 1;
 
         return acc;
@@ -49,7 +51,7 @@ export const getMonthlyRevenue = withAuth(
       {} as Record<string, { month: string; revenue: number; count: number }>
     );
 
-    return Object.values(monthlyData);
+    return successResult(Object.values(monthlyData));
   },
   "getMonthlyRevenue"
 );
@@ -81,14 +83,14 @@ export const getTopClientsByRevenue = withAuth(
       .map((client) => ({
         clientId: client.id,
         clientName: `${client.firstName} ${client.lastName}`,
-        totalRevenue: client.quotes.reduce((sum, q) => sum + q.total, 0),
+        totalRevenue: client.quotes.reduce((sum, q) => sum + toNumber(q.total), 0),
         quoteCount: client.quotes.length,
       }))
       .filter((c) => c.totalRevenue > 0)
       .sort((a, b) => b.totalRevenue - a.totalRevenue)
       .slice(0, 10);
 
-    return topClients;
+    return successResult(topClients);
   },
   "getTopClientsByRevenue"
 );
@@ -134,7 +136,7 @@ export const getServiceStats = withAuth(
         }
 
         acc[serviceId].timesUsed += 1;
-        acc[serviceId].totalRevenue += item.total;
+        acc[serviceId].totalRevenue += toNumber(item.total);
 
         return acc;
       },
@@ -149,7 +151,7 @@ export const getServiceStats = withAuth(
       >
     );
 
-    return Object.values(stats).sort((a, b) => b.timesUsed - a.timesUsed);
+    return successResult(Object.values(stats).sort((a, b) => b.timesUsed - a.timesUsed));
   },
   "getServiceStats"
 );

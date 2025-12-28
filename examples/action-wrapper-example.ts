@@ -21,6 +21,7 @@ import {
 } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { successResult } from "@/lib/action-types";
 import { z } from "zod";
 import type { Client } from "@prisma/client";
 
@@ -39,7 +40,7 @@ export const getClients = withAuth(
       orderBy: { createdAt: "desc" },
     });
 
-    return clients;
+    return successResult(clients);
   },
   "getClients"
 );
@@ -87,7 +88,7 @@ export const createClient = withAuthAndValidation(
     // Revalidation cache
     revalidatePath("/dashboard/clients");
 
-    return client;
+    return successResult(client);
   },
   "createClient",
   createClientSchema
@@ -129,7 +130,7 @@ export const updateClient = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/clients");
-    return client;
+    return successResult(client);
   },
   "updateClient",
   // Schema composé : ID + données de mise à jour
@@ -185,9 +186,9 @@ export const deleteClient = withAuth(
     });
 
     revalidatePath("/dashboard/clients");
+    return successResult({ id: input.id });
   },
-  "deleteClient",
-  { logSuccess: true } // Log les suppressions dans Sentry
+  "deleteClient"
 );
 
 // ============================================================================
@@ -211,7 +212,7 @@ export const getClientById = withAuthAndValidation(
       throw new Error("Client introuvable");
     }
 
-    return client;
+    return successResult(client);
   },
   "getClientById",
   z.object({
@@ -235,6 +236,7 @@ export const resendVerificationEmail = withAuthUnverified(
     // await sendVerificationEmail(userEmail);
 
     console.log(`Email de vérification envoyé à ${userEmail}`);
+    return successResult({ email: userEmail });
   },
   "resendVerificationEmail"
 );
@@ -281,7 +283,7 @@ export const importClients = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/clients");
-    return { imported: imported.length, clients: imported };
+    return successResult({ imported: imported.length, clients: imported });
   },
   "importClients",
   z.object({
@@ -320,14 +322,9 @@ export const exportClientData = withAuth(
       exportedBy: session.userId,
     };
 
-    return exportData;
+    return successResult(exportData);
   },
-  "exportClientData",
-  {
-    requireEmailVerification: true,
-    sanitizeInput: false, // Pas de sanitization sur un simple ID
-    logSuccess: true, // Logger les exports pour conformité RGPD
-  }
+  "exportClientData"
 );
 
 // ============================================================================
@@ -385,9 +382,9 @@ export const archiveClient = withAuth(
     });
 
     revalidatePath("/dashboard/clients");
+    return successResult({ id: input.id, archived: true });
   },
-  "archiveClient",
-  { logSuccess: true }
+  "archiveClient"
 );
 
 // ============================================================================
@@ -434,11 +431,11 @@ export const searchClients = withAuthAndValidation(
       },
     });
 
-    return {
+    return successResult({
       clients,
       total,
       hasMore: offset + clients.length < total,
-    };
+    });
   },
   "searchClients",
   z.object({

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ParametresPage() {
-  const result = await getBusinessInfo({});
+  const result = await getBusinessInfo();
 
   if (!result.success || !result.data) {
     redirect("/dashboard");

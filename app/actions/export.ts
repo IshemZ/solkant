@@ -3,6 +3,7 @@
 import prisma from "@/lib/prisma";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { withAuth } from "@/lib/action-wrapper";
+import { successResult } from "@/lib/action-types";
 
 /**
  * Escapes CSV field values by wrapping in quotes and escaping internal quotes
@@ -46,7 +47,7 @@ export const exportAllQuotes = withAuth(
     });
 
     if (quotes.length === 0) {
-      return "";
+      return successResult("");
     }
 
     // Build CSV with headers
@@ -176,8 +177,7 @@ export const exportAllQuotes = withAuth(
       },
     });
 
-    return csvContent;
+    return successResult(csvContent);
   },
-  "exportAllQuotes",
-  { logSuccess: true }
+  "exportAllQuotes"
 );

@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { getQuote } from "@/app/actions/quotes";
-import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { redirect } from "next/navigation";
 import QuoteView from "../_components/QuoteView";
 
@@ -44,12 +43,9 @@ export default async function QuotePage({ params }: QuotePageProps) {
     redirect("/dashboard/devis");
   }
 
-  // Serialize Decimal fields to numbers for client component
-  const serializedQuote = serializeDecimalFields(result.data) as any;
-
   return (
     <div className="mx-auto max-w-5xl">
-      <QuoteView quote={serializedQuote} />
+      <QuoteView quote={result.data} />
     </div>
   );
 }

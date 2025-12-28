@@ -2,6 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { withAuth } from "@/lib/action-wrapper";
+import { successResult } from "@/lib/action-types";
+import { toNumber } from "@/lib/decimal-utils";
 
 /**
  * Type pour les statistiques du dashboard
@@ -19,7 +21,7 @@ export type DashboardStats = {
  * SÉCURITÉ: Filtre automatiquement par businessId pour l'isolation multi-tenant
  */
 export const getDashboardStats = withAuth(
-  async (_input: Record<string, never>, session): Promise<DashboardStats> => {
+  async (_input: Record<string, never>, session) => {
     const { businessId } = session;
 
     // Exécuter les requêtes en parallèle pour optimiser les performances
@@ -38,17 +40,17 @@ export const getDashboardStats = withAuth(
     const totalQuotes = quotes.length;
 
     // Calculer le revenu total (somme de tous les totaux)
-    const totalRevenue = quotes.reduce((sum, quote) => sum + quote.total, 0);
+    const totalRevenue = quotes.reduce((sum, quote) => sum + toNumber(quote.total), 0);
 
     // Calculer la valeur moyenne des quotes (0 si aucun quote)
     const averageQuoteValue = totalQuotes > 0 ? totalRevenue / totalQuotes : 0;
 
-    return {
+    return successResult({
       totalClients,
       totalQuotes,
       totalRevenue,
       averageQuoteValue,
-    };
+    });
   },
   "getDashboardStats"
 );

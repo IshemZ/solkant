@@ -7,6 +7,7 @@ import QuoteForm from "../_components/QuoteFormUnified";
 import { EmptyState } from "@/components/ui/empty-state";
 import { redirect } from "next/navigation";
 import { Users, Briefcase } from "lucide-react";
+import type { SerializedService, SerializedPackage } from "@/types/quote";
 
 export const metadata: Metadata = {
   title: "Nouveau devis | Solkant",
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 
 export default async function NewQuotePage() {
   const [clientsResult, servicesResult, packagesResult] = await Promise.all([
-    getClients({}),
-    getServices({}),
-    getPackages({}),
+    getClients(),
+    getServices(),
+    getPackages(),
   ]);
 
   if (!clientsResult.success || !servicesResult.success || !packagesResult.success) {
@@ -29,8 +30,8 @@ export default async function NewQuotePage() {
   const packages = packagesResult.data;
 
   // Serialize Decimal fields to numbers for client component
-  const serializedServices = serializeDecimalFields(services) as any;
-  const serializedPackages = serializeDecimalFields(packages) as any;
+  const serializedServices = serializeDecimalFields(services) as SerializedService[];
+  const serializedPackages = serializeDecimalFields(packages) as SerializedPackage[];
 
   return (
     <div className="mx-auto max-w-5xl py-8">

@@ -61,27 +61,31 @@ All CRUD operations use Server Actions in `app/actions/` with action wrappers fr
 
 **Simple actions (no input validation):**
 ```typescript
+import { successResult } from "@/lib/action-types";
+
 export const deleteResource = withAuth(
   async (input: { id: string }, session) => {
     await prisma.resource.delete({
       where: { id: input.id, businessId: session.businessId }
     });
     revalidatePath('/dashboard/resources');
+    return successResult({ id: input.id });
   },
-  "deleteResource",
-  { logSuccess: true } // Log deletions in Sentry
+  "deleteResource"
 );
 ```
 
 **Actions with validation:**
 ```typescript
+import { successResult } from "@/lib/action-types";
+
 export const createResource = withAuthAndValidation(
   async (input: CreateResourceInput, session) => {
     const resource = await prisma.resource.create({
       data: { ...input, businessId: session.businessId }
     });
     revalidatePath('/dashboard/resources');
-    return resource; // Wrapper handles successResult() automatically
+    return successResult(resource);
   },
   "createResource",
   createResourceSchema  // Zod schema from lib/validations/
@@ -96,7 +100,7 @@ export const createResource = withAuthAndValidation(
 - ✅ Input sanitization (XSS protection)
 - ✅ 60% less boilerplate
 
-**Handler Return:** Return data directly (not `successResult()`). Wrapper converts to `ActionResult<T>` automatically.
+**Handler Return:** Handlers MUST return `ActionResult<T>` using `successResult(data)` wrapper. The wrappers do NOT auto-convert - you must explicitly wrap your return value.
 
 **Error Handling:** Throw errors in handler. Wrapper catches and converts to `errorResult()` with Sentry logging.
 

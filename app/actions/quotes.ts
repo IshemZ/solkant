@@ -9,15 +9,22 @@ import {
 } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
-import type { Quote, QuoteItem, Service, Client, Business } from "@prisma/client";
+import { type ActionResult, successResult } from "@/lib/action-types";
+import type {
+  Quote,
+  QuoteItem,
+  Service,
+  Client,
+  Business,
+} from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
-import { Decimal } from '@prisma/client/runtime/library';
+import { Decimal } from "@prisma/client/runtime/library";
 import {
   toDecimal,
+  toNumber,
   calculateDiscount,
-  serializeDecimalFields
-} from '@/lib/decimal-utils';
+  serializeDecimalFields,
+} from "@/lib/decimal-utils";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { BusinessError } from "@/lib/errors";
 import { sanitizeObject } from "@/lib/security";
@@ -36,7 +43,12 @@ type QuoteWithFullRelations = Quote & {
 };
 
 export const getQuotes = withAuth(
-  async (_input: void, session): Promise<ActionResult<import('@/types/quote').SerializedQuoteWithRelations[]>> => {
+  async (
+    _input: void,
+    session
+  ): Promise<
+    ActionResult<import("@/types/quote").SerializedQuoteWithRelations[]>
+  > => {
     const quotes = await prisma.quote.findMany({
       where: { businessId: session.businessId },
       include: {
@@ -51,13 +63,18 @@ export const getQuotes = withAuth(
     });
 
     const serialized = serializeDecimalFields(quotes);
-    return successResult(serialized as unknown as import('@/types/quote').SerializedQuoteWithRelations[]);
+    return successResult(
+      serialized as unknown as import("@/types/quote").SerializedQuoteWithRelations[]
+    );
   },
   "getQuotes"
 );
 
 export const getQuote = withAuth(
-  async (input: { id: string }, session): Promise<ActionResult<QuoteWithFullRelations>> => {
+  async (
+    input: { id: string },
+    session
+  ): Promise<ActionResult<import("@/types/quote").SerializedQuoteWithFullRelations>> => {
     const quote = await prisma.quote.findFirst({
       where: {
         id: input.id,
@@ -78,7 +95,9 @@ export const getQuote = withAuth(
       throw new BusinessError("Devis introuvable");
     }
 
-    return successResult(serializeDecimalFields(quote));
+    return successResult(
+      serializeDecimalFields(quote) as unknown as import("@/types/quote").SerializedQuoteWithFullRelations
+    );
   },
   "getQuote"
 );
@@ -143,10 +162,12 @@ async function createQuoteWithRetry(
       );
 
       // Calculate subtotal after package discounts
-      const subtotalAfterPackageDiscounts = subtotal.minus(packageDiscountsTotal);
+      const subtotalAfterPackageDiscounts = subtotal.minus(
+        packageDiscountsTotal
+      );
 
       // Calculate discount amount based on type (applied on subtotal AFTER package discounts)
-      const discountType = quoteData.discountType || 'FIXED';
+      const discountType = quoteData.discountType || "FIXED";
       const discountValue = quoteData.discount || 0;
 
       const discountAmount = calculateDiscount(
@@ -208,7 +229,10 @@ async function createQuoteWithRetry(
 }
 
 export const createQuote = withAuthAndValidation(
-  async (input: CreateQuoteInput, session): Promise<ActionResult<QuoteWithRelations>> => {
+  async (
+    input: CreateQuoteInput,
+    session
+  ): Promise<ActionResult<QuoteWithRelations>> => {
     // Sanitize input
     const sanitized = sanitizeObject(input);
 
@@ -290,7 +314,10 @@ const updateQuoteWithIdSchema = z.intersection(
 );
 
 export const updateQuote = withAuthAndValidation(
-  async (input: UpdateQuoteInput & { id: string }, session): Promise<ActionResult<QuoteWithRelations>> => {
+  async (
+    input: UpdateQuoteInput & { id: string },
+    session
+  ): Promise<ActionResult<QuoteWithRelations>> => {
     // Sanitize input
     const sanitized = sanitizeObject(input);
 
@@ -335,14 +362,17 @@ export const updateQuote = withAuthAndValidation(
       );
 
       // Calculate subtotal after package discounts
-      const subtotalAfterPackageDiscounts = subtotal.minus(packageDiscountsTotal);
+      const subtotalAfterPackageDiscounts = subtotal.minus(
+        packageDiscountsTotal
+      );
 
       // Calculate discount amount based on type (applied on subtotal AFTER package discounts)
       // Use existing values as fallback if not provided in update
       const discountType = quoteData.discountType || existingQuote.discountType;
-      const discountValue = quoteData.discount !== undefined
-        ? quoteData.discount
-        : existingQuote.discount;
+      const discountValue =
+        quoteData.discount !== undefined
+          ? quoteData.discount
+          : existingQuote.discount;
 
       const discountAmount = calculateDiscount(
         subtotalAfterPackageDiscounts,
@@ -429,7 +459,12 @@ export const updateQuote = withAuthAndValidation(
  * Met à jour le statut à SENT et enregistre la date d'envoi
  */
 export const sendQuote = withAuth(
-  async (input: { id: string }, session): Promise<ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>> => {
+  async (
+    input: { id: string },
+    session
+  ): Promise<
+    ActionResult<Quote & { client: Client | null; items: QuoteItem[] }>
+  > => {
     // Import Sentry for email-specific error handling
     const Sentry = await import("@sentry/nextjs");
 
@@ -466,7 +501,9 @@ export const sendQuote = withAuth(
         console.log("\n📧 [SIMULATION] Envoi email devis:");
         console.log(`   → À: ${quote.client.email}`);
         console.log(`   → Devis: ${quote.quoteNumber}`);
-        console.log(`   → Client: ${quote.client.firstName} ${quote.client.lastName}`);
+        console.log(
+          `   → Client: ${quote.client.firstName} ${quote.client.lastName}`
+        );
         console.log(`   → Total: ${Number(quote.total).toFixed(2)} €\n`);
 
         // Mettre à jour le devis même en mode simulation
@@ -498,11 +535,13 @@ export const sendQuote = withAuth(
 
         revalidatePath("/dashboard/devis");
         // Retourner le quote avec les relations mis à jour
-        return successResult(serializeDecimalFields({
-          ...quote,
-          status: "SENT" as const,
-          sentAt: new Date(),
-        }));
+        return successResult(
+          serializeDecimalFields({
+            ...quote,
+            status: "SENT" as const,
+            sentAt: new Date(),
+          })
+        );
       }
 
       throw new BusinessError(
@@ -533,12 +572,12 @@ export const sendQuote = withAuth(
         name: item.name,
         description: item.description || undefined,
         quantity: item.quantity,
-        price: item.price as any,
-        total: item.total as any,
+        price: toNumber(item.price),
+        total: toNumber(item.total),
       })),
-      subtotal: quote.subtotal as any,
-      discount: quote.discount as any,
-      total: quote.total as any,
+      subtotal: toNumber(quote.subtotal),
+      discount: toNumber(quote.discount),
+      total: toNumber(quote.total),
       notes: quote.notes || undefined,
     });
 

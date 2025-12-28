@@ -1,8 +1,9 @@
 import { withSentryConfig } from "@sentry/nextjs";
-import type { NextConfig } from "next";
+import type { Configuration as WebpackConfiguration } from 'webpack';
+import bundleAnalyzer from '@next/bundle-analyzer';
 
 // Bundle analyzer configuration
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })
 
@@ -21,9 +22,24 @@ const nextConfig = {
   // Packages qui ne doivent JAMAIS être bundlés côté client
   serverExternalPackages: ['sanitize-html'],
 
+  // Webpack configuration for fallback (when not using Turbopack)
+  webpack: (config: WebpackConfiguration, { isServer }: { isServer: boolean }) => {
+    if (!isServer) {
+      // Don't attempt to bundle sanitize-html on the client
+      config.resolve = {
+        ...config.resolve,
+        alias: {
+          ...config.resolve?.alias,
+          'sanitize-html': false,
+        },
+      };
+    }
+    return config;
+  },
+
   experimental: {
     serverActions: {
-      bodySizeLimit: '8mb', // Permet l'upload de logos jusqu'à 5MB (+ marge pour base64)
+      bodySizeLimit: 8 * 1024 * 1024, // 8MB - Permet l'upload de logos jusqu'à 5MB (+ marge pour base64)
     },
     // Optimiser les imports de packages lourds
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons'],

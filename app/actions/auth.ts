@@ -243,6 +243,8 @@ export const resendVerificationEmail = withAuthUnverified(
     if (!result.success) {
       throw new Error(result.error);
     }
+
+    return successResult({ email: user.email });
   },
   "resendVerificationEmail"
 );

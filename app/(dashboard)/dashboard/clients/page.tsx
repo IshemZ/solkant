@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ClientsPage() {
-  const result = await getClients({});
+  const result = await getClients();
 
   return (
     <div className="mx-auto max-w-6xl">

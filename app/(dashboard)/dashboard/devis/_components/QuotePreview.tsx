@@ -1,21 +1,9 @@
-import type {
-  Quote,
-  Client,
-  Business,
-  QuoteItem,
-  Service,
-} from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 import { formatDate } from "@/lib/date-utils";
 import { formatAddress } from "@/lib/utils";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuotePreviewProps {
-  quote: QuoteWithRelations;
+  quote: SerializedQuoteWithFullRelations;
 }
 
 /**
@@ -154,7 +142,7 @@ export default function QuotePreview({ quote }: QuotePreviewProps) {
               {Number(quote.subtotal).toFixed(2)} €
             </span>
           </div>
-          {(quote.discount as any) > 0 && (
+          {quote.discount > 0 && (
             <div className="flex justify-between text-sm">
               <span className="text-gray-600">
                 Remise
@@ -164,8 +152,8 @@ export default function QuotePreview({ quote }: QuotePreviewProps) {
               </span>
               <span className="font-medium text-red-600">
                 -
-                {Number(quote.discountType === "PERCENTAGE"
-                  ? (quote.subtotal as any) * ((quote.discount as any) / 100)
+                {(quote.discountType === "PERCENTAGE"
+                  ? quote.subtotal * (quote.discount / 100)
                   : quote.discount
                 ).toFixed(2)}{" "}
                 €

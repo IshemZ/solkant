@@ -2,6 +2,8 @@
 
 import prisma from "@/lib/prisma";
 import { withAuth } from "@/lib/action-wrapper";
+import { successResult } from "@/lib/action-types";
+import { toNumber } from "@/lib/decimal-utils";
 
 /**
  * Revenue summary for a business
@@ -21,7 +23,7 @@ export type RevenueSummary = {
  * It MUST filter by businessId from the session to ensure data isolation.
  */
 export const getBusinessRevenue = withAuth(
-  async (_input: Record<string, never>, session): Promise<RevenueSummary> => {
+  async (_input: Record<string, never>, session) => {
     const { businessId } = session;
 
     // Fetch business details
@@ -49,7 +51,7 @@ export const getBusinessRevenue = withAuth(
       },
     });
 
-    const totalRevenue = quotes.reduce((sum, quote) => sum + quote.total, 0);
+    const totalRevenue = quotes.reduce((sum, quote) => sum + toNumber(quote.total), 0);
     const sentQuotes = quotes.length;
 
     // Calculate total quote value (regardless of status)
@@ -63,17 +65,17 @@ export const getBusinessRevenue = withAuth(
     });
 
     const totalQuoteValue = allQuotes.reduce(
-      (sum, quote) => sum + quote.total,
+      (sum, quote) => sum + toNumber(quote.total),
       0
     );
 
-    return {
+    return successResult({
       businessId: business.id,
       businessName: business.name,
       totalRevenue,
       sentQuotes,
       totalQuoteValue,
-    };
+    });
   },
   "getBusinessRevenue"
 );
@@ -95,7 +97,7 @@ export const getBusinessRevenue = withAuth(
  */
 export const getAllBusinessRevenue = withAuth(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (_input: Record<string, never>, _session): Promise<RevenueSummary[]> => {
+  async (_input: Record<string, never>, _session) => {
     // TODO: Add admin authorization check here in production
     // const isAdmin = await checkIfUserIsAdmin(_session.userId);
     // if (!isAdmin) {
@@ -124,7 +126,7 @@ export const getAllBusinessRevenue = withAuth(
         },
       });
 
-      const totalRevenue = quotes.reduce((sum, quote) => sum + quote.total, 0);
+      const totalRevenue = quotes.reduce((sum, quote) => sum + toNumber(quote.total), 0);
       const sentQuotes = quotes.length;
 
       const allQuotes = await prisma.quote.findMany({
@@ -137,7 +139,7 @@ export const getAllBusinessRevenue = withAuth(
       });
 
       const totalQuoteValue = allQuotes.reduce(
-        (sum, quote) => sum + quote.total,
+        (sum, quote) => sum + toNumber(quote.total),
         0
       );
 
@@ -150,7 +152,7 @@ export const getAllBusinessRevenue = withAuth(
       });
     }
 
-    return revenueSummaries;
+    return successResult(revenueSummaries);
   },
   "getAllBusinessRevenue"
 );

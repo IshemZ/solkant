@@ -10,15 +10,9 @@ import {
   AuditLevel,
   extractRequestInfo,
 } from "@/lib/audit-logger";
-import type { Quote, Client, Business, QuoteItem, Service } from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
-function generatePdfFileName(quote: QuoteWithRelations): string {
+function generatePdfFileName(quote: SerializedQuoteWithFullRelations): string {
   const { pdfFileNamePrefix } = quote.business;
   const client = quote.client;
 

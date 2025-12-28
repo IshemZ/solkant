@@ -28,10 +28,10 @@ import {
   createServiceSchema,
   type CreateServiceInput,
 } from "@/lib/validations";
-import type { Service } from "@prisma/client";
+import type { SerializedService } from "@/types/quote";
 
 interface ServiceFormProps {
-  service?: Service;
+  service?: SerializedService;
   mode?: "create" | "edit";
 }
 
@@ -50,7 +50,7 @@ export default function ServiceForm({
     defaultValues: {
       name: service?.name || "",
       description: service?.description || null,
-      price: (service?.price as any) || 0,
+      price: service?.price || 0,
       duration: service?.duration || null,
       category: service?.category || null,
       isActive: service?.isActive ?? true,

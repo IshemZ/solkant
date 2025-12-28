@@ -5,26 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Download, Mail } from "lucide-react";
 import { toast } from "sonner";
-import type {
-  Quote,
-  Client,
-  Business,
-  QuoteItem,
-  Service,
-} from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 import { formatDate } from "@/lib/date-utils";
 import { deleteQuote } from "@/app/actions/quotes";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import QuotePreview from "./QuotePreview";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuoteViewProps {
-  quote: QuoteWithRelations;
+  quote: SerializedQuoteWithFullRelations;
 }
 
 export default function QuoteView({ quote }: QuoteViewProps) {

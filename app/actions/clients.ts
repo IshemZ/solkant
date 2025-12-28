@@ -11,21 +11,18 @@ import { z } from "zod";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { successResult, errorResult } from "@/lib/action-types";
+import { successResult } from "@/lib/action-types";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { serializeDecimalFields } from "@/lib/decimal-utils";
 
-export const getClients = withAuth(
-  async (_input: void, session) => {
-    const clients = await prisma.client.findMany({
-      where: { businessId: session.businessId },
-      orderBy: { createdAt: "desc" },
-    });
+export const getClients = withAuth(async (_input: void, session) => {
+  const clients = await prisma.client.findMany({
+    where: { businessId: session.businessId },
+    orderBy: { createdAt: "desc" },
+  });
 
-    return successResult(serializeDecimalFields(clients));
-  },
-  "getClients"
-);
+  return successResult(serializeDecimalFields(clients));
+}, "getClients");
 
 export const createClient = withAuthAndValidation(
   async (input: CreateClientInput, session) => {
@@ -80,44 +77,41 @@ export const updateClient = withAuthAndValidation(
   updateClientSchema.extend({ id: z.string().min(1) })
 );
 
-export const deleteClient = withAuth(
-  async (input: { id: string }, session) => {
-    // Récupérer les infos avant suppression
-    const client = await prisma.client.findFirst({
-      where: {
-        id: input.id,
-        businessId: session.businessId,
-      },
-      select: { firstName: true, lastName: true, email: true },
-    });
-
-    if (!client) {
-      throw new Error("Client introuvable");
-    }
-
-    await prisma.client.delete({
-      where: {
-        id: input.id,
-        businessId: session.businessId,
-      },
-    });
-
-    await auditLog({
-      action: AuditAction.CLIENT_DELETED,
-      level: AuditLevel.CRITICAL,
-      userId: session.userId,
+export const deleteClient = withAuth(async (input: { id: string }, session) => {
+  // Récupérer les infos avant suppression
+  const client = await prisma.client.findFirst({
+    where: {
+      id: input.id,
       businessId: session.businessId,
-      resourceId: input.id,
-      resourceType: "Client",
-      metadata: {
-        firstName: client.firstName,
-        lastName: client.lastName,
-        email: client.email,
-      },
-    });
+    },
+    select: { firstName: true, lastName: true, email: true },
+  });
 
-    revalidatePath("/dashboard/clients");
-    return successResult({ id: input.id });
-  },
-  "deleteClient"
-);
+  if (!client) {
+    throw new Error("Client introuvable");
+  }
+
+  await prisma.client.delete({
+    where: {
+      id: input.id,
+      businessId: session.businessId,
+    },
+  });
+
+  await auditLog({
+    action: AuditAction.CLIENT_DELETED,
+    level: AuditLevel.CRITICAL,
+    userId: session.userId,
+    businessId: session.businessId,
+    resourceId: input.id,
+    resourceType: "Client",
+    metadata: {
+      firstName: client.firstName,
+      lastName: client.lastName,
+      email: client.email,
+    },
+  });
+
+  revalidatePath("/dashboard/clients");
+  return successResult({ id: input.id });
+}, "deleteClient");

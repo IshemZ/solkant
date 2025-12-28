@@ -15,6 +15,7 @@ import {
   createMultiTenantSessions,
   assertBusinessIdIsolation,
 } from "../helpers/session-mock";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // Mock dependencies
 vi.mock("next-auth", () => ({
@@ -203,10 +204,11 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         id: "service_123",
         name: "Coupe",
         description: "Coupe de cheveux",
-        price: 50,
+        price: new Decimal(50),
         duration: 30,
         category: null,
         isActive: true,
+        deletedAt: null,
         businessId: "business_tenant1",
         createdAt: new Date(),
         updatedAt: new Date(),

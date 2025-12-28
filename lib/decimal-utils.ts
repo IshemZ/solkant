@@ -1,4 +1,10 @@
+import "server-only";
 import { Decimal } from '@prisma/client/runtime/library';
+
+/**
+ * Server-only utilities for Prisma Decimal operations
+ * For client-safe number utilities, use lib/number-utils.ts
+ */
 
 /**
  * Convertit Decimal vers number pour sérialisation Next.js
@@ -13,15 +19,6 @@ export function toNumber(value: Decimal | number): number {
 export function toDecimal(value: number | string | Decimal): Decimal {
   if (value instanceof Decimal) return value;
   return new Decimal(value);
-}
-
-/**
- * Parse de manière sécurisée un prix en number
- * Retourne 0 si la valeur est invalide (NaN, null, undefined, négative)
- */
-export function safeParsePrice(value: unknown): number {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0;
 }
 
 /**
@@ -145,7 +142,7 @@ export function serializeDecimalFields<T>(data: T): T {
 
   // Handle objects - recursively serialize each property
   if (typeof data === 'object') {
-    const result: Record<string, any> = {};
+    const result: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(data)) {
       // Skip functions (like JSON.stringify does)
       if (typeof value === 'function') {

@@ -7,24 +7,12 @@ import {
   Image,
   StyleSheet,
 } from "@react-pdf/renderer";
-import type {
-  Quote,
-  Client,
-  Business,
-  QuoteItem,
-  Service,
-} from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 import { formatDate } from "@/lib/date-utils";
 import { formatAddress } from "@/lib/utils";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuotePDFProps {
-  quote: QuoteWithRelations;
+  quote: SerializedQuoteWithFullRelations;
 }
 
 const styles = StyleSheet.create({
@@ -362,14 +350,14 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
               </Text>
             </View>
 
-            {(quote.discount as any) > 0 && (
+            {quote.discount > 0 && (
               <View style={styles.totalRow}>
                 <Text style={styles.totalLabel}>
                   Remise{quote.discountType === 'PERCENTAGE' ? ` (${quote.discount}%)` : ''}
                 </Text>
                 <Text style={[styles.totalValue, { color: "#dc2626" }]}>
-                  -{Number(quote.discountType === 'PERCENTAGE'
-                    ? (quote.subtotal as any) * ((quote.discount as any) / 100)
+                  -{(quote.discountType === 'PERCENTAGE'
+                    ? quote.subtotal * (quote.discount / 100)
                     : quote.discount).toFixed(2)} €
                 </Text>
               </View>

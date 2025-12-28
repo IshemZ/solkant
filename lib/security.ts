@@ -4,6 +4,7 @@
  * @module lib/security
  */
 
+import "server-only";
 import sanitizeHtml from "sanitize-html";
 
 /**

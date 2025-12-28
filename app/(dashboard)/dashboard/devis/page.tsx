@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function DevisPage() {
-  const result = await getQuotes({});
+  const result = await getQuotes();
 
   return (
     <div className="mx-auto max-w-6xl">

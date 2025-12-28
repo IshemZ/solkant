@@ -1,5 +1,6 @@
 import { Session } from 'next-auth';
 import { Business, Client, Service, Quote, QuoteItem } from '@prisma/client';
+import { Decimal } from '@prisma/client/runtime/library';
 
 /**
  * Test Data Helpers
@@ -81,7 +82,7 @@ export const mockService: Service = {
   businessId: 'business-test-123',
   name: 'Coupe Cheveux',
   description: 'Coupe classique',
-  price: 45.0,
+  price: new Decimal(45.0),
   duration: 30,
   category: 'Coiffure',
   isActive: true,
@@ -98,10 +99,10 @@ export const mockQuote: Quote = {
   quoteNumber: 'DEVIS-2025-001',
   status: 'DRAFT',
   validUntil: new Date('2025-12-31'),
-  subtotal: 45.0,
+  subtotal: new Decimal(45.0),
   discountType: 'FIXED',
-  discount: 0,
-  total: 45.0,
+  discount: new Decimal(0),
+  total: new Decimal(45.0),
   notes: 'Test devis',
   sentAt: null,
   createdAt: new Date('2025-01-01'),
@@ -116,9 +117,10 @@ export const mockQuoteItem: QuoteItem = {
   packageId: null,
   name: 'Coupe Cheveux',
   description: 'Coupe classique',
-  price: 45.0,
+  price: new Decimal(45.0),
   quantity: 1,
-  total: 45.0,
+  total: new Decimal(45.0),
+  packageDiscount: new Decimal(0),
   createdAt: new Date('2025-01-01'),
   updatedAt: new Date('2025-01-01'),
 };

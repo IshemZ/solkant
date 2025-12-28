@@ -66,7 +66,7 @@ export default async function EditServicePage({ params }: PageProps) {
   }
 
   // Serialize Decimal fields for Client Component
-  const serializedService = serializeDecimalFields(service);
+  const serializedService = serializeDecimalFields(service) as unknown as import("@/types/quote").SerializedService;
 
   return (
     <div className="mx-auto max-w-2xl py-8">

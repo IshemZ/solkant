@@ -1,5 +1,5 @@
 import type { SerializedPackage } from "@/types/quote";
-import { safeParsePrice } from "@/lib/decimal-utils";
+import { safeParsePrice } from "@/lib/number-utils";
 
 /**
  * Calculate the base price of a package from all its services

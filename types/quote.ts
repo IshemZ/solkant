@@ -50,6 +50,13 @@ export type SerializedClient = Omit<Client, 'createdAt' | 'updatedAt' | 'deleted
   lastContactDate: string | null;
 };
 
+export type SerializedBusiness = Omit<import("@prisma/client").Business, 'createdAt' | 'updatedAt' | 'subscriptionEndsAt' | 'trialEndsAt'> & {
+  createdAt: string;
+  updatedAt: string;
+  subscriptionEndsAt: string | null;
+  trialEndsAt: string | null;
+};
+
 export type SerializedQuote = Omit<Quote, 'discount' | 'subtotal' | 'total' | 'createdAt' | 'updatedAt' | 'validUntil'> & {
   discount: number;
   subtotal: number;
@@ -61,6 +68,12 @@ export type SerializedQuote = Omit<Quote, 'discount' | 'subtotal' | 'total' | 'c
 
 export type SerializedQuoteWithRelations = SerializedQuote & {
   client: SerializedClient | null;
+  items: SerializedQuoteItem[];
+};
+
+export type SerializedQuoteWithFullRelations = SerializedQuote & {
+  client: SerializedClient | null;
+  business: SerializedBusiness;
   items: SerializedQuoteItem[];
 };
 

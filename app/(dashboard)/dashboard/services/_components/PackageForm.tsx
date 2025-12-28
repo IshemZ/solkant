@@ -80,7 +80,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
   // Load services
   useEffect(() => {
     async function loadServices() {
-      const result = await getServices({});
+      const result = await getServices();
       if (result.success) {
         setServices(result.data || []);
       } else {

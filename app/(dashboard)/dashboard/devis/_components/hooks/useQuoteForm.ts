@@ -16,7 +16,7 @@ import {
   calculatePackageDiscount,
   createPackageServicesDescription,
 } from "@/lib/package-utils";
-import { safeParsePrice } from "@/lib/decimal-utils";
+import { safeParsePrice } from "@/lib/number-utils";
 
 interface UseQuoteFormProps {
   mode: 'create' | 'edit';
@@ -62,7 +62,7 @@ export function useQuoteForm({
           price: safeParsePrice(item.price),
           quantity: Number(item.quantity) || 1,
           total: safeParsePrice(item.total),
-          packageDiscount: safeParsePrice((item as any).packageDiscount),
+          packageDiscount: safeParsePrice(item.packageDiscount),
         }))
       );
       setDiscount(Number(initialQuote.discount));
