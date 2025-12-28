@@ -5,6 +5,9 @@ import * as matchers from "@testing-library/jest-dom/matchers";
 // Extend Vitest's expect with Testing Library matchers
 expect.extend(matchers);
 
+// Mock server-only to allow importing server-side utilities in tests
+vi.mock('server-only', () => ({}));
+
 // Mock Next.js navigation
 vi.mock('next/navigation', () => ({
   useRouter: () => ({
