@@ -4,20 +4,15 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { deleteQuote } from "@/app/actions/quotes";
-import type { Quote, Client, QuoteItem, Service } from "@prisma/client";
+import type { SerializedQuoteWithRelations } from "@/types/quote";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FileText } from "lucide-react";
 import { formatDate } from "@/lib/date-utils";
 import { QuoteStatusBadge } from "./QuoteStatusBadge";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuotesListProps {
-  initialQuotes: QuoteWithRelations[];
+  initialQuotes: SerializedQuoteWithRelations[];
 }
 
 export default function QuotesList({ initialQuotes }: QuotesListProps) {
@@ -124,7 +119,7 @@ export default function QuotesList({ initialQuotes }: QuotesListProps) {
                       <QuoteStatusBadge status={quote.status} />
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right font-medium text-foreground">
-                      {quote.total.toFixed(2)} €
+                      {Number(quote.total).toFixed(2)} €
                     </td>
                     <td className="whitespace-nowrap px-6 py-4 text-right text-sm">
                       <div className="flex items-center justify-end gap-3">

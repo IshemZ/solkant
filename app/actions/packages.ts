@@ -9,38 +9,29 @@ import {
   type UpdatePackageInput,
 } from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
+import { successResult, errorResult, type ActionResult } from "@/lib/action-types";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
+import { sanitizeObject } from "@/lib/security";
 import { z } from "zod";
+import type { SerializedPackage } from "@/types/quote";
 
-type PackageWithRelations = Package & {
+export type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
 };
 
 // Convert Prisma Decimal fields to plain numbers for safe serialization
 function serializePackage(
   pkg: Package & { items: (PackageItem & { service: Service | null })[] }
-) {
-  const items = pkg.items || [];
-  return {
-    ...pkg,
-    discountValue: Number((pkg as unknown as { discountValue: number }).discountValue),
-    items: items.map((item) => ({
-      ...item,
-      service: item.service
-        ? {
-            ...item.service,
-            price: Number((item.service as unknown as { price: number }).price),
-          }
-        : null,
-    })),
-  } as unknown as PackageWithRelations;
+): SerializedPackage {
+  return serializeDecimalFields(pkg) as unknown as SerializedPackage;
 }
 
 /**
  * Get all active packages for the current business
  */
 export const getPackages = withAuth(
-  async (_input: Record<string, never>, session) => {
+  async (_input: void, session): Promise<ActionResult<SerializedPackage[]>> => {
     const packages = await prisma.package.findMany({
       where: {
         businessId: session.businessId,
@@ -48,15 +39,14 @@ export const getPackages = withAuth(
       },
       include: {
         items: {
-          include: {
-            service: true,
-          },
+          include: { service: true },
         },
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: { name: "asc" },
     });
 
-    return packages.map((p) => serializePackage(p));
+    const serialized = packages.map((p) => serializePackage(p));
+    return successResult(serialized);
   },
   "getPackages"
 );
@@ -64,8 +54,8 @@ export const getPackages = withAuth(
 /**
  * Get a single package by ID
  */
-export const getPackageById = withAuthAndValidation(
-  async (input: { id: string }, session) => {
+export const getPackageById = withAuth(
+  async (input: { id: string }, session): Promise<ActionResult<SerializedPackage>> => {
     const packageData = await prisma.package.findFirst({
       where: {
         id: input.id,
@@ -73,21 +63,18 @@ export const getPackageById = withAuthAndValidation(
       },
       include: {
         items: {
-          include: {
-            service: true,
-          },
+          include: { service: true },
         },
       },
     });
 
     if (!packageData) {
-      throw new Error("Forfait introuvable");
+      return errorResult("Forfait introuvable", "NOT_FOUND");
     }
 
-    return serializePackage(packageData);
+    return successResult(serializePackage(packageData));
   },
-  "getPackageById",
-  z.object({ id: z.string() })
+  "getPackageById"
 );
 
 /**
@@ -95,42 +82,29 @@ export const getPackageById = withAuthAndValidation(
  */
 export const createPackage = withAuthAndValidation(
   async (input: CreatePackageInput, session) => {
-    const { items, ...packageData } = input;
+    const sanitized = sanitizeObject(input);
+    const { items, ...packageData } = sanitized;
 
-    // Verify all services exist and belong to the business
-    const serviceIds = items.map((item) => item.serviceId);
-    const services = await prisma.service.findMany({
-      where: {
-        id: { in: serviceIds },
-        businessId: session.businessId,
-        isActive: true,
-      },
-    });
-
-    if (services.length !== serviceIds.length) {
-      throw new Error("Un ou plusieurs services sont invalides ou inactifs");
-    }
-
-    // Create package and items in a transaction
-    const newPackage = await prisma.package.create({
+    const pkg = await prisma.package.create({
       data: {
         ...packageData,
         businessId: session.businessId,
         items: {
-          create: items,
+          create: items.map((item) => ({
+            serviceId: item.serviceId,
+            quantity: item.quantity,
+          })),
         },
       },
       include: {
         items: {
-          include: {
-            service: true,
-          },
+          include: { service: true },
         },
       },
     });
 
     revalidatePath("/dashboard/services");
-    return serializePackage(newPackage);
+    return successResult(serializePackage(pkg));
   },
   "createPackage",
   createPackageSchema
@@ -140,74 +114,41 @@ export const createPackage = withAuthAndValidation(
  * Update an existing package
  */
 export const updatePackage = withAuthAndValidation(
-  async (input: { id: string } & UpdatePackageInput, session) => {
-    const { id, items, ...packageData } = input;
+  async (input: UpdatePackageInput & { id: string }, session) => {
+    const sanitized = sanitizeObject(input);
+    const { id, items, ...packageData } = sanitized;
 
-    // Check package exists and belongs to business
-    const existingPackage = await prisma.package.findFirst({
+    // Delete existing items and create new ones
+    await prisma.packageItem.deleteMany({
+      where: { packageId: id },
+    });
+
+    const pkg = await prisma.package.update({
       where: {
         id,
         businessId: session.businessId,
       },
-    });
-
-    if (!existingPackage) {
-      throw new Error("Forfait introuvable");
-    }
-
-    // Update package in transaction
-    const updatedPackage = await prisma.$transaction(async (tx) => {
-      // If items are being updated, delete old ones and create new ones
-      if (items) {
-        // Verify all services exist and belong to the business
-        const serviceIds = items.map((item) => item.serviceId);
-        const services = await tx.service.findMany({
-          where: {
-            id: { in: serviceIds },
-            businessId: session.businessId,
-            isActive: true,
-          },
-        });
-
-        if (services.length !== serviceIds.length) {
-          throw new Error(
-            "Un ou plusieurs services sont invalides ou inactifs"
-          );
-        }
-
-        // Delete existing items
-        await tx.packageItem.deleteMany({
-          where: { packageId: id },
-        });
-
-        // Create new items
-        await tx.packageItem.createMany({
-          data: items.map((item) => ({
-            ...item,
-            packageId: id,
+      data: {
+        ...packageData,
+        items: items ? {
+          create: items.map((item) => ({
+            serviceId: item.serviceId,
+            quantity: item.quantity,
           })),
-        });
-      }
-
-      // Update package data
-      return tx.package.update({
-        where: { id },
-        data: packageData,
-        include: {
-          items: {
-            include: {
-              service: true,
-            },
-          },
+        } : undefined,
+      },
+      include: {
+        items: {
+          include: { service: true },
         },
-      });
+      },
     });
 
     revalidatePath("/dashboard/services");
-    return serializePackage(updatedPackage);
+    return successResult(serializePackage(pkg));
   },
   "updatePackage",
-  z.object({ id: z.string() }).and(updatePackageSchema)
+  updatePackageSchema.extend({ id: z.string().min(1) })
 );
 
 /**
@@ -215,21 +156,11 @@ export const updatePackage = withAuthAndValidation(
  */
 export const deletePackage = withAuth(
   async (input: { id: string }, session) => {
-    // Check package exists and belongs to business
-    const existingPackage = await prisma.package.findFirst({
+    await prisma.package.update({
       where: {
         id: input.id,
         businessId: session.businessId,
       },
-    });
-
-    if (!existingPackage) {
-      throw new Error("Forfait introuvable");
-    }
-
-    // Soft delete
-    await prisma.package.update({
-      where: { id: input.id },
       data: {
         isActive: false,
         deletedAt: new Date(),
@@ -237,8 +168,7 @@ export const deletePackage = withAuth(
     });
 
     revalidatePath("/dashboard/services");
-    return { id: input.id };
+    return successResult({ id: input.id });
   },
-  "deletePackage",
-  { logSuccess: true }
+  "deletePackage"
 );

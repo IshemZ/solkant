@@ -2,7 +2,8 @@ import { Metadata } from "next";
 import { getClients } from "@/app/actions/clients";
 import { getServices } from "@/app/actions/services";
 import { getPackages } from "@/app/actions/packages";
-import QuoteFormNew from "../_components/QuoteFormNew";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
+import QuoteForm from "../_components/QuoteFormUnified";
 import { EmptyState } from "@/components/ui/empty-state";
 import { redirect } from "next/navigation";
 import { Users, Briefcase } from "lucide-react";
@@ -26,6 +27,10 @@ export default async function NewQuotePage() {
   const clients = clientsResult.data;
   const services = servicesResult.data;
   const packages = packagesResult.data;
+
+  // Serialize Decimal fields to numbers for client component
+  const serializedServices = serializeDecimalFields(services) as any;
+  const serializedPackages = serializeDecimalFields(packages) as any;
 
   return (
     <div className="mx-auto max-w-5xl py-8">
@@ -53,7 +58,7 @@ export default async function NewQuotePage() {
           actionHref="/dashboard/services/nouveau"
         />
       ) : (
-        <QuoteFormNew clients={clients} services={services} packages={packages} />
+        <QuoteForm mode="create" clients={clients} services={serializedServices} packages={serializedPackages} />
       )}
     </div>
   );

@@ -133,7 +133,7 @@ describe("Business Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Non autorisé");
+        expect(result.error).toBe("Compte non configuré. Veuillez contacter le support.");
         if ("code" in result && result.code) {
           expect(result.code).toBe("UNAUTHORIZED");
         }
@@ -154,7 +154,7 @@ describe("Business Server Actions", () => {
       if (!result.success) {
         // Les erreurs techniques retournent un message générique
         expect(result.error).toBe(
-          "Erreur lors de l'exécution de getBusinessInfo"
+          "Erreur lors de la récupération des informations"
         );
       }
     });
@@ -318,7 +318,7 @@ describe("Business Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         // Les erreurs techniques retournent un message générique
-        expect(result.error).toBe("Erreur lors de l'exécution de updateBusiness");
+        expect(result.error).toBe("Erreur lors de la mise à jour");
       }
     });
 
@@ -435,7 +435,7 @@ describe("Business Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         // Les erreurs techniques retournent un message générique
-        expect(result.error).toBe("Erreur lors de l'exécution de uploadBusinessLogo");
+        expect(result.error).toBe("Erreur lors de l'upload du logo");
       }
     });
   });

@@ -15,7 +15,7 @@ export default async function EditPackagePage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const result = await getPackageById(id);
+  const result = await getPackageById({ id });
 
   if (!result.success) {
     notFound();

@@ -29,6 +29,11 @@ export const quoteItemSchema = z.object({
     .cuid('ID de service invalide')
     .optional()
     .nullable(),
+  packageId: z
+    .string()
+    .cuid('ID de package invalide')
+    .optional()
+    .nullable(),
   name: z
     .string()
     .min(1, 'Le nom de l\'article est requis')
@@ -55,6 +60,13 @@ export const quoteItemSchema = z.object({
     .number('Le total doit être un nombre')
     .min(0, 'Le total ne peut pas être négatif')
     .max(9999999.99, 'Le total ne peut pas dépasser 9 999 999,99 €'),
+  packageDiscount: z
+    .number('La remise package doit être un nombre')
+    .min(0, 'La remise package ne peut pas être négative')
+    .max(999999.99, 'La remise package ne peut pas dépasser 999 999,99 €')
+    .multipleOf(0.01, 'La remise package doit avoir au maximum 2 décimales')
+    .default(0)
+    .optional(),
 })
 
 /**
@@ -104,12 +116,15 @@ export const createQuoteSchema = z.object({
 )
 .refine(
   (data) => {
-    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total
+    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total après remises packages
     const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
+    const packageDiscountsTotal = data.items.reduce((sum, item) => sum + (item.packageDiscount || 0), 0);
+    const subtotalAfterPackageDiscounts = subtotal - packageDiscountsTotal;
+
     const discountAmount = data.discountType === 'PERCENTAGE'
-      ? subtotal * (data.discount / 100)
+      ? subtotalAfterPackageDiscounts * (data.discount / 100)
       : data.discount;
-    return discountAmount <= subtotal;
+    return discountAmount <= subtotalAfterPackageDiscounts;
   },
   {
     message: 'La remise ne peut pas dépasser le sous-total',
@@ -176,18 +191,21 @@ export const updateQuoteSchema = z.object({
 )
 .refine(
   (data) => {
-    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total
+    // Validation : le montant de remise calculé ne doit pas dépasser le sous-total après remises packages
     // Seulement si items ET discount sont fournis
     if (!data.items || !data.discount) {
       return true;
     }
 
     const subtotal = data.items.reduce((sum, item) => sum + item.total, 0);
+    const packageDiscountsTotal = data.items.reduce((sum, item) => sum + (item.packageDiscount || 0), 0);
+    const subtotalAfterPackageDiscounts = subtotal - packageDiscountsTotal;
+
     const discountType = data.discountType || 'FIXED';
     const discountAmount = discountType === 'PERCENTAGE'
-      ? subtotal * (data.discount / 100)
+      ? subtotalAfterPackageDiscounts * (data.discount / 100)
       : data.discount;
-    return discountAmount <= subtotal;
+    return discountAmount <= subtotalAfterPackageDiscounts;
   },
   {
     message: 'La remise ne peut pas dépasser le sous-total',

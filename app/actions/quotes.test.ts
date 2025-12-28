@@ -169,8 +169,7 @@ describe("Quote Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        // withAuth() retourne un message générique pour les erreurs techniques
-        expect(result.error).toBe("Erreur lors de l'exécution de getQuotes");
+        expect(result.error).toBe("Erreur lors de getQuotes");
       }
     });
   });

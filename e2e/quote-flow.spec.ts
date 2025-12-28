@@ -46,7 +46,9 @@ test.describe("Flow Complet - Création de Devis", () => {
       lastName: "Dupont",
       email: `marie-${timestamp}@example.com`,
       phone: "0123456789",
-      address: "1 rue de Paris, 75001 Paris",
+      rue: "1 rue de Paris",
+      codePostal: "75001",
+      ville: "Paris",
     });
 
     // Soumettre

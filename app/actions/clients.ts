@@ -7,45 +7,42 @@ import {
   type CreateClientInput,
   type UpdateClientInput,
 } from "@/lib/validations";
+import { z } from "zod";
+import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { successResult, errorResult } from "@/lib/action-types";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
-import { z } from "zod";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 
-/**
- * Récupère tous les clients du business
- */
 export const getClients = withAuth(
-  async (_input: Record<string, never>, session) => {
+  async (_input: void, session) => {
     const clients = await prisma.client.findMany({
       where: { businessId: session.businessId },
       orderBy: { createdAt: "desc" },
     });
 
-    return clients;
+    return successResult(serializeDecimalFields(clients));
   },
   "getClients"
 );
 
-/**
- * Crée un nouveau client
- */
 export const createClient = withAuthAndValidation(
   async (input: CreateClientInput, session) => {
-    const { businessId, userId } = session;
+    const sanitized = sanitizeObject(input);
 
     const client = await prisma.client.create({
       data: {
-        ...input,
-        businessId,
+        ...sanitized,
+        businessId: session.businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.CLIENT_CREATED,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: client.id,
       resourceType: "Client",
       metadata: {
@@ -56,18 +53,16 @@ export const createClient = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/clients");
-    return client;
+    return successResult(serializeDecimalFields(client));
   },
   "createClient",
   createClientSchema
 );
 
-/**
- * Met à jour un client existant
- */
 export const updateClient = withAuthAndValidation(
-  async (input: { id: string } & UpdateClientInput, session) => {
-    const { id, ...data } = input;
+  async (input: UpdateClientInput & { id: string }, session) => {
+    const sanitized = sanitizeObject(input);
+    const { id, ...data } = sanitized;
 
     const client = await prisma.client.update({
       where: {
@@ -78,24 +73,20 @@ export const updateClient = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/clients");
-    return client;
+    revalidatePath(`/dashboard/clients/${id}`);
+    return successResult(serializeDecimalFields(client));
   },
   "updateClient",
-  z.object({ id: z.string() }).and(updateClientSchema)
+  updateClientSchema.extend({ id: z.string().min(1) })
 );
 
-/**
- * Supprime un client
- */
 export const deleteClient = withAuth(
   async (input: { id: string }, session) => {
-    const { businessId, userId } = session;
-
     // Récupérer les infos avant suppression
     const client = await prisma.client.findFirst({
       where: {
         id: input.id,
-        businessId,
+        businessId: session.businessId,
       },
       select: { firstName: true, lastName: true, email: true },
     });
@@ -107,15 +98,15 @@ export const deleteClient = withAuth(
     await prisma.client.delete({
       where: {
         id: input.id,
-        businessId,
+        businessId: session.businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.CLIENT_DELETED,
       level: AuditLevel.CRITICAL,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: input.id,
       resourceType: "Client",
       metadata: {
@@ -126,7 +117,7 @@ export const deleteClient = withAuth(
     });
 
     revalidatePath("/dashboard/clients");
+    return successResult({ id: input.id });
   },
-  "deleteClient",
-  { logSuccess: true } // Log deletions in Sentry
+  "deleteClient"
 );

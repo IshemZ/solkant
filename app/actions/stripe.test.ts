@@ -245,7 +245,7 @@ describe("Stripe Server Actions", () => {
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de l'exécution de createCheckoutSession"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });
@@ -271,7 +271,7 @@ describe("Stripe Server Actions", () => {
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de l'exécution de createCheckoutSession"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });
@@ -365,7 +365,7 @@ describe("Stripe Server Actions", () => {
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de l'exécution de createCheckoutSession"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });

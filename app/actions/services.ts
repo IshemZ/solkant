@@ -9,15 +9,14 @@ import {
 } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { successResult, errorResult, type ActionResult } from "@/lib/action-types";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
-import type { Service } from "@prisma/client";
+import { sanitizeObject } from "@/lib/security";
 import { z } from "zod";
 
-/**
- * Récupère tous les services actifs du business
- */
 export const getServices = withAuth(
-  async (_input: Record<string, never>, session) => {
+  async (_input: void, session): Promise<ActionResult<import('@/types/quote').SerializedService[]>> => {
     const services = await prisma.service.findMany({
       where: {
         businessId: session.businessId,
@@ -26,30 +25,27 @@ export const getServices = withAuth(
       orderBy: { createdAt: "desc" },
     });
 
-    return services;
+    return successResult(serializeDecimalFields(services) as unknown as import('@/types/quote').SerializedService[]);
   },
   "getServices"
 );
 
-/**
- * Crée un nouveau service
- */
 export const createService = withAuthAndValidation(
   async (input: CreateServiceInput, session) => {
-    const { businessId, userId } = session;
+    const sanitized = sanitizeObject(input);
 
     const service = await prisma.service.create({
       data: {
-        ...input,
-        businessId,
+        ...sanitized,
+        businessId: session.businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.SERVICE_CREATED,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: service.id,
       resourceType: "Service",
       metadata: {
@@ -59,18 +55,16 @@ export const createService = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/services");
-    return service;
+    return successResult(serializeDecimalFields(service));
   },
   "createService",
   createServiceSchema
 );
 
-/**
- * Met à jour un service existant
- */
 export const updateService = withAuthAndValidation(
-  async (input: { id: string } & UpdateServiceInput, session) => {
-    const { id, ...data } = input;
+  async (input: UpdateServiceInput & { id: string }, session) => {
+    const sanitized = sanitizeObject(input);
+    const { id, ...data } = sanitized;
 
     const service = await prisma.service.update({
       where: {
@@ -81,24 +75,19 @@ export const updateService = withAuthAndValidation(
     });
 
     revalidatePath("/dashboard/services");
-    return service;
+    return successResult(serializeDecimalFields(service));
   },
   "updateService",
-  z.object({ id: z.string() }).and(updateServiceSchema)
+  updateServiceSchema.extend({ id: z.string().min(1) })
 );
 
-/**
- * Archive un service (soft delete)
- */
 export const deleteService = withAuth(
   async (input: { id: string }, session) => {
-    const { businessId, userId } = session;
-
-    // Récupérer les infos avant archivage
+    // Récupérer les infos avant suppression
     const service = await prisma.service.findFirst({
       where: {
         id: input.id,
-        businessId,
+        businessId: session.businessId,
       },
       select: { name: true, price: true },
     });
@@ -110,7 +99,7 @@ export const deleteService = withAuth(
     await prisma.service.update({
       where: {
         id: input.id,
-        businessId,
+        businessId: session.businessId,
       },
       data: {
         isActive: false,
@@ -121,8 +110,8 @@ export const deleteService = withAuth(
     await auditLog({
       action: AuditAction.SERVICE_DELETED,
       level: AuditLevel.CRITICAL,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: input.id,
       resourceType: "Service",
       metadata: {
@@ -132,71 +121,7 @@ export const deleteService = withAuth(
     });
 
     revalidatePath("/dashboard/services");
+    return successResult(undefined);
   },
-  "deleteService",
-  { logSuccess: true }
-);
-
-/**
- * Interface pour service avec compteur de devis
- */
-interface ServiceWithQuoteCount extends Service {
-  quoteCount: number;
-}
-
-/**
- * Récupère les services les plus utilisés (top 10)
- */
-export const getTopServices = withAuth(
-  async (_input: Record<string, never>, session) => {
-    const { businessId } = session;
-
-    // Use raw SQL to efficiently count quotes per service with multi-tenant security
-    const result = await prisma.$queryRaw<
-      Array<{ serviceId: string; quoteCount: bigint }>
-    >`
-      SELECT
-        qi."serviceId",
-        COUNT(DISTINCT qi."quoteId") AS "quoteCount"
-      FROM "quote_items" qi
-      INNER JOIN "quotes" q ON qi."quoteId" = q."id"
-      WHERE q."businessId" = ${businessId} AND qi."serviceId" IS NOT NULL
-      GROUP BY qi."serviceId"
-      ORDER BY "quoteCount" DESC
-      LIMIT 10
-    `;
-
-    // Fetch the top services with their quote counts
-    const serviceIds = result.map((r) => r.serviceId);
-
-    if (serviceIds.length === 0) {
-      return [];
-    }
-
-    const services = await prisma.service.findMany({
-      where: {
-        id: { in: serviceIds },
-        businessId,
-        isActive: true,
-      },
-    });
-
-    // Merge quote counts with services
-    const serviceCounts = new Map(
-      result.map((r) => [r.serviceId, Number(r.quoteCount)])
-    );
-
-    const servicesWithCounts: ServiceWithQuoteCount[] = services.map(
-      (service) => ({
-        ...service,
-        quoteCount: serviceCounts.get(service.id) || 0,
-      })
-    );
-
-    // Sort by quote count descending
-    servicesWithCounts.sort((a, b) => b.quoteCount - a.quoteCount);
-
-    return servicesWithCounts;
-  },
-  "getTopServices"
+  "deleteService"
 );

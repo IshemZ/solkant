@@ -6,83 +6,74 @@ import {
   type UpdateBusinessInput,
 } from "@/lib/validations";
 import { revalidatePath } from "next/cache";
+import { successResult, errorResult } from "@/lib/action-types";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
-import type { Business } from "@prisma/client";
-import { z } from "zod";
-import { BusinessError } from "@/lib/errors";
+import { sanitizeObject } from "@/lib/security";
 
-/**
- * Récupère les informations du business
- */
 export const getBusinessInfo = withAuth(
-  async (_input: Record<string, never>, session) => {
+  async (_input: void, session) => {
     const business = await prisma.business.findUnique({
       where: { id: session.businessId },
     });
 
-    return business;
+    return successResult(business);
   },
-  "getBusinessInfo"
+  "getBusinessInfo",
+  "Erreur lors de la récupération des informations"
 );
 
-/**
- * Met à jour les informations du business
- */
 export const updateBusiness = withAuthAndValidation(
   async (input: UpdateBusinessInput, session) => {
+    const sanitized = sanitizeObject(input);
+
     const business = await prisma.business.update({
       where: { id: session.businessId },
-      data: input,
+      data: sanitized,
     });
 
     revalidatePath("/dashboard/parametres");
-    return business;
+    return successResult(business);
   },
   "updateBusiness",
-  updateBusinessSchema
+  updateBusinessSchema,
+  "Erreur lors de la mise à jour"
 );
 
-/**
- * Upload le logo du business (data URL base64)
- */
-export const uploadBusinessLogo = withAuthAndValidation(
+export const uploadBusinessLogo = withAuth(
   async (input: { logoData: string }, session) => {
+    const { logoData } = input;
+
     // Valider que c'est bien une data URL d'image
-    if (!input.logoData.startsWith("data:image/")) {
-      throw new BusinessError("Format d'image invalide");
+    if (!logoData.startsWith("data:image/")) {
+      return errorResult("Format d'image invalide", "INVALID_FORMAT");
     }
 
     // Limiter la taille (5MB en base64 ≈ 3.75MB original)
-    if (input.logoData.length > 5 * 1024 * 1024) {
-      throw new BusinessError("L'image est trop volumineuse (max 5MB)");
+    if (logoData.length > 5 * 1024 * 1024) {
+      return errorResult("L'image est trop volumineuse (max 5MB)", "FILE_TOO_LARGE");
     }
 
     const business = await prisma.business.update({
       where: { id: session.businessId },
-      data: { logo: input.logoData },
+      data: { logo: logoData },
     });
 
     revalidatePath("/dashboard/parametres");
-    return business;
+    return successResult(business);
   },
   "uploadBusinessLogo",
-  z.object({
-    logoData: z.string().min(1, "Logo requis"),
-  })
+  "Erreur lors de l'upload du logo"
 );
 
-/**
- * Supprime le logo du business
- */
 export const deleteBusinessLogo = withAuth(
-  async (_input: Record<string, never>, session) => {
+  async (_input: void, session) => {
     const business = await prisma.business.update({
       where: { id: session.businessId },
       data: { logo: null },
     });
 
     revalidatePath("/dashboard/parametres");
-    return business;
+    return successResult(business);
   },
   "deleteBusinessLogo"
 );

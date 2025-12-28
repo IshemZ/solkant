@@ -5,7 +5,6 @@ import GoogleProvider from "next-auth/providers/google";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 import { getEnv, features } from "./env";
-import * as Sentry from "@sentry/nextjs";
 
 /**
  * NextAuth configuration
@@ -188,7 +187,8 @@ export const authOptions: NextAuthOptions = {
                 lastError
               );
 
-              // Logger dans Sentry pour monitoring
+              // Logger dans Sentry pour monitoring (lazy import to avoid bundling in client components)
+              const Sentry = await import("@sentry/nextjs");
               Sentry.captureException(lastError, {
                 tags: {
                   action: "google_oauth_signin",

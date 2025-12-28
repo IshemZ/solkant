@@ -21,6 +21,10 @@ export default async function ServicesPage({
   const servicesResult = await getServices({});
   const packagesResult = await getPackages({});
 
+  // Server actions already serialize Decimal fields, no need to do it again
+  const services = servicesResult.success ? servicesResult.data : [];
+  const packages = packagesResult.success ? packagesResult.data : [];
+
   return (
     <div className="mx-auto max-w-6xl">
       <div className="mb-8 flex items-center justify-between">
@@ -40,7 +44,7 @@ export default async function ServicesPage({
             {servicesResult.error}
           </div>
         ) : (
-          <ServicesList initialServices={servicesResult.data || []} />
+          <ServicesList initialServices={services} />
         )
       ) : (
         !packagesResult.success ? (
@@ -48,7 +52,7 @@ export default async function ServicesPage({
             {packagesResult.error}
           </div>
         ) : (
-          <PackagesList initialPackages={packagesResult.data || []} />
+          <PackagesList initialPackages={packages} />
         )
       )}
     </div>

@@ -20,6 +20,16 @@ describe("date-utils", () => {
       expect(formatDate(date1)).toBe("02/12/2024");
       expect(formatDate(date2)).toBe("02/12/2024");
     });
+
+    it("devrait gérer les valeurs null et undefined", () => {
+      expect(formatDate(null)).toBe("—");
+      expect(formatDate(undefined)).toBe("—");
+    });
+
+    it("devrait gérer les dates invalides", () => {
+      expect(formatDate("invalid-date")).toBe("—");
+      expect(formatDate(new Date("invalid"))).toBe("—");
+    });
   });
 
   describe("formatDateTime", () => {
@@ -35,6 +45,15 @@ describe("date-utils", () => {
     it("devrait padder les heures et minutes", () => {
       const date = new Date("2024-01-05T03:07:00Z");
       expect(formatDateTime(date)).toBe("05/01/2024 03:07");
+    });
+
+    it("devrait gérer les valeurs null et undefined", () => {
+      expect(formatDateTime(null)).toBe("—");
+      expect(formatDateTime(undefined)).toBe("—");
+    });
+
+    it("devrait gérer les dates invalides", () => {
+      expect(formatDateTime("invalid-date")).toBe("—");
     });
   });
 
@@ -52,6 +71,15 @@ describe("date-utils", () => {
       // Format attendu par <input type="date">
       const date = new Date("2024-01-05T00:00:00Z");
       expect(formatDateISO(date)).toBe("2024-01-05");
+    });
+
+    it("devrait gérer les valeurs null et undefined", () => {
+      expect(formatDateISO(null)).toBe("");
+      expect(formatDateISO(undefined)).toBe("");
+    });
+
+    it("devrait gérer les dates invalides", () => {
+      expect(formatDateISO("invalid-date")).toBe("");
     });
   });
 

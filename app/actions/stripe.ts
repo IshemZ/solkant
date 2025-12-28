@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { withAuth } from "@/lib/action-wrapper";
 import { BusinessError } from "@/lib/errors";
+import { type ActionResult, successResult } from "@/lib/action-types";
 
 // Types pour les résultats Stripe
 type CheckoutSessionResult = { url: string };
@@ -20,7 +21,7 @@ type CustomerPortalResult = { url: string };
  * Crée une session Stripe Checkout pour l'abonnement Pro
  */
 export const createCheckoutSession = withAuth(
-  async (_input: Record<string, never>, session): Promise<CheckoutSessionResult> => {
+  async (_input: Record<string, never>, session): Promise<ActionResult<CheckoutSessionResult>> => {
     const { businessId, userId, userEmail } = session;
 
     // Récupérer le Business
@@ -89,7 +90,7 @@ export const createCheckoutSession = withAuth(
       throw new BusinessError("URL de session Checkout invalide");
     }
 
-    return { url: checkoutSession.url };
+    return successResult({ url: checkoutSession.url });
   },
   "createCheckoutSession"
 );
@@ -98,7 +99,7 @@ export const createCheckoutSession = withAuth(
  * Récupère le statut de l'abonnement actuel
  */
 export const getSubscriptionStatus = withAuth(
-  async (_input: Record<string, never>, session): Promise<SubscriptionStatus> => {
+  async (_input: Record<string, never>, session): Promise<ActionResult<SubscriptionStatus>> => {
     const business = await prisma.business.findUnique({
       where: { id: session.businessId },
     });
@@ -115,11 +116,11 @@ export const getSubscriptionStatus = withAuth(
     ).stripeSubscriptionId;
 
     if (!stripeSubscriptionId) {
-      return {
+      return successResult({
         plan: "free",
         status: "active",
         currentPeriodEnd: null,
-      };
+      });
     }
 
     // Récupérer l'abonnement depuis Stripe
@@ -134,14 +135,14 @@ export const getSubscriptionStatus = withAuth(
       cancel_at_period_end: boolean;
     };
 
-    return {
+    return successResult({
       plan: "pro",
       status: subData.status,
       currentPeriodEnd: new Date(
         subData.current_period_end * 1000
       ).toISOString(),
       cancelAtPeriodEnd: subData.cancel_at_period_end,
-    };
+    });
   },
   "getSubscriptionStatus"
 );
@@ -150,7 +151,7 @@ export const getSubscriptionStatus = withAuth(
  * Crée une session de portail client Stripe pour gérer l'abonnement
  */
 export const createCustomerPortalSession = withAuth(
-  async (_input: Record<string, never>, session): Promise<CustomerPortalResult> => {
+  async (_input: Record<string, never>, session): Promise<ActionResult<CustomerPortalResult>> => {
     const business = await prisma.business.findUnique({
       where: { id: session.businessId },
     });
@@ -178,7 +179,7 @@ export const createCustomerPortalSession = withAuth(
       return_url: `${baseUrl}/dashboard/abonnement`,
     });
 
-    return { url: portalSession.url };
+    return successResult({ url: portalSession.url });
   },
   "createCustomerPortalSession"
 );

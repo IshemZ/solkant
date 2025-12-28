@@ -43,7 +43,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success || !result.data) {
     return NextResponse.json({ error: "Devis introuvable" }, { status: 404 });
