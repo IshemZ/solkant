@@ -35,6 +35,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
+import { BusinessError } from "@/lib/errors";
 
 /**
  * Type guard pour vérifier si une valeur est un Record
@@ -145,7 +146,13 @@ export function withAuth<TInput, TOutput>(
 
       return successResult(result);
     } catch (error) {
-      // Logger l'erreur dans Sentry
+      // Préserver les erreurs métier (BusinessError)
+      if (error instanceof BusinessError) {
+        // Pas de logging Sentry pour les erreurs métier (flux normal)
+        return errorResult(error.message, error.code || "BUSINESS_ERROR");
+      }
+
+      // Logger les erreurs techniques dans Sentry
       Sentry.captureException(error, {
         tags: { action: actionName },
         extra: { input },
@@ -155,7 +162,7 @@ export function withAuth<TInput, TOutput>(
         console.error(`Error in ${actionName}:`, error);
       }
 
-      // Retourner une erreur générique (ne pas exposer les détails internes)
+      // Retourner une erreur générique pour les erreurs techniques
       return errorResult(
         `Erreur lors de l'exécution de ${actionName}`,
         "INTERNAL_ERROR"
@@ -262,7 +269,13 @@ export function withAuthAndValidation<TInput, TOutput>(
 
       return successResult(result);
     } catch (error) {
-      // Logger l'erreur dans Sentry
+      // Préserver les erreurs métier (BusinessError)
+      if (error instanceof BusinessError) {
+        // Pas de logging Sentry pour les erreurs métier (flux normal)
+        return errorResult(error.message, error.code || "BUSINESS_ERROR");
+      }
+
+      // Logger les erreurs techniques dans Sentry
       Sentry.captureException(error, {
         tags: { action: actionName },
         extra: { input },
@@ -272,7 +285,7 @@ export function withAuthAndValidation<TInput, TOutput>(
         console.error(`Error in ${actionName}:`, error);
       }
 
-      // Retourner une erreur générique
+      // Retourner une erreur générique pour les erreurs techniques
       return errorResult(
         `Erreur lors de l'exécution de ${actionName}`,
         "INTERNAL_ERROR"

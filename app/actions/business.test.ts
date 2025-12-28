@@ -152,8 +152,9 @@ describe("Business Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
+        // Les erreurs techniques retournent un message générique
         expect(result.error).toBe(
-          "Erreur lors de la récupération des informations"
+          "Erreur lors de l'exécution de getBusinessInfo"
         );
       }
     });
@@ -316,7 +317,8 @@ describe("Business Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la mise à jour");
+        // Les erreurs techniques retournent un message générique
+        expect(result.error).toBe("Erreur lors de l'exécution de updateBusiness");
       }
     });
 
@@ -366,7 +368,7 @@ describe("Business Server Actions", () => {
         logo: validLogoData,
       });
 
-      const result = await uploadBusinessLogo(validLogoData);
+      const result = await uploadBusinessLogo({ logoData: validLogoData });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -384,7 +386,7 @@ describe("Business Server Actions", () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
-      const result = await uploadBusinessLogo("data:text/plain;base64,test");
+      const result = await uploadBusinessLogo({ logoData: "data:text/plain;base64,test" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -400,7 +402,7 @@ describe("Business Server Actions", () => {
       // Create a string > 5MB
       const largeData = "data:image/png;base64," + "a".repeat(6 * 1024 * 1024);
 
-      const result = await uploadBusinessLogo(largeData);
+      const result = await uploadBusinessLogo({ logoData: largeData });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -412,7 +414,7 @@ describe("Business Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await uploadBusinessLogo(validLogoData);
+      const result = await uploadBusinessLogo({ logoData: validLogoData });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -428,11 +430,12 @@ describe("Business Server Actions", () => {
         new Error("Database error")
       );
 
-      const result = await uploadBusinessLogo(validLogoData);
+      const result = await uploadBusinessLogo({ logoData: validLogoData });
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de l'upload du logo");
+        // Les erreurs techniques retournent un message générique
+        expect(result.error).toBe("Erreur lors de l'exécution de uploadBusinessLogo");
       }
     });
   });

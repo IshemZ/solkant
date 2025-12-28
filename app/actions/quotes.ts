@@ -14,6 +14,7 @@ import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import type { Quote, QuoteItem, Service, Client } from "@prisma/client";
 import { formatAddress } from "@/lib/utils";
 import { z } from "zod";
+import { BusinessError } from "@/lib/errors";
 
 // Types pour les quotes avec relations
 type QuoteWithRelations = Quote & {
@@ -66,7 +67,7 @@ export const getQuote = withAuthAndValidation(
     });
 
     if (!quote) {
-      throw new Error("Devis introuvable");
+      throw new BusinessError("Devis introuvable");
     }
 
     return quote;
@@ -180,7 +181,7 @@ async function createQuoteWithRetry(
     }
   }
 
-  throw new Error("Failed to create quote after maximum retries");
+  throw new BusinessError("Failed to create quote after maximum retries");
 }
 
 /**
@@ -232,7 +233,7 @@ export const deleteQuote = withAuth(
     });
 
     if (!quote) {
-      throw new Error("Devis introuvable");
+      throw new BusinessError("Devis introuvable");
     }
 
     await prisma.quote.delete({
@@ -287,11 +288,11 @@ export const updateQuote = withAuthAndValidation(
     });
 
     if (!existingQuote) {
-      throw new Error("Devis introuvable");
+      throw new BusinessError("Devis introuvable");
     }
 
     if (existingQuote.status !== "DRAFT") {
-      throw new Error("Impossible de modifier un devis déjà envoyé");
+      throw new BusinessError("Impossible de modifier un devis déjà envoyé");
     }
 
     // Si des items sont fournis, calculer les nouveaux totaux
@@ -410,11 +411,11 @@ export const sendQuote = withAuth(
     });
 
     if (!quote) {
-      throw new Error("Devis introuvable");
+      throw new BusinessError("Devis introuvable");
     }
 
     if (!quote.client?.email) {
-      throw new Error("Le client n'a pas d'adresse email");
+      throw new BusinessError("Le client n'a pas d'adresse email");
     }
 
     // Vérifier que Resend est configuré
@@ -461,7 +462,7 @@ export const sendQuote = withAuth(
         return updatedQuote;
       }
 
-      throw new Error(
+      throw new BusinessError(
         "Service d'envoi d'emails non configuré. Veuillez ajouter RESEND_API_KEY dans .env"
       );
     }
@@ -518,7 +519,7 @@ export const sendQuote = withAuth(
         extra: { quoteId: input.id, clientEmail: quote.client.email },
       });
 
-      throw new Error(
+      throw new BusinessError(
         "Erreur lors de l'envoi de l'email. Veuillez réessayer."
       );
     }

@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import type { Business } from "@prisma/client";
 import { z } from "zod";
+import { BusinessError } from "@/lib/errors";
 
 /**
  * Récupère les informations du business
@@ -48,12 +49,12 @@ export const uploadBusinessLogo = withAuthAndValidation(
   async (input: { logoData: string }, session) => {
     // Valider que c'est bien une data URL d'image
     if (!input.logoData.startsWith("data:image/")) {
-      throw new Error("Format d'image invalide");
+      throw new BusinessError("Format d'image invalide");
     }
 
     // Limiter la taille (5MB en base64 ≈ 3.75MB original)
     if (input.logoData.length > 5 * 1024 * 1024) {
-      throw new Error("L'image est trop volumineuse (max 5MB)");
+      throw new BusinessError("L'image est trop volumineuse (max 5MB)");
     }
 
     const business = await prisma.business.update({

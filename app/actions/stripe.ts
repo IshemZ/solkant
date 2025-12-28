@@ -4,6 +4,7 @@ import { stripe, STRIPE_PRICE_ID_PRO } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
 import { withAuth } from "@/lib/action-wrapper";
+import { BusinessError } from "@/lib/errors";
 
 // Types pour les résultats Stripe
 type CheckoutSessionResult = { url: string };
@@ -28,7 +29,7 @@ export const createCheckoutSession = withAuth(
     });
 
     if (!business) {
-      throw new Error("Business introuvable");
+      throw new BusinessError("Business introuvable");
     }
 
     // Créer ou récupérer le customer Stripe
@@ -85,7 +86,7 @@ export const createCheckoutSession = withAuth(
     });
 
     if (!checkoutSession.url) {
-      throw new Error("URL de session Checkout invalide");
+      throw new BusinessError("URL de session Checkout invalide");
     }
 
     return { url: checkoutSession.url };
@@ -103,7 +104,7 @@ export const getSubscriptionStatus = withAuth(
     });
 
     if (!business) {
-      throw new Error("Business introuvable");
+      throw new BusinessError("Business introuvable");
     }
 
     // Récupérer les informations de l'abonnement
@@ -155,14 +156,14 @@ export const createCustomerPortalSession = withAuth(
     });
 
     if (!business) {
-      throw new Error("Business introuvable");
+      throw new BusinessError("Business introuvable");
     }
 
     const stripeCustomerId = (business as unknown as { stripeCustomerId?: string | null })
       .stripeCustomerId;
 
     if (!stripeCustomerId) {
-      throw new Error("Aucun compte Stripe trouvé");
+      throw new BusinessError("Aucun compte Stripe trouvé");
     }
 
     // Obtenir l'URL de base
