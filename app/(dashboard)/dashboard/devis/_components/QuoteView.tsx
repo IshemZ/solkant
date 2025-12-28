@@ -5,26 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Pencil, Trash2, Download, Mail } from "lucide-react";
 import { toast } from "sonner";
-import type {
-  Quote,
-  Client,
-  Business,
-  QuoteItem,
-  Service,
-} from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 import { formatDate } from "@/lib/date-utils";
 import { deleteQuote } from "@/app/actions/quotes";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import QuotePreview from "./QuotePreview";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuoteViewProps {
-  quote: QuoteWithRelations;
+  quote: SerializedQuoteWithFullRelations;
 }
 
 export default function QuoteView({ quote }: QuoteViewProps) {
@@ -68,7 +56,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
   }
 
   async function handleSendEmail() {
-    if (!quote.client || !quote.client.email) {
+    if (!quote.client?.email) {
       alert("Le client n'a pas d'adresse email");
       return;
     }
@@ -99,7 +87,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
   }
 
   async function handleDelete() {
-    const result = await deleteQuote(quote.id);
+    const result = await deleteQuote({ id: quote.id });
     if (result.success) {
       toast.success("Devis supprimé avec succès");
       router.push("/dashboard/devis");

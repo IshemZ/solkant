@@ -11,7 +11,7 @@ export async function generateMetadata({
   params,
 }: QuotePageProps): Promise<Metadata> {
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success) {
     return {
@@ -29,7 +29,7 @@ export async function generateMetadata({
     title: `Devis ${quote.quoteNumber} - ${clientName} | Solkant`,
     description: `Devis ${
       quote.quoteNumber
-    } pour ${clientName} - Montant: ${quote.total.toFixed(2)} € - Statut: ${
+    } pour ${clientName} - Montant: ${Number(quote.total).toFixed(2)} € - Statut: ${
       quote.status
     }`,
   };
@@ -37,7 +37,7 @@ export async function generateMetadata({
 
 export default async function QuotePage({ params }: QuotePageProps) {
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success) {
     redirect("/dashboard/devis");

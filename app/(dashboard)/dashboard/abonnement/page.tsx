@@ -11,7 +11,7 @@ export default async function AbonnementPage() {
     redirect("/login");
   }
 
-  const result = await getSubscriptionStatus();
+  const result = await getSubscriptionStatus({});
 
   if (!result.success) {
     return (

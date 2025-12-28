@@ -11,13 +11,17 @@ import { getServerSession } from "next-auth";
 import prisma from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 import { sendVerificationEmail, sendPasswordResetEmail } from "@/lib/email";
-import { randomBytes } from "crypto";
+import { randomBytes, randomInt } from "node:crypto";
 import * as Sentry from "@sentry/nextjs";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import {
+  type ActionResult,
+  successResult,
+  errorResult,
+} from "@/lib/action-types";
+import { withAuthUnverified } from "@/lib/action-wrapper";
 
 // Types spécifiques pour auth
 type VerifyEmailResult = { userId: string };
-type CheckEmailVerificationResult = { isVerified: boolean; email: string | null };
 
 /**
  * Configuration des tokens de vérification
@@ -29,8 +33,6 @@ const TOKEN_CONFIG = {
 
 /**
  * Génère un token de vérification unique et cryptographiquement sécurisé
- *
- * @returns Token hexadécimal de 64 caractères
  */
 function generateSecureToken(): string {
   return randomBytes(TOKEN_CONFIG.length).toString("hex");
@@ -38,8 +40,6 @@ function generateSecureToken(): string {
 
 /**
  * Calcule la date d'expiration du token
- *
- * @returns Date d'expiration (24h dans le futur)
  */
 function getTokenExpiry(): Date {
   const expiry = new Date();
@@ -49,20 +49,9 @@ function getTokenExpiry(): Date {
 
 /**
  * Génère un nouveau token de vérification et envoie l'email
- * Peut être utilisé pour renvoyer un email de vérification
- *
- * @param userId - ID de l'utilisateur
- * @returns Résultat de l'opération
- *
- * @example
- * ```typescript
- * const result = await generateVerificationToken('user_123');
- * if (result.success) {
- *   console.log('Email envoyé !');
- * }
- * ```
+ * Note: Fonction interne utilisée par resendVerificationEmail
  */
-export async function generateVerificationToken(
+async function generateVerificationToken(
   userId: string
 ): Promise<ActionResult<void>> {
   try {
@@ -141,20 +130,13 @@ export async function generateVerificationToken(
  * - Invalide le token après utilisation (one-time use)
  * - Rate limiting recommandé au niveau route
  *
- * @param token - Token de vérification reçu par email
- * @returns Résultat avec userId si succès
- *
- * @example
- * ```typescript
- * const result = await verifyEmailToken(token);
- * if (result.success) {
- *   redirect('/dashboard');
- * }
- * ```
+ * Note: Pas de session requise (token public dans URL)
  */
-export async function verifyEmailToken(token: string): Promise<ActionResult<VerifyEmailResult>> {
+export async function verifyEmailToken(
+  token: string
+): Promise<ActionResult<VerifyEmailResult>> {
   try {
-    if (!token || token.length !== 64) {
+    if (token?.length !== 64) {
       return errorResult("Token invalide", "INVALID_TOKEN");
     }
 
@@ -217,20 +199,12 @@ export async function verifyEmailToken(token: string): Promise<ActionResult<Veri
  * Utile si l'email précédent a expiré ou n'a pas été reçu
  *
  * ⚠️ RATE LIMITING : Limiter à 1 envoi toutes les 5 minutes par utilisateur
- *
- * @returns Résultat de l'opération
  */
-export async function resendVerificationEmail(): Promise<ActionResult<void>> {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.email) {
-      return errorResult("Non authentifié", "UNAUTHORIZED");
-    }
-
+export const resendVerificationEmail = withAuthUnverified(
+  async (_input: Record<string, never>, session) => {
     // Récupérer l'utilisateur
     const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
+      where: { email: session.userEmail },
       select: {
         id: true,
         email: true,
@@ -241,11 +215,11 @@ export async function resendVerificationEmail(): Promise<ActionResult<void>> {
     });
 
     if (!user) {
-      return errorResult("Utilisateur introuvable", "NOT_FOUND");
+      throw new Error("Utilisateur introuvable");
     }
 
     if (user.emailVerified) {
-      return errorResult("Email déjà vérifié", "ALREADY_VERIFIED");
+      throw new Error("Email déjà vérifié");
     }
 
     // Rate limiting basique : vérifier si un token récent existe déjà
@@ -257,27 +231,29 @@ export async function resendVerificationEmail(): Promise<ActionResult<void>> {
       // Permettre renvoi seulement si le dernier token expire dans plus de 23h
       // (donc envoyé il y a plus de 1h)
       if (minutesRemaining > 23 * 60) {
-        return errorResult(
-          `Veuillez patienter avant de renvoyer un email. Un lien valide a déjà été envoyé.`,
-          "RATE_LIMIT"
+        throw new Error(
+          `Veuillez patienter avant de renvoyer un email. Un lien valide a déjà été envoyé.`
         );
       }
     }
 
     // Générer et envoyer nouveau token
-    return await generateVerificationToken(user.id);
-  } catch (error) {
-    console.error("[resendVerificationEmail]", error);
-    Sentry.captureException(error);
-    return errorResult("Une erreur est survenue. Veuillez réessayer.");
-  }
-}
+    const result = await generateVerificationToken(user.id);
+
+    if (!result.success) {
+      throw new Error(result.error);
+    }
+
+    return successResult({ email: user.email });
+  },
+  "resendVerificationEmail"
+);
 
 /**
  * Vérifie si l'utilisateur actuel a vérifié son email
  * Utile pour afficher des bannières de rappel
  *
- * @returns État de vérification
+ * Note: Fonction de lecture simple, pas besoin de wrapper
  */
 export async function checkEmailVerificationStatus(): Promise<{
   isVerified: boolean;
@@ -311,21 +287,12 @@ export async function checkEmailVerificationStatus(): Promise<{
 /**
  * Génère un code OTP à 6 chiffres et envoie l'email de réinitialisation
  *
- * @param email - Email de l'utilisateur
- * @returns Résultat de l'opération
- *
  * @security
  * - Retourne succès même si email n'existe pas (protection contre l'énumération)
  * - Token valide 15 minutes
  * - Invalide les anciens tokens non utilisés
  *
- * @example
- * ```typescript
- * const result = await requestPasswordReset({ email: 'user@example.com' });
- * if (result.success) {
- *   // Email envoyé (ou pas, mais on ne révèle pas l'information)
- * }
- * ```
+ * Note: Pas de session requise (password reset public)
  */
 export async function requestPasswordReset(input: {
   email: string;
@@ -358,8 +325,8 @@ export async function requestPasswordReset(input: {
       },
     });
 
-    // Générer un code OTP à 6 chiffres
-    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    // Générer un code OTP à 6 chiffres (cryptographiquement sécurisé)
+    const code = randomInt(100000, 1000000).toString();
 
     // Créer le token avec expiration de 15 minutes
     const expiresAt = new Date();
@@ -418,23 +385,12 @@ export async function requestPasswordReset(input: {
 /**
  * Réinitialise le mot de passe avec un code OTP
  *
- * @param input - Email, code OTP et nouveau mot de passe
- * @returns Résultat de l'opération
- *
  * @security
  * - Vérifie la validité temporelle du code (15 min)
  * - Invalide le code après utilisation
  * - Hash bcrypt du nouveau mot de passe
  *
- * @example
- * ```typescript
- * const result = await resetPasswordWithOTP({
- *   email: 'user@example.com',
- *   code: '123456',
- *   newPassword: 'NewPass123',
- *   confirmPassword: 'NewPass123'
- * });
- * ```
+ * Note: Pas de session requise (password reset public)
  */
 export async function resetPasswordWithOTP(input: {
   email: string;

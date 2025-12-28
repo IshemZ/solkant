@@ -90,21 +90,6 @@ export const metadata: Metadata = {
   },
 };
 
-// Audit A11y en développement uniquement - DÉSACTIVÉ temporairement
-// Cause "window is not defined" en mode Turbopack
-// TODO: Réactiver après migration stable
-/*
-if (process.env.NODE_ENV === "development") {
-  logEnvSummary();
-  import("@axe-core/react").then((axe) => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const React = require("react");
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const ReactDOM = require("react-dom");
-    axe.default(React, ReactDOM, 1000);
-  });
-}
-*/
 
 export default function RootLayout({
   children,

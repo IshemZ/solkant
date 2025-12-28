@@ -19,7 +19,7 @@ export default function EmailVerificationBanner() {
     setIsLoading(true);
     setMessage("");
 
-    const result = await resendVerificationEmail();
+    const result = await resendVerificationEmail({});
 
     if (result.success) {
       setMessage("✅ Email renvoyé ! Vérifiez votre boîte de réception.");

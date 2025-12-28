@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
-import { generateVerificationToken } from "@/app/actions/auth";
 
 // Simple in-memory rate limiting (production: use Redis/Upstash)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
@@ -74,13 +73,12 @@ export async function POST(request: Request) {
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user with Business in a transaction
-    // ⚠️ emailVerified reste null jusqu'à validation du token
     const user = await prisma.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        emailVerified: null, // Non vérifié initialement
+        emailVerified: new Date(), // Auto-vérifié (email verification désactivée)
         business: {
           create: {
             name: `Institut de ${name || "beauté"}`,
@@ -102,34 +100,10 @@ export async function POST(request: Request) {
       },
     });
 
-    // Générer token de vérification et envoyer email
-    const verificationResult = await generateVerificationToken(user.id);
-
-    if (!verificationResult.success) {
-      // L'utilisateur est créé mais l'email n'a pas pu être envoyé
-      console.error(
-        "Échec envoi email vérification:",
-        verificationResult.error
-      );
-
-      // On retourne quand même un succès car l'utilisateur existe
-      // Il pourra redemander un email depuis /check-email
-      return NextResponse.json(
-        {
-          user,
-          message: "Compte créé. Veuillez vérifier votre email.",
-          warning:
-            "L'email de vérification n'a pas pu être envoyé. Vous pourrez le renvoyer depuis votre profil.",
-        },
-        { status: 201 }
-      );
-    }
-
     return NextResponse.json(
       {
         user,
-        message:
-          "Compte créé avec succès ! Veuillez vérifier votre email pour activer votre compte.",
+        message: "Compte créé avec succès ! Vous pouvez maintenant vous connecter.",
         trackSignUp: true, // Flag pour tracking GA4
       },
       { status: 201 }

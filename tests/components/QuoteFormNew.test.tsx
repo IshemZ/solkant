@@ -1,5 +1,5 @@
 /**
- * Tests pour QuoteFormNew - Suit les anti-patterns de testing
+ * Tests pour QuoteForm (unified) - Suit les anti-patterns de testing
  *
  * Principes suivis:
  * 1. Ne jamais tester le comportement des mocks
@@ -16,8 +16,9 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { Decimal } from "@prisma/client/runtime/library";
-import QuoteFormNew from "@/app/(dashboard)/dashboard/devis/_components/QuoteFormNew";
+import QuoteForm from "@/app/(dashboard)/dashboard/devis/_components/QuoteFormUnified";
 import type { Client, Service, Package, PackageItem } from "@prisma/client";
+import type { SerializedService, SerializedPackage } from "@/types/quote";
 
 // Mock des dépendances EXTERNES uniquement
 vi.mock("next/navigation", () => ({
@@ -56,12 +57,12 @@ const createMockClient = (overrides?: Partial<Client>): Client => ({
   ...overrides,
 });
 
-// ✅ GOOD: Structure de données COMPLÈTE pour les services
-const createMockService = (overrides?: Partial<Service>): Service => ({
+// ✅ GOOD: Structure de données COMPLÈTE pour les services (serialized)
+const createMockService = (overrides?: Partial<SerializedService>): SerializedService => ({
   id: "service-1",
   name: "Coupe de cheveux",
   description: "Coupe classique",
-  price: 50.0,
+  price: 50.0, // number instead of Decimal
   duration: 60,
   category: "HAIRCUT",
   isActive: true,
@@ -72,19 +73,15 @@ const createMockService = (overrides?: Partial<Service>): Service => ({
   ...overrides,
 });
 
-// ✅ GOOD: Structure de données COMPLÈTE pour les forfaits avec relations
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
-
+// ✅ GOOD: Structure de données COMPLÈTE pour les forfaits avec relations (serialized)
 const createMockPackage = (
-  overrides?: Partial<PackageWithRelations>
-): PackageWithRelations => ({
+  overrides?: Partial<SerializedPackage>
+): SerializedPackage => ({
   id: "package-1",
   name: "Forfait Beauté",
   description: "Forfait complet",
   discountType: "PERCENTAGE",
-  discountValue: new Decimal(10),
+  discountValue: 10, // number instead of Decimal
   isActive: true,
   deletedAt: null,
   businessId: "business-1",
@@ -109,7 +106,7 @@ const createMockPackage = (
   ...overrides,
 });
 
-describe("QuoteFormNew - Anti-Pattern Tests", () => {
+describe("QuoteForm (create mode) - Anti-Pattern Tests", () => {
   const mockClients = [
     createMockClient({ id: "client-1", firstName: "Marie", lastName: "Dupont" }),
     createMockClient({
@@ -131,7 +128,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       id: "package-1",
       name: "Forfait Beauté",
       discountType: "PERCENTAGE",
-      discountValue: new Decimal(10),
+      discountValue: 10, // number instead of Decimal
       items: [
         {
           id: "item-1",
@@ -153,7 +150,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       id: "package-2",
       name: "Forfait Premium",
       discountType: "FIXED",
-      discountValue: new Decimal(15),
+      discountValue: 15, // number instead of Decimal
       items: [
         {
           id: "item-3",
@@ -236,7 +233,8 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
   describe("Component Rendering (Real Behavior, Not Mocks)", () => {
     it("devrait rendre le formulaire avec toutes les sections", () => {
       render(
-        <QuoteFormNew
+        <QuoteForm
+          mode="create"
           clients={mockClients}
           services={mockServices}
           packages={mockPackages}
@@ -254,7 +252,8 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
 
     it("devrait afficher le bouton désactivé quand le formulaire est vide", () => {
       render(
-        <QuoteFormNew
+        <QuoteForm
+          mode="create"
           clients={mockClients}
           services={mockServices}
           packages={mockPackages}
@@ -271,7 +270,8 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
 
     it("devrait afficher les champs de formulaire", () => {
       render(
-        <QuoteFormNew
+        <QuoteForm
+          mode="create"
           clients={mockClients}
           services={mockServices}
           packages={mockPackages}
@@ -303,7 +303,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(basePrice).toBe(80); // 50€ + 30€ = 80€
 
       // ✅ Teste que la réduction est calculée correctement
-      const discountValue = pkg.discountValue.toNumber();
+      const discountValue = pkg.discountValue; // already a number
       const discountAmount = basePrice * (discountValue / 100);
       expect(discountAmount).toBe(8); // 10% de 80€ = 8€
 
@@ -325,7 +325,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(basePrice).toBe(80); // Service à 80€
 
       // ✅ Réduction fixe
-      const discountAmount = pkg.discountValue.toNumber();
+      const discountAmount = pkg.discountValue; // already a number
       expect(discountAmount).toBe(15);
 
       // ✅ Prix final
@@ -380,8 +380,8 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
 
       const discountAmount =
         pkg.discountType === "PERCENTAGE"
-          ? basePrice * (pkg.discountValue.toNumber() / 100)
-          : pkg.discountValue.toNumber();
+          ? basePrice * (pkg.discountValue / 100)
+          : pkg.discountValue;
 
       // ✅ Le prix dans les articles doit être le prix de BASE
       const articlePrice = basePrice; // Pas basePrice - discountAmount
@@ -419,7 +419,8 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       const { createQuote } = await import("@/app/actions/quotes");
 
       render(
-        <QuoteFormNew
+        <QuoteForm
+          mode="create"
           clients={mockClients}
           services={mockServices}
           packages={mockPackages}
@@ -446,7 +447,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       // comme getItems(), resetForm(), etc. qui seraient uniquement
       // utilisées par les tests
 
-      // Si QuoteFormNew avait des méthodes publiques test-only:
+      // Si QuoteForm avait des méthodes publiques test-only:
       // - addItemForTesting()
       // - clearFormForTesting()
       // - getStateForTesting()
@@ -495,7 +496,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(basePrice).toBe(80); // 50€ + 30€
 
       // Calcul de la réduction (ce que fait addPackageItem)
-      const discountValue = pkg.discountValue.toNumber();
+      const discountValue = pkg.discountValue; // already a number
       const packageDiscount = Math.min(
         basePrice * (discountValue / 100),
         basePrice
@@ -517,7 +518,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(basePrice).toBe(80); // Service à 80€
 
       // Calcul de la réduction fixe (ce que fait addPackageItem)
-      const discountValue = pkg.discountValue.toNumber();
+      const discountValue = pkg.discountValue; // already a number
       const packageDiscount = Math.min(discountValue, basePrice);
 
       expect(packageDiscount).toBe(15); // Réduction fixe de 15€
@@ -529,7 +530,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       const expensiveDiscountPackage = createMockPackage({
         id: "package-expensive",
         discountType: "FIXED",
-        discountValue: new Decimal(100), // 100€ de réduction
+        discountValue: 100, // 100€ de réduction
         items: [
           {
             id: "item-cheap",
@@ -549,7 +550,7 @@ describe("QuoteFormNew - Anti-Pattern Tests", () => {
       expect(basePrice).toBe(50);
 
       // Calcul avec Math.min pour limiter la réduction
-      const discountValue = expensiveDiscountPackage.discountValue.toNumber();
+      const discountValue = expensiveDiscountPackage.discountValue; // already a number
       const packageDiscount = Math.min(discountValue, basePrice);
 
       // La réduction ne doit jamais dépasser le prix de base

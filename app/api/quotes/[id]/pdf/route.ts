@@ -10,15 +10,9 @@ import {
   AuditLevel,
   extractRequestInfo,
 } from "@/lib/audit-logger";
-import type { Quote, Client, Business, QuoteItem, Service } from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
-function generatePdfFileName(quote: QuoteWithRelations): string {
+function generatePdfFileName(quote: SerializedQuoteWithFullRelations): string {
   const { pdfFileNamePrefix } = quote.business;
   const client = quote.client;
 
@@ -43,7 +37,7 @@ export async function GET(
   }
 
   const { id } = await params;
-  const result = await getQuote(id);
+  const result = await getQuote({ id });
 
   if (!result.success || !result.data) {
     return NextResponse.json({ error: "Devis introuvable" }, { status: 404 });

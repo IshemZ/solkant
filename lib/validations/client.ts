@@ -20,12 +20,14 @@ export const createClientSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
+    .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'email invalide")
     .optional()
     .nullable(),
   phone: z
     .string()
     .trim()
+    .max(20, "Le numéro de téléphone ne peut pas dépasser 20 caractères")
     .regex(
       /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       "Numéro de téléphone invalide (format français attendu)"
@@ -94,12 +96,14 @@ export const updateClientSchema = z.object({
     .string()
     .trim()
     .toLowerCase()
+    .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'email invalide")
     .optional()
     .nullable(),
   phone: z
     .string()
     .trim()
+    .max(20, "Le numéro de téléphone ne peut pas dépasser 20 caractères")
     .regex(
       /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       "Numéro de téléphone invalide (format français attendu)"

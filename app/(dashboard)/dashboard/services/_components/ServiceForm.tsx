@@ -28,10 +28,10 @@ import {
   createServiceSchema,
   type CreateServiceInput,
 } from "@/lib/validations";
-import type { Service } from "@prisma/client";
+import type { SerializedService } from "@/types/quote";
 
 interface ServiceFormProps {
-  service?: Service;
+  service?: SerializedService;
   mode?: "create" | "edit";
 }
 
@@ -72,7 +72,7 @@ export default function ServiceForm({
       // Donc data.isActive sera toujours défini après résolution
       const result =
         isEdit && service
-          ? await updateService(service.id, data as CreateServiceInput)
+          ? await updateService({ id: service.id, ...(data as CreateServiceInput) })
           : await createService(data as CreateServiceInput);
 
       if (!result.success) {

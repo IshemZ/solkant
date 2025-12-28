@@ -180,7 +180,7 @@ describe("sendQuote - Envoi d'emails", () => {
         error: null,
       });
 
-      const result = await sendQuote("quote_123");
+      const result = await sendQuote({ id: "quote_123" });
 
       // Vérifier succès
       expect(result.success).toBe(true);
@@ -234,7 +234,7 @@ describe("sendQuote - Envoi d'emails", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await sendQuote("quote_123");
+      const result = await sendQuote({ id: "quote_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -248,7 +248,7 @@ describe("sendQuote - Envoi d'emails", () => {
     it("should return error if quote not found", async () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await sendQuote("quote_999");
+      const result = await sendQuote({ id: "quote_999" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -271,7 +271,7 @@ describe("sendQuote - Envoi d'emails", () => {
         quoteWithoutEmail as any
       );
 
-      const result = await sendQuote("quote_123");
+      const result = await sendQuote({ id: "quote_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -290,7 +290,7 @@ describe("sendQuote - Envoi d'emails", () => {
         error: { message: "Resend API error" },
       });
 
-      const result = await sendQuote("quote_123");
+      const result = await sendQuote({ id: "quote_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -308,24 +308,31 @@ describe("sendQuote - Envoi d'emails", () => {
     it("should only send quotes from own business", async () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
 
-      await sendQuote("quote_123");
+      await sendQuote({ id: "quote_123" });
 
       // Vérifier que businessId est filtré
-      expect(prisma.quote.findFirst).toHaveBeenCalledWith(
-        expect.objectContaining({
-          where: expect.objectContaining({
-            id: "quote_123",
-            businessId: "business_123",
-          }),
-        })
-      );
+      expect(prisma.quote.findFirst).toHaveBeenCalledWith({
+        where: {
+          id: "quote_123",
+          businessId: "business_123",
+        },
+        include: {
+          client: true,
+          items: {
+            include: {
+              service: true,
+            },
+          },
+          business: true,
+        },
+      });
     });
 
     it("should not send quote from another business", async () => {
       // Simuler qu'aucun devis n'est trouvé (car businessId différent)
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await sendQuote("quote_other_business");
+      const result = await sendQuote({ id: "quote_other_business" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -358,7 +365,7 @@ describe("sendQuote - Envoi d'emails", () => {
         .spyOn(console, "log")
         .mockImplementation(() => {});
 
-      const result = await sendQuote("quote_123");
+      const result = await sendQuote({ id: "quote_123" });
 
       // Devrait réussir en mode simulation
       expect(result.success).toBe(true);

@@ -45,6 +45,7 @@ export const createBusinessSchema = z.object({
     .nullable(),
   phone: z
     .string()
+    .max(20, "Le numéro de téléphone ne peut pas dépasser 20 caractères")
     .regex(
       /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       "Numéro de téléphone invalide (format français attendu)"
@@ -54,6 +55,7 @@ export const createBusinessSchema = z.object({
     .nullable(),
   email: z
     .string()
+    .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'email invalide")
     .toLowerCase()
     .trim()
@@ -185,7 +187,10 @@ export const updateBusinessSchema = z.object({
     .optional(),
   email: z
     .union([
-      z.string().email("Format d'email invalide").toLowerCase().trim(),
+      z.string().regex(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Format d'email invalide"
+      ).toLowerCase().trim(),
       z.literal(""),
       z.null(),
     ])

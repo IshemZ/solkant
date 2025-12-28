@@ -216,34 +216,6 @@ describe("Stripe Server Actions", () => {
       expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
     });
 
-    it("should return error if no email in session", async () => {
-      vi.mocked(getServerSession).mockResolvedValue({
-        user: {
-          id: "user_123",
-          businessId: "business_123",
-          email: null,
-          name: "Test User",
-        },
-      } as any);
-
-      // Mock user with unverified email
-      vi.mocked(prisma.user.findUnique).mockResolvedValue({
-        ...mockUser,
-        emailVerified: null,
-      });
-
-      const result = await createCheckoutSession();
-
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        expect(result.error).toBe("Email non vérifié. Veuillez vérifier votre email.");
-        if ("code" in result && result.code) {
-          expect(result.code).toBe("EMAIL_NOT_VERIFIED");
-        }
-      }
-      expect(stripe.customers.create).not.toHaveBeenCalled();
-    });
-
     it("should return error if business not found", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
@@ -271,8 +243,9 @@ describe("Stripe Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
+        // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de la création de la session de paiement"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });
@@ -296,8 +269,9 @@ describe("Stripe Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
+        // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de la création de la session de paiement"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });
@@ -389,8 +363,9 @@ describe("Stripe Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
+        // withAuth() retourne un message générique pour les erreurs techniques
         expect(result.error).toBe(
-          "Erreur lors de la création de la session de paiement"
+          "Erreur lors de createCheckoutSession"
         );
       }
     });

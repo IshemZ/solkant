@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { GoogleAnalytics as GAComponent } from "@next/third-parties/google";
 
 export function GoogleAnalytics() {
-  const [GA, setGA] = useState<any>(null);
+  const [GA, setGA] = useState<typeof GAComponent | null>(null);
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   useEffect(() => {

@@ -170,8 +170,8 @@ describe("Password Reset Server Actions", () => {
 
       // Vérifier que le code est bien 6 chiffres
       expect(code).toMatch(/^\d{6}$/);
-      expect(parseInt(code)).toBeGreaterThanOrEqual(100000);
-      expect(parseInt(code)).toBeLessThanOrEqual(999999);
+      expect(Number.parseInt(code)).toBeGreaterThanOrEqual(100000);
+      expect(Number.parseInt(code)).toBeLessThanOrEqual(999999);
     });
 
     it("should set token expiry to 15 minutes", async () => {

@@ -4,13 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export interface BreadcrumbItem {
-  label: string;
-  href: string;
+  readonly label: string;
+  readonly href: string;
 }
 
 interface BreadcrumbsProps {
-  items: BreadcrumbItem[];
-  className?: string;
+  readonly items: BreadcrumbItem[];
+  readonly className?: string;
 }
 
 export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {

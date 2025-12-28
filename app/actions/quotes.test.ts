@@ -7,6 +7,7 @@ import {
 } from "@/app/actions/quotes";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { Decimal } from "@prisma/client/runtime/library";
 
 // Mock dependencies
 vi.mock("next-auth", () => ({
@@ -72,11 +73,13 @@ describe("Quote Server Actions", () => {
           clientId: "clxxx333333333333333",
           businessId: "clxxx222222222222222",
           status: "DRAFT",
-          validUntil: new Date("2025-01-15").toISOString(),
-          discount: 0,
-          subtotal: 150,
-          total: 150,
+          validUntil: new Date("2025-01-15"),
+          discount: new Decimal(0),
+          subtotal: new Decimal(150),
+          total: new Decimal(150),
+          discountType: "FIXED",
           notes: null,
+          sentAt: null,
           createdAt: new Date(),
           updatedAt: new Date(),
           client: {
@@ -97,21 +100,24 @@ describe("Quote Server Actions", () => {
               id: "item_1",
               quoteId: "quote_1",
               serviceId: "clxxx444444444444444",
+              packageId: null,
               name: "Coupe classique",
               description: null,
-              price: 30,
+              price: new Decimal(30),
               quantity: 1,
-              total: 30,
+              total: new Decimal(30),
+              packageDiscount: new Decimal(0),
               createdAt: new Date(),
               updatedAt: new Date(),
               service: {
                 id: "clxxx444444444444444",
                 name: "Coupe classique",
                 description: null,
-                price: 30,
+                price: new Decimal(30),
                 duration: 45,
                 category: null,
                 isActive: true,
+                deletedAt: null,
                 businessId: "clxxx222222222222222",
                 createdAt: new Date(),
                 updatedAt: new Date(),
@@ -169,7 +175,7 @@ describe("Quote Server Actions", () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe("Erreur lors de la récupération des devis");
+        expect(result.error).toBe("Erreur lors de getQuotes");
       }
     });
   });
@@ -184,11 +190,13 @@ describe("Quote Server Actions", () => {
         clientId: "clxxx333333333333333",
         businessId: "clxxx222222222222222",
         status: "DRAFT",
-        validUntil: new Date("2025-01-15").toISOString(),
-        discount: 0,
-        subtotal: 150,
-        total: 150,
+        validUntil: new Date("2025-01-15"),
+        discount: new Decimal(0),
+        discountType: "FIXED",
+        subtotal: new Decimal(150),
+        total: new Decimal(150),
         notes: "Note de test",
+        sentAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
@@ -246,7 +254,7 @@ describe("Quote Server Actions", () => {
         ],
       });
 
-      const result = await getQuote("quote_1");
+      const result = await getQuote({ id: "quote_1" });
 
       expect(result.success).toBe(true);
       if (result.success) {
@@ -278,7 +286,7 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await getQuote("quote_not_found");
+      const result = await getQuote({ id: "quote_not_found" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -289,7 +297,7 @@ describe("Quote Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await getQuote("quote_1");
+      const result = await getQuote({ id: "quote_1" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -391,10 +399,12 @@ describe("Quote Server Actions", () => {
         businessId: "clxxx222222222222222",
         status: "SENT",
         validUntil: new Date(),
-        discount: 0,
-        subtotal: 100,
-        total: 100,
+        discount: new Decimal(0),
+        discountType: "FIXED",
+        subtotal: new Decimal(100),
+        total: new Decimal(100),
         notes: null,
+        sentAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -754,10 +764,12 @@ describe("Quote Server Actions", () => {
         businessId: "clxxx222222222222222",
         status: "DRAFT",
         validUntil: new Date(),
-        discount: 0,
-        subtotal: 100,
-        total: 100,
+        discount: new Decimal(0),
+        discountType: "FIXED",
+        subtotal: new Decimal(100),
+        total: new Decimal(100),
         notes: null,
+        sentAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -769,15 +781,17 @@ describe("Quote Server Actions", () => {
         businessId: "clxxx222222222222222",
         status: "DRAFT",
         validUntil: new Date(),
-        discount: 0,
-        subtotal: 100,
-        total: 100,
+        discount: new Decimal(0),
+        discountType: "FIXED",
+        subtotal: new Decimal(100),
+        total: new Decimal(100),
         notes: null,
+        sentAt: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
 
-      const result = await deleteQuote("quote_123");
+      const result = await deleteQuote({ id: "quote_123" });
 
       expect(result.success).toBe(true);
 
@@ -802,7 +816,7 @@ describe("Quote Server Actions", () => {
     it("should return error if not authenticated", async () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
-      const result = await deleteQuote("quote_123");
+      const result = await deleteQuote({ id: "quote_123" });
 
       expect(result.success).toBe(false);
       if (!result.success) {
@@ -818,7 +832,7 @@ describe("Quote Server Actions", () => {
       // Mock findFirst retourne null (quote inexistant ou autre business)
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
-      const result = await deleteQuote("quote_other");
+      const result = await deleteQuote({ id: "quote_other" });
 
       expect(result.success).toBe(false);
       if (!result.success) {

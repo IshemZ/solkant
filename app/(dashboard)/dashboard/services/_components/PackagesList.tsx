@@ -4,17 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { deletePackage } from "@/app/actions/packages";
-import type { Package, PackageItem, Service } from "@prisma/client";
+import type { SerializedPackage } from "@/types/quote";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Package as PackageIcon } from "lucide-react";
 
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
-
 interface PackagesListProps {
-  initialPackages: PackageWithRelations[];
+  initialPackages: SerializedPackage[];
 }
 
 export default function PackagesList({ initialPackages }: PackagesListProps) {
@@ -30,7 +26,7 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
   async function confirmDelete() {
     if (!packageToDelete) return;
 
-    const result = await deletePackage(packageToDelete);
+    const result = await deletePackage({ id: packageToDelete });
     if (result.success) {
       setPackages(packages.filter((p) => p.id !== packageToDelete));
       toast.success("Forfait archivé avec succès");
@@ -40,24 +36,23 @@ export default function PackagesList({ initialPackages }: PackagesListProps) {
     setPackageToDelete(null);
   }
 
-  function calculateBasePrice(pkg: PackageWithRelations): number {
+  function calculateBasePrice(pkg: SerializedPackage): number {
     return pkg.items.reduce((sum, item) => {
       const price = item.service?.price || 0;
       return sum + price * item.quantity;
     }, 0);
   }
 
-  function calculateFinalPrice(pkg: PackageWithRelations): number {
+  function calculateFinalPrice(pkg: SerializedPackage): number {
     const basePrice = calculateBasePrice(pkg);
     if (pkg.discountType === "NONE") return basePrice;
     if (pkg.discountType === "PERCENTAGE") {
-      const discountVal = Number(pkg.discountValue);
-      return basePrice * (1 - discountVal / 100);
+      return basePrice * (1 - pkg.discountValue / 100);
     }
-    return basePrice - Number(pkg.discountValue);
+    return basePrice - pkg.discountValue;
   }
 
-  function formatDiscount(pkg: PackageWithRelations): string | null {
+  function formatDiscount(pkg: SerializedPackage): string | null {
     if (pkg.discountType === "NONE") return null;
     if (pkg.discountType === "PERCENTAGE") {
       return `-${pkg.discountValue}%`;

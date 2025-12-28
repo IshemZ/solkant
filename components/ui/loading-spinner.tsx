@@ -14,18 +14,17 @@ const sizeClasses = {
 export function LoadingSpinner({
   className,
   size = "md",
-}: LoadingSpinnerProps) {
+}: Readonly<LoadingSpinnerProps>) {
   return (
-    <div
+    <output
       className={cn(
         "animate-spin rounded-full border-2 border-primary border-t-transparent",
         sizeClasses[size],
         className
       )}
-      role="status"
       aria-label="Chargement en cours"
     >
       <span className="sr-only">Chargement...</span>
-    </div>
+    </output>
   );
 }

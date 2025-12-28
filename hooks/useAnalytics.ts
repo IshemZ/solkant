@@ -17,7 +17,7 @@ export function useAnalytics() {
     params?: Record<string, string | number | boolean>
   ) => {
     // Server-side or gtag not loaded
-    if (typeof window === "undefined" || !window.gtag) {
+    if (!globalThis.window?.gtag) {
       return;
     }
 
@@ -27,7 +27,7 @@ export function useAnalytics() {
       ...(session?.user?.businessId && { user_id: session.user.businessId }),
     };
 
-    window.gtag("event", eventName, enrichedParams);
+    globalThis.window.gtag("event", eventName, enrichedParams);
   };
 
   return { trackEvent };

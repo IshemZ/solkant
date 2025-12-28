@@ -5,8 +5,6 @@
  * @module lib/audit-logger
  */
 
-import * as Sentry from "@sentry/nextjs";
-
 /**
  * Types d'actions auditées
  */
@@ -18,6 +16,7 @@ export enum AuditAction {
   QUOTE_SENT = "quote.sent",
   QUOTE_PDF_GENERATED = "quote.pdf_generated",
   QUOTE_STATUS_CHANGED = "quote.status_changed",
+  QUOTE_EXPORTED = "quote.exported",
 
   // Clients
   CLIENT_CREATED = "client.created",
@@ -109,8 +108,10 @@ export async function auditLog(
     });
   }
 
-  // Envoyer à Sentry pour monitoring centralisé
+  // Envoyer à Sentry pour monitoring centralisé (lazy import to avoid bundling in client components)
   try {
+    const Sentry = await import("@sentry/nextjs");
+
     Sentry.addBreadcrumb({
       type: "audit",
       category: "audit-log",
@@ -153,27 +154,8 @@ export async function auditLog(
     console.error("Erreur lors du logging d'audit:", error);
   }
 
-  // TODO: Implémenter stockage persistant en base de données
-  // Pour une vraie application en production, il faudrait :
-  // 1. Créer un modèle AuditLog dans Prisma
-  // 2. Sauvegarder les logs en BDD pour historique long terme
-  // 3. Ajouter des endpoints admin pour consulter les logs
-  // 4. Implémenter rotation/archivage des vieux logs
-  //
-  // Exemple Prisma model:
-  // model AuditLog {
-  //   id          String   @id @default(cuid())
-  //   action      String
-  //   level       String
-  //   userId      String?
-  //   businessId  String?
-  //   resourceId  String?
-  //   resourceType String?
-  //   metadata    Json?
-  //   ipAddress   String?
-  //   userAgent   String?
-  //   createdAt   DateTime @default(now())
-  // }
+  // Note: Current implementation uses Sentry for audit logging.
+  // For enhanced compliance, consider adding database persistence in the future.
 }
 
 /**

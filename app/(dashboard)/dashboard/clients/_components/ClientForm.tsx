@@ -98,7 +98,7 @@ export default function ClientForm({
 
       const result =
         isEdit && client
-          ? await updateClient(client.id, submitData)
+          ? await updateClient({ id: client.id, ...submitData })
           : await createClient(submitData);
 
       if (!result.success) {

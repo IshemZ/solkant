@@ -4,13 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { deleteService } from "@/app/actions/services";
-import type { Service } from "@prisma/client";
+import type { SerializedService } from "@/types/quote";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Briefcase } from "lucide-react";
 
 interface ServicesListProps {
-  initialServices: Service[];
+  initialServices: SerializedService[];
 }
 
 export default function ServicesList({ initialServices }: ServicesListProps) {
@@ -26,7 +26,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
   async function confirmDelete() {
     if (!serviceToDelete) return;
 
-    const result = await deleteService(serviceToDelete);
+    const result = await deleteService({ id: serviceToDelete });
     if (result.success) {
       setServices(services.filter((s) => s.id !== serviceToDelete));
       toast.success("Service archivé avec succès");
@@ -134,7 +134,7 @@ export default function ServicesList({ initialServices }: ServicesListProps) {
 
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-lg font-bold text-foreground">
-                  {service.price.toFixed(2)} €
+                  {Number(service.price).toFixed(2)} €
                 </span>
                 {service.duration && (
                   <span className="text-sm text-muted-foreground">

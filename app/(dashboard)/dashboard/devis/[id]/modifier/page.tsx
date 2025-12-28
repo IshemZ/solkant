@@ -3,7 +3,9 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { getPackages } from "@/app/actions/packages";
-import QuoteFormEdit from "../../_components/QuoteFormEdit";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
+import QuoteForm from "../../_components/QuoteFormUnified";
+import type { SerializedService, SerializedPackage } from "@/types/quote";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -27,7 +29,11 @@ export default async function ModifierDevisPage({ params }: PageProps) {
     },
     include: {
       client: true,
-      items: true,
+      items: {
+        include: {
+          service: true,
+        },
+      },
     },
   });
 
@@ -64,6 +70,10 @@ export default async function ModifierDevisPage({ params }: PageProps) {
 
   const packages = packagesResult.data;
 
+  // Serialize Decimal fields to numbers for client component
+  const serializedServices = serializeDecimalFields(services) as unknown as SerializedService[];
+  const serializedPackages = serializeDecimalFields(packages) as unknown as SerializedPackage[];
+
   return (
     <div className="mx-auto max-w-5xl py-8">
       <div className="mb-8">
@@ -71,7 +81,7 @@ export default async function ModifierDevisPage({ params }: PageProps) {
         <p className="mt-2 text-muted-foreground">Devis {quote.quoteNumber}</p>
       </div>
 
-      <QuoteFormEdit quote={quote} clients={clients} services={services} packages={packages} />
+      <QuoteForm mode="edit" initialQuote={quote} clients={clients} services={serializedServices} packages={serializedPackages} />
     </div>
   );
 }

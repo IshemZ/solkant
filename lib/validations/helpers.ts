@@ -43,16 +43,7 @@ export function formatZodErrors(error: z.ZodError): Record<string, string> {
  * ```
  */
 export function formatZodFlatErrors(error: z.ZodError): Record<string, string> {
-  const flattened = error.flatten()
-  const formattedErrors: Record<string, string> = {}
-
-  Object.entries(flattened.fieldErrors).forEach(([key, messages]) => {
-    if (Array.isArray(messages) && messages.length > 0) {
-      formattedErrors[key] = messages[0]
-    }
-  })
-
-  return formattedErrors
+  return formatZodErrors(error)
 }
 
 /**
@@ -140,4 +131,32 @@ export function validateOrThrow<T>(schema: z.ZodSchema<T>, data: unknown): T {
 export function validateOrNull<T>(schema: z.ZodSchema<T>, data: unknown): T | null {
   const result = schema.safeParse(data)
   return result.success ? result.data : null
+}
+
+/**
+ * Formate les erreurs Zod en un objet Record<string, string[]>
+ * pour les fieldErrors dans ActionResult
+ *
+ * @example
+ * ```ts
+ * const result = createClientSchema.safeParse(data)
+ * if (!result.success) {
+ *   const fieldErrors = formatZodFieldErrors(result.error)
+ *   // { email: ["Format d'email invalide"], phone: ["Numéro invalide"] }
+ *   return errorResult("Données invalides", "VALIDATION_ERROR", fieldErrors)
+ * }
+ * ```
+ */
+export function formatZodFieldErrors(error: z.ZodError): Record<string, string[]> {
+  const fieldErrors: Record<string, string[]> = {}
+
+  error.issues.forEach((issue) => {
+    const path = issue.path.join('.')
+    if (!fieldErrors[path]) {
+      fieldErrors[path] = []
+    }
+    fieldErrors[path].push(issue.message)
+  })
+
+  return fieldErrors
 }

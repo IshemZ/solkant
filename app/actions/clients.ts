@@ -7,73 +7,39 @@ import {
   type CreateClientInput,
   type UpdateClientInput,
 } from "@/lib/validations";
+import { z } from "zod";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
-import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
-import type { Client } from "@prisma/client";
+import { successResult } from "@/lib/action-types";
+import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
+import { serializeDecimalFields } from "@/lib/decimal-utils";
 
-export async function getClients(): Promise<ActionResult<Client[]>> {
-  const validatedSession = await validateSession();
+export const getClients = withAuth(async (_input: void, session) => {
+  const clients = await prisma.client.findMany({
+    where: { businessId: session.businessId },
+    orderBy: { createdAt: "desc" },
+  });
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
+  return successResult(serializeDecimalFields(clients));
+}, "getClients");
 
-  const { businessId } = validatedSession;
+export const createClient = withAuthAndValidation(
+  async (input: CreateClientInput, session) => {
+    const sanitized = sanitizeObject(input);
 
-  try {
-    const clients = await prisma.client.findMany({
-      where: { businessId },
-      orderBy: { createdAt: "desc" },
-    });
-
-    return successResult(clients);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getClients", businessId },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching clients:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération des clients");
-  }
-}
-
-export async function createClient(input: CreateClientInput): Promise<ActionResult<Client>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = createClientSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     const client = await prisma.client.create({
       data: {
-        ...validation.data,
-        businessId,
+        ...sanitized,
+        businessId: session.businessId,
       },
     });
 
     await auditLog({
       action: AuditAction.CLIENT_CREATED,
       level: AuditLevel.INFO,
-      userId,
-      businessId,
+      userId: session.userId,
+      businessId: session.businessId,
       resourceId: client.id,
       resourceType: "Client",
       metadata: {
@@ -84,119 +50,68 @@ export async function createClient(input: CreateClientInput): Promise<ActionResu
     });
 
     revalidatePath("/dashboard/clients");
-    return successResult(client);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "createClient", businessId },
-      extra: { input: sanitized },
-    });
+    return successResult(serializeDecimalFields(client));
+  },
+  "createClient",
+  createClientSchema
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error creating client:", error);
-    }
+export const updateClient = withAuthAndValidation(
+  async (input: UpdateClientInput & { id: string }, session) => {
+    const sanitized = sanitizeObject(input);
+    const { id, ...data } = sanitized;
 
-    return errorResult("Erreur lors de la création du client");
-  }
-}
-
-export async function updateClient(id: string, input: UpdateClientInput): Promise<ActionResult<Client>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = updateClientSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     const client = await prisma.client.update({
       where: {
         id,
-        businessId, // Tenant isolation
+        businessId: session.businessId,
       },
-      data: validation.data,
+      data,
     });
 
     revalidatePath("/dashboard/clients");
-    return successResult(client);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "updateClient", businessId },
-      extra: { clientId: id, input: sanitized },
-    });
+    revalidatePath(`/dashboard/clients/${id}`);
+    return successResult(serializeDecimalFields(client));
+  },
+  "updateClient",
+  updateClientSchema.extend({ id: z.string().min(1) })
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error updating client:", error);
-    }
+export const deleteClient = withAuth(async (input: { id: string }, session) => {
+  // Récupérer les infos avant suppression
+  const client = await prisma.client.findFirst({
+    where: {
+      id: input.id,
+      businessId: session.businessId,
+    },
+    select: { firstName: true, lastName: true, email: true },
+  });
 
-    return errorResult("Erreur lors de la mise à jour du client");
+  if (!client) {
+    throw new Error("Client introuvable");
   }
-}
 
-export async function deleteClient(id: string): Promise<ActionResult<void>> {
-  const validatedSession = await validateSession();
+  await prisma.client.delete({
+    where: {
+      id: input.id,
+      businessId: session.businessId,
+    },
+  });
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
+  await auditLog({
+    action: AuditAction.CLIENT_DELETED,
+    level: AuditLevel.CRITICAL,
+    userId: session.userId,
+    businessId: session.businessId,
+    resourceId: input.id,
+    resourceType: "Client",
+    metadata: {
+      firstName: client.firstName,
+      lastName: client.lastName,
+      email: client.email,
+    },
+  });
 
-  const { businessId, userId } = validatedSession;
-
-  try {
-    // Récupérer les infos avant suppression
-    const client = await prisma.client.findFirst({
-      where: {
-        id,
-        businessId,
-      },
-      select: { firstName: true, lastName: true, email: true },
-    });
-
-    if (!client) {
-      return errorResult("Client introuvable", "NOT_FOUND");
-    }
-
-    await prisma.client.delete({
-      where: {
-        id,
-        businessId,
-      },
-    });
-
-    await auditLog({
-      action: AuditAction.CLIENT_DELETED,
-      level: AuditLevel.CRITICAL,
-      userId,
-      businessId,
-      resourceId: id,
-      resourceType: "Client",
-      metadata: {
-        firstName: client.firstName,
-        lastName: client.lastName,
-        email: client.email,
-      },
-    });
-
-    revalidatePath("/dashboard/clients");
-    return successResult(undefined);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "deleteClient", businessId },
-      extra: { clientId: id },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error deleting client:", error);
-    }
-
-    return errorResult("Erreur lors de la suppression du client");
-  }
-}
+  revalidatePath("/dashboard/clients");
+  return successResult({ id: input.id });
+}, "deleteClient");

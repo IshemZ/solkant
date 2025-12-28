@@ -1,8 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { X, Plus, AlertCircle, Package as PackageIcon } from "lucide-react";
 import {
   Button,
@@ -28,233 +26,70 @@ import {
   Alert,
   AlertDescription,
 } from "@/components/ui";
-import { updateQuote } from "@/app/actions/quotes";
-import DiscountField, { type DiscountType } from "@/components/shared/DiscountField";
-import type { Client, Service, Quote, QuoteItem as PrismaQuoteItem, Package, PackageItem } from "@prisma/client";
+import DiscountField from "@/components/shared/DiscountField";
+import { useQuoteForm } from "./hooks/useQuoteForm";
+import { calculatePackageBasePrice } from "@/lib/package-utils";
+import type { Client } from "@prisma/client";
+import type {
+  SerializedService,
+  SerializedPackage,
+  QuoteWithItems,
+} from "@/types/quote";
 
-interface PackageWithRelations extends Package {
-  items: (PackageItem & { service: Service | null })[];
-}
-
-type QuoteWithItems = Quote & {
-  items: PrismaQuoteItem[];
-  client: Client | null;
-};
-
-interface QuoteFormEditProps {
-  quote: QuoteWithItems;
+interface QuoteFormProps {
+  mode: 'create' | 'edit';
   clients: Client[];
-  services: Service[];
-  packages: PackageWithRelations[];
+  services: SerializedService[];
+  packages: SerializedPackage[];
+  initialQuote?: QuoteWithItems;
 }
 
-interface QuoteItem {
-  serviceId?: string;
-  packageId?: string;
-  name: string;
-  description?: string;
-  price: number;
-  quantity: number;
-  total: number;
-  packageDiscount?: number;
-}
-
-export default function QuoteFormEdit({
-  quote,
+export default function QuoteForm({
+  mode,
   clients,
   services,
   packages,
-}: QuoteFormEditProps) {
+  initialQuote,
+}: QuoteFormProps) {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Initialize with quote data
-  const [selectedClientId, setSelectedClientId] = useState(quote.clientId || "");
-  const [items, setItems] = useState<QuoteItem[]>(
-    quote.items.map((item) => ({
-      serviceId: item.serviceId || undefined,
-      name: item.name,
-      description: item.description || undefined,
-      price: item.price,
-      quantity: item.quantity,
-      total: item.total,
-    }))
-  );
-  const [discount, setDiscount] = useState(quote.discount);
-  const [discountType, setDiscountType] = useState<DiscountType>(quote.discountType as DiscountType);
-  const [notes, setNotes] = useState(quote.notes || "");
-  const [clientSearch, setClientSearch] = useState("");
+  const {
+    selectedClientId,
+    setSelectedClientId,
+    selectedClient,
+    clientSearch,
+    setClientSearch,
+    filteredClients,
+    clearClient,
+    items,
+    addServiceItem,
+    addPackageItem,
+    updateItem,
+    removeItem,
+    subtotal,
+    packageDiscountsTotal,
+    subtotalAfterPackageDiscounts,
+    discountAmount,
+    total,
+    discount,
+    setDiscount,
+    discountType,
+    setDiscountType,
+    notes,
+    setNotes,
+    validUntil,
+    setValidUntil,
+    handleSubmit,
+    isLoading,
+    error,
+  } = useQuoteForm({ mode, initialQuote, clients, services, packages, router });
 
-  // Filtered clients for search
-  const filteredClients = useMemo(() => {
-    if (!clientSearch) return clients;
-    const search = clientSearch.toLowerCase();
-    return clients.filter(
-      (client) =>
-        client.firstName.toLowerCase().includes(search) ||
-        client.lastName.toLowerCase().includes(search) ||
-        client.email?.toLowerCase().includes(search)
-    );
-  }, [clients, clientSearch]);
-
-  // Get selected client object
-  const selectedClient = useMemo(
-    () => clients.find((c) => c.id === selectedClientId),
-    [clients, selectedClientId]
-  );
-
-  // Calculate totals in real-time
-  const subtotal = useMemo(
-    () => items.reduce((sum, item) => sum + item.total, 0),
-    [items]
-  );
-
-  // Calculate total package discounts
-  const packageDiscountsTotal = useMemo(
-    () => items.reduce((sum, item) => sum + (item.packageDiscount || 0), 0),
-    [items]
-  );
-
-  // Calculate subtotal after package discounts
-  const subtotalAfterPackageDiscounts = useMemo(
-    () => subtotal - packageDiscountsTotal,
-    [subtotal, packageDiscountsTotal]
-  );
-
-  // Calculate discount amount based on type
-  const discountAmount = useMemo(() => {
-    return discountType === "PERCENTAGE"
-      ? subtotalAfterPackageDiscounts * (discount / 100)
-      : discount;
-  }, [discount, discountType, subtotalAfterPackageDiscounts]);
-
-  const total = useMemo(
-    () => subtotalAfterPackageDiscounts - discountAmount,
-    [subtotalAfterPackageDiscounts, discountAmount]
-  );
-
-  // Clear client selection
-  function clearClient() {
-    setSelectedClientId("");
-    setClientSearch("");
-  }
-
-  function addServiceItem(serviceId: string) {
-    const service = services.find((s) => s.id === serviceId);
-    if (!service) return;
-
-    const newItem: QuoteItem = {
-      serviceId: service.id,
-      name: service.name,
-      description: service.description || undefined,
-      price: service.price,
-      quantity: 1,
-      total: service.price,
-    };
-
-    setItems([...items, newItem]);
-  }
-
-  function addPackageItem(packageId: string) {
-    const pkg = packages.find((p) => p.id === packageId);
-    if (!pkg) return;
-
-    // Calculate base price from all services in the package
-    const basePrice = pkg.items.reduce((sum, item) => {
-      const price = item.service?.price || 0;
-      return sum + price * item.quantity;
-    }, 0);
-
-    // Calculate package discount separately
-    let packageDiscount = 0;
-
-    if (pkg.discountType === "PERCENTAGE" && Number(pkg.discountValue) > 0) {
-      const discountValue = Number(pkg.discountValue);
-      packageDiscount = basePrice * (discountValue / 100);
-    } else if (pkg.discountType === "FIXED" && Number(pkg.discountValue) > 0) {
-      packageDiscount = Math.min(Number(pkg.discountValue), basePrice); // Limit to basePrice
+  const getSubmitButtonText = () => {
+    if (isLoading) {
+      return mode === 'create' ? "Création..." : "Enregistrement...";
     }
-
-    // Create description with included services
-    const servicesDescription = pkg.items
-      .map((item) => `${item.service?.name} × ${item.quantity}`)
-      .join(", ");
-
-    const newItem: QuoteItem = {
-      packageId: pkg.id,
-      name: pkg.name,
-      description: servicesDescription,
-      price: basePrice, // Use FULL price, not discounted
-      quantity: 1,
-      total: basePrice,
-      packageDiscount: packageDiscount, // Store discount separately
-    };
-
-    setItems([...items, newItem]);
-  }
-
-  function updateItem(
-    index: number,
-    field: keyof QuoteItem,
-    value: string | number
-  ) {
-    // Block price and quantity modifications for packages
-    if (items[index].packageId && (field === "price" || field === "quantity")) {
-      return; // Silently ignore modifications
-    }
-
-    const newItems = [...items];
-    newItems[index] = { ...newItems[index], [field]: value };
-
-    // Recalculate total for this item
-    if (field === "price" || field === "quantity") {
-      newItems[index].total = newItems[index].price * newItems[index].quantity;
-    }
-
-    setItems(newItems);
-  }
-
-  function removeItem(index: number) {
-    setItems(items.filter((_, i) => i !== index));
-  }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    if (!selectedClientId) {
-      setError("Veuillez sélectionner un client");
-      setIsLoading(false);
-      return;
-    }
-
-    if (items.length === 0) {
-      setError("Veuillez ajouter au moins un article");
-      setIsLoading(false);
-      return;
-    }
-
-    const quoteData = {
-      clientId: selectedClientId,
-      items,
-      discount,
-      discountType,
-      notes: notes || undefined,
-    };
-
-    const result = await updateQuote(quote.id, quoteData);
-
-    if (!result.success) {
-      setError(result.error);
-      toast.error("Erreur lors de la modification du devis");
-      setIsLoading(false);
-    } else {
-      toast.success(`Devis ${result.data.quoteNumber} modifié avec succès`);
-      router.push(`/dashboard/devis/${result.data.id}`);
-    }
-  }
+    return mode === 'create' ? "Créer le devis" : "Enregistrer les modifications";
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -274,77 +109,82 @@ export default function QuoteFormEdit({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Search input - always visible, smaller when client selected */}
           {selectedClient ? (
-            <>
+            <Input
+              id="clientSearch"
+              placeholder="Rechercher..."
+              value={clientSearch}
+              onChange={(e) => setClientSearch(e.target.value)}
+              className="h-9 text-sm"
+            />
+          ) : (
+            <FormField
+              label="Rechercher un client"
+              id="clientSearch"
+              hint="Tapez le nom, prénom ou email"
+            >
               <Input
                 id="clientSearch"
                 placeholder="Rechercher..."
                 value={clientSearch}
                 onChange={(e) => setClientSearch(e.target.value)}
-                className="h-9 text-sm"
               />
-              <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 relative">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearClient}
-                  className="absolute top-2 right-2 h-8 w-8 p-0"
-                  aria-label="Retirer la sélection du client"
-                >
-                  <X className="h-4 w-4" />
-                </Button>
-                <div className="pr-8">
-                  <p className="font-semibold text-lg">
-                    {selectedClient.firstName} {selectedClient.lastName}
-                  </p>
-                  {selectedClient.email && (
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {selectedClient.email}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <FormField
-                label="Rechercher un client"
-                id="clientSearch"
-                hint="Tapez le nom, prénom ou email"
+            </FormField>
+          )}
+
+          {/* Selected client card - only shown when client is selected */}
+          {selectedClient && (
+            <div className="rounded-lg border-2 border-primary/20 bg-primary/5 p-4 relative">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearClient}
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                aria-label="Retirer la sélection du client"
               >
-                <Input
-                  id="clientSearch"
-                  placeholder="Rechercher..."
-                  value={clientSearch}
-                  onChange={(e) => setClientSearch(e.target.value)}
-                />
-              </FormField>
-              <FormField label="Client" id="client" required>
-                <Select
-                  value={selectedClientId}
-                  onValueChange={setSelectedClientId}
-                >
-                  <SelectTrigger id="client">
-                    <SelectValue placeholder="Sélectionner un client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {filteredClients.length === 0 ? (
-                      <div className="p-2 text-sm text-muted-foreground">
-                        Aucun client trouvé
-                      </div>
-                    ) : (
-                      filteredClients.map((client) => (
-                        <SelectItem key={client.id} value={client.id}>
-                          {client.firstName} {client.lastName}
-                          {client.email && ` • ${client.email}`}
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              </FormField>
-            </>
+                <X className="h-4 w-4" />
+              </Button>
+              <div className="pr-8">
+                <p className="font-semibold text-lg">
+                  {selectedClient.firstName} {selectedClient.lastName}
+                </p>
+                {selectedClient.email && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {selectedClient.email}
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Dropdown - only shown when NO client is selected */}
+          {!selectedClient && (
+            <FormField label="Client" id="client" required>
+              <Select
+                value={selectedClientId}
+                onValueChange={setSelectedClientId}
+              >
+                <SelectTrigger id="client">
+                  <SelectValue placeholder="Sélectionner un client" />
+                </SelectTrigger>
+                <SelectContent>
+                  {filteredClients.length === 0 ? (
+                    <div className="p-2 text-sm text-muted-foreground">
+                      Aucun client trouvé
+                    </div>
+                  ) : (
+                    filteredClients.map((client) => (
+                      <SelectItem key={client.id} value={client.id}>
+                        {client.firstName} {client.lastName}
+                        {client.email && ` • ${client.email}`}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectContent>
+              </Select>
+            </FormField>
           )}
         </CardContent>
       </Card>
@@ -373,7 +213,7 @@ export default function QuoteFormEdit({
                   ) : (
                     services.map((service) => (
                       <SelectItem key={service.id} value={service.id}>
-                        {service.name} • {service.price.toFixed(2)} €
+                        {service.name} • {Number.isFinite(Number(service.price)) ? Number(service.price).toFixed(2) : '0.00'} €
                       </SelectItem>
                     ))
                   )}
@@ -390,18 +230,11 @@ export default function QuoteFormEdit({
                       Aucun forfait disponible
                     </div>
                   ) : (
-                    packages.map((pkg) => {
-                      // Calculate base price (without discount)
-                      const basePrice = pkg.items.reduce((sum, item) => {
-                        const price = item.service?.price || 0;
-                        return sum + price * item.quantity;
-                      }, 0);
-                      return (
-                        <SelectItem key={pkg.id} value={pkg.id}>
-                          {pkg.name} • {basePrice.toFixed(2)} €
-                        </SelectItem>
-                      );
-                    })
+                    packages.map((pkg) => (
+                      <SelectItem key={pkg.id} value={pkg.id}>
+                        {pkg.name} • {calculatePackageBasePrice(pkg).toFixed(2)} €
+                      </SelectItem>
+                    ))
                   )}
                 </SelectContent>
               </Select>
@@ -435,7 +268,7 @@ export default function QuoteFormEdit({
                 </TableHeader>
                 <TableBody>
                   {items.map((item, index) => (
-                    <TableRow key={index}>
+                    <TableRow key={item.id}>
                       <TableCell>
                         <div className="space-y-1">
                           <Input
@@ -456,7 +289,7 @@ export default function QuoteFormEdit({
                         {item.packageId ? (
                           <div className="flex items-center gap-2 px-3 py-2 text-sm">
                             <PackageIcon className="h-3 w-3 text-muted-foreground" />
-                            <span className="font-medium">{item.price.toFixed(2)} €</span>
+                            <span className="font-medium">{Number(item.price).toFixed(2)} €</span>
                           </div>
                         ) : (
                           <Input
@@ -467,7 +300,7 @@ export default function QuoteFormEdit({
                               updateItem(
                                 index,
                                 "price",
-                                parseFloat(e.target.value) || 0
+                                Number.parseFloat(e.target.value) || 0
                               )
                             }
                             className="w-full"
@@ -488,7 +321,7 @@ export default function QuoteFormEdit({
                               updateItem(
                                 index,
                                 "quantity",
-                                parseInt(e.target.value) || 1
+                                Number.parseInt(e.target.value) || 1
                               )
                             }
                             className="w-full"
@@ -496,7 +329,7 @@ export default function QuoteFormEdit({
                         )}
                       </TableCell>
                       <TableCell className="text-right font-medium">
-                        {item.total.toFixed(2)} €
+                        {Number(item.total).toFixed(2)} €
                       </TableCell>
                       <TableCell>
                         <Button
@@ -532,6 +365,21 @@ export default function QuoteFormEdit({
               setDiscountType(type);
             }}
           />
+
+          {mode === 'create' && (
+            <FormField
+              label="Valable jusqu'au"
+              id="validUntil"
+              hint="Date limite de validité du devis"
+            >
+              <Input
+                type="date"
+                id="validUntil"
+                value={validUntil}
+                onChange={(e) => setValidUntil(e.target.value)}
+              />
+            </FormField>
+          )}
 
           <FormField
             label="Notes"
@@ -591,13 +439,17 @@ export default function QuoteFormEdit({
         <Button
           type="button"
           variant="outline"
-          onClick={() => router.push(`/dashboard/devis/${quote.id}`)}
+          onClick={() =>
+            mode === 'create'
+              ? router.push("/dashboard/devis")
+              : router.push(`/dashboard/devis/${initialQuote!.id}`)
+          }
           disabled={isLoading}
         >
           Annuler
         </Button>
         <Button type="submit" disabled={isLoading || items.length === 0}>
-          {isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
+          {getSubmitButtonText()}
         </Button>
       </div>
     </form>

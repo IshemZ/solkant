@@ -7,24 +7,12 @@ import {
   Image,
   StyleSheet,
 } from "@react-pdf/renderer";
-import type {
-  Quote,
-  Client,
-  Business,
-  QuoteItem,
-  Service,
-} from "@prisma/client";
+import type { SerializedQuoteWithFullRelations } from "@/types/quote";
 import { formatDate } from "@/lib/date-utils";
 import { formatAddress } from "@/lib/utils";
 
-interface QuoteWithRelations extends Quote {
-  client: Client | null;
-  business: Business;
-  items: (QuoteItem & { service: Service | null })[];
-}
-
 interface QuotePDFProps {
-  quote: QuoteWithRelations;
+  quote: SerializedQuoteWithFullRelations;
 }
 
 const styles = StyleSheet.create({
@@ -340,13 +328,13 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
                 )}
               </View>
               <Text style={[styles.tableCell, styles.col2]}>
-                {item.price.toFixed(2)} €
+                {Number(item.price).toFixed(2)} €
               </Text>
               <Text style={[styles.tableCell, styles.col3]}>
                 {item.quantity}
               </Text>
               <Text style={[styles.tableCellBold, styles.col4]}>
-                {item.total.toFixed(2)} €
+                {Number(item.total).toFixed(2)} €
               </Text>
             </View>
           ))}
@@ -358,7 +346,7 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>Sous-total</Text>
               <Text style={styles.totalValue}>
-                {quote.subtotal.toFixed(2)} €
+                {Number(quote.subtotal).toFixed(2)} €
               </Text>
             </View>
 
@@ -378,12 +366,12 @@ export default function QuotePDF({ quote }: QuotePDFProps) {
             <View style={styles.grandTotalRow}>
               <Text style={styles.grandTotalLabel}>Total TTC</Text>
               <Text style={styles.grandTotalValue}>
-                {quote.total.toFixed(2)} €
+                {Number(quote.total).toFixed(2)} €
               </Text>
             </View>
             {quote.business.showInstallmentPayment && (
               <Text style={styles.installmentPayment}>
-                Si paiement en 4× sans frais : {(quote.total / 4).toFixed(2)} € ×
+                Si paiement en 4× sans frais : {(Number(quote.total) / 4).toFixed(2)} € ×
                 4
               </Text>
             )}

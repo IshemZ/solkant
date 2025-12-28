@@ -49,7 +49,7 @@ export default function LogoUpload({
         setPreviewUrl(base64String);
 
         // Upload
-        const result = await uploadBusinessLogo(base64String);
+        const result = await uploadBusinessLogo({ logoData: base64String });
 
         if (!result.success) {
           toast.error(result.error);
