@@ -55,3 +55,8 @@ public/robots.txt
 # Markdown files (except README.md)
 *.md
 !README.md
+
+# IDE and code analysis tools
+.vscode/
+.sonarlint/
+.sonarqube/
