@@ -20,6 +20,7 @@ import {
 } from '@/lib/decimal-utils';
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { BusinessError } from "@/lib/errors";
+import { sanitizeObject } from "@/lib/security";
 import { z } from "zod";
 
 // Types pour les quotes avec relations
