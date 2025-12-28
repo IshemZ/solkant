@@ -52,6 +52,8 @@ public/robots.txt
 # Sentry Config File
 .env.sentry-build-plugin
 
-# Markdown files (except README.md)
+# Markdown files (except README.md and Claude docs)
 *.md
 !README.md
+!CLAUDE.md
+!CLAUDE-ADVANCED.md
