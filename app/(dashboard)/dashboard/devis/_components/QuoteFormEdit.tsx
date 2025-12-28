@@ -244,7 +244,7 @@ export default function QuoteFormEdit({
       notes: notes || undefined,
     };
 
-    const result = await updateQuote(quote.id, quoteData);
+    const result = await updateQuote({ id: quote.id, ...quoteData });
 
     if (!result.success) {
       setError(result.error);

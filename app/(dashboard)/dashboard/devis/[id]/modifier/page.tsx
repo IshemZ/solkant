@@ -54,7 +54,7 @@ export default async function ModifierDevisPage({ params }: PageProps) {
       },
       orderBy: { name: "asc" },
     }),
-    getPackages(),
+    getPackages({}),
   ]);
 
   // Check if packages fetch was successful

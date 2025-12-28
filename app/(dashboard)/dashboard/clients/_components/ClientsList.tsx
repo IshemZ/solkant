@@ -62,7 +62,7 @@ export default function ClientsList({ initialClients }: ClientsListProps) {
   async function confirmDelete() {
     if (!clientToDelete) return;
 
-    const result = await deleteClient(clientToDelete);
+    const result = await deleteClient({ id: clientToDelete });
     if (!result.success) {
       toast.error("Erreur lors de la suppression du client");
     } else {

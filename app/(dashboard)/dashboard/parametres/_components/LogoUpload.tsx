@@ -78,7 +78,7 @@ export default function LogoUpload({
     if (!previewUrl) return;
 
     setIsUploading(true);
-    const result = await deleteBusinessLogo();
+    const result = await deleteBusinessLogo({});
 
     if (!result.success) {
       toast.error(result.error);

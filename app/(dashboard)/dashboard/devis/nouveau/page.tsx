@@ -14,9 +14,9 @@ export const metadata: Metadata = {
 
 export default async function NewQuotePage() {
   const [clientsResult, servicesResult, packagesResult] = await Promise.all([
-    getClients(),
-    getServices(),
-    getPackages(),
+    getClients({}),
+    getServices({}),
+    getPackages({}),
   ]);
 
   if (!clientsResult.success || !servicesResult.success || !packagesResult.success) {

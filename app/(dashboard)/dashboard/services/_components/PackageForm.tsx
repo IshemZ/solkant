@@ -84,7 +84,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
   // Load services
   useEffect(() => {
     async function loadServices() {
-      const result = await getServices();
+      const result = await getServices({});
       if (result.success) {
         setServices(result.data || []);
       } else {
@@ -123,7 +123,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     try {
       const result =
         isEdit && initialData
-          ? await updatePackage(initialData.id, data as CreatePackageInput)
+          ? await updatePackage({ id: initialData.id, ...(data as CreatePackageInput) })
           : await createPackage(data as CreatePackageInput);
 
       if (!result.success) {

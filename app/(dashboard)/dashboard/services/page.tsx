@@ -18,8 +18,8 @@ export default async function ServicesPage({
   const params = await searchParams;
   const activeTab = params.tab || "services";
 
-  const servicesResult = await getServices();
-  const packagesResult = await getPackages();
+  const servicesResult = await getServices({});
+  const packagesResult = await getPackages({});
 
   return (
     <div className="mx-auto max-w-6xl">
