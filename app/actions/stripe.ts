@@ -3,9 +3,7 @@
 import { stripe, STRIPE_PRICE_ID_PRO } from "@/lib/stripe";
 import prisma from "@/lib/prisma";
 import { headers } from "next/headers";
-import * as Sentry from "@sentry/nextjs";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import { withAuth } from "@/lib/action-wrapper";
 
 // Types pour les résultats Stripe
 type CheckoutSessionResult = { url: string };
@@ -17,28 +15,25 @@ type SubscriptionStatus = {
 };
 type CustomerPortalResult = { url: string };
 
-export async function createCheckoutSession(): Promise<ActionResult<CheckoutSessionResult>> {
-  try {
-    // 1. Vérifier l'authentification ET email vérifié
-    const validatedSession = await validateSession();
+/**
+ * Crée une session Stripe Checkout pour l'abonnement Pro
+ */
+export const createCheckoutSession = withAuth(
+  async (_input: Record<string, never>, session): Promise<CheckoutSessionResult> => {
+    const { businessId, userId, userEmail } = session;
 
-    if ("error" in validatedSession) {
-      return errorResult(validatedSession.error);
-    }
-
-    const { businessId, userId, userEmail } = validatedSession;
-
-    // 2. Récupérer le Business
+    // Récupérer le Business
     const business = await prisma.business.findUnique({
       where: { id: businessId },
     });
 
     if (!business) {
-      return errorResult("Business introuvable", "NOT_FOUND");
+      throw new Error("Business introuvable");
     }
 
-    // 3. Créer ou récupérer le customer Stripe
-    let stripeCustomerId = (business as any).stripeCustomerId as string | null; // eslint-disable-line @typescript-eslint/no-explicit-any
+    // Créer ou récupérer le customer Stripe
+    let stripeCustomerId = (business as unknown as { stripeCustomerId?: string | null })
+      .stripeCustomerId;
 
     if (!stripeCustomerId) {
       const customer = await stripe.customers.create({
@@ -54,17 +49,17 @@ export async function createCheckoutSession(): Promise<ActionResult<CheckoutSess
       // Sauvegarder le customerId
       await prisma.business.update({
         where: { id: businessId },
-        data: { stripeCustomerId: customer.id } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
+        data: { stripeCustomerId: customer.id } as unknown as { stripeCustomerId: string },
       });
     }
 
-    // 4. Obtenir l'URL de base
+    // Obtenir l'URL de base
     const headersList = await headers();
     const host = headersList.get("host") || "";
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
     const baseUrl = `${protocol}://${host}`;
 
-    // 5. Créer la session Checkout
+    // Créer la session Checkout
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: "subscription",
@@ -90,54 +85,40 @@ export async function createCheckoutSession(): Promise<ActionResult<CheckoutSess
     });
 
     if (!checkoutSession.url) {
-      return errorResult("URL de session Checkout invalide", "INVALID_CHECKOUT_URL");
+      throw new Error("URL de session Checkout invalide");
     }
 
-    return successResult({ url: checkoutSession.url });
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "createCheckoutSession" },
-    });
+    return { url: checkoutSession.url };
+  },
+  "createCheckoutSession"
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Erreur création session Checkout:", error);
-    }
-
-    return errorResult("Erreur lors de la création de la session de paiement");
-  }
-}
-
-export async function getSubscriptionStatus(): Promise<ActionResult<SubscriptionStatus>> {
-  try {
-    const validatedSession = await validateSession();
-
-    if ("error" in validatedSession) {
-      return errorResult(validatedSession.error);
-    }
-
-    const { businessId } = validatedSession;
-
+/**
+ * Récupère le statut de l'abonnement actuel
+ */
+export const getSubscriptionStatus = withAuth(
+  async (_input: Record<string, never>, session): Promise<SubscriptionStatus> => {
     const business = await prisma.business.findUnique({
-      where: { id: businessId },
+      where: { id: session.businessId },
     });
 
     if (!business) {
-      return errorResult("Business introuvable", "NOT_FOUND");
+      throw new Error("Business introuvable");
     }
 
     // Récupérer les informations de l'abonnement
     const stripeSubscriptionId = (
-      business as {
+      business as unknown as {
         stripeSubscriptionId?: string | null;
       }
     ).stripeSubscriptionId;
 
     if (!stripeSubscriptionId) {
-      return successResult({
-        plan: "free" as const,
+      return {
+        plan: "free",
         status: "active",
         currentPeriodEnd: null,
-      });
+      };
     }
 
     // Récupérer l'abonnement depuis Stripe
@@ -152,50 +133,36 @@ export async function getSubscriptionStatus(): Promise<ActionResult<Subscription
       cancel_at_period_end: boolean;
     };
 
-    return successResult({
-      plan: "pro" as const,
+    return {
+      plan: "pro",
       status: subData.status,
       currentPeriodEnd: new Date(
         subData.current_period_end * 1000
       ).toISOString(),
       cancelAtPeriodEnd: subData.cancel_at_period_end,
-    });
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getSubscriptionStatus" },
-    });
+    };
+  },
+  "getSubscriptionStatus"
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Erreur récupération abonnement:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération de l'abonnement");
-  }
-}
-
-export async function createCustomerPortalSession(): Promise<ActionResult<CustomerPortalResult>> {
-  try {
-    const validatedSession = await validateSession();
-
-    if ("error" in validatedSession) {
-      return errorResult(validatedSession.error);
-    }
-
-    const { businessId } = validatedSession;
-
+/**
+ * Crée une session de portail client Stripe pour gérer l'abonnement
+ */
+export const createCustomerPortalSession = withAuth(
+  async (_input: Record<string, never>, session): Promise<CustomerPortalResult> => {
     const business = await prisma.business.findUnique({
-      where: { id: businessId },
+      where: { id: session.businessId },
     });
 
     if (!business) {
-      return errorResult("Business introuvable", "NOT_FOUND");
+      throw new Error("Business introuvable");
     }
 
-    const stripeCustomerId = (business as { stripeCustomerId?: string | null })
+    const stripeCustomerId = (business as unknown as { stripeCustomerId?: string | null })
       .stripeCustomerId;
 
     if (!stripeCustomerId) {
-      return errorResult("Aucun compte Stripe trouvé", "NO_STRIPE_CUSTOMER");
+      throw new Error("Aucun compte Stripe trouvé");
     }
 
     // Obtenir l'URL de base
@@ -210,16 +177,7 @@ export async function createCustomerPortalSession(): Promise<ActionResult<Custom
       return_url: `${baseUrl}/dashboard/abonnement`,
     });
 
-    return successResult({ url: portalSession.url });
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "createCustomerPortalSession" },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Erreur création portail client:", error);
-    }
-
-    return errorResult("Erreur lors de la création du portail client");
-  }
-}
+    return { url: portalSession.url };
+  },
+  "createCustomerPortalSession"
+);

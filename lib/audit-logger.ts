@@ -18,6 +18,7 @@ export enum AuditAction {
   QUOTE_SENT = "quote.sent",
   QUOTE_PDF_GENERATED = "quote.pdf_generated",
   QUOTE_STATUS_CHANGED = "quote.status_changed",
+  QUOTE_EXPORTED = "quote.exported",
 
   // Clients
   CLIENT_CREATED = "client.created",

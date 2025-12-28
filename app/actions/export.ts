@@ -1,21 +1,23 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
-import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
+import { withAuth } from "@/lib/action-wrapper";
 
 /**
  * Escapes CSV field values by wrapping in quotes and escaping internal quotes
  */
-function escapeCSVField(field: any): string {
+function escapeCSVField(field: unknown): string {
   if (field === null || field === undefined) {
     return "";
   }
   const fieldStr = String(field);
   // If field contains comma, quote, or newline, wrap in quotes and escape internal quotes
-  if (fieldStr.includes(",") || fieldStr.includes('"') || fieldStr.includes("\n")) {
+  if (
+    fieldStr.includes(",") ||
+    fieldStr.includes('"') ||
+    fieldStr.includes("\n")
+  ) {
     return `"${fieldStr.replace(/"/g, '""')}"`;
   }
   return fieldStr;
@@ -25,16 +27,10 @@ function escapeCSVField(field: any): string {
  * Exports all quotes to CSV format for accounting
  * Returns CSV string with all quotes and their line items
  */
-export async function exportAllQuotes(): Promise<ActionResult<string>> {
-  const validatedSession = await validateSession();
+export const exportAllQuotes = withAuth(
+  async (_input: Record<string, never>, session) => {
+    const { businessId, userId } = session;
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  try {
     // Fetch all quotes with relations for this business only
     const quotes = await prisma.quote.findMany({
       where: { businessId },
@@ -50,84 +46,116 @@ export async function exportAllQuotes(): Promise<ActionResult<string>> {
     });
 
     if (quotes.length === 0) {
-      return successResult("");
+      return "";
     }
 
     // Build CSV with headers
     const csvLines: string[] = [];
 
     // Add main header row
-    csvLines.push([
-      "Numéro de Devis",
-      "Date de Création",
-      "Statut",
-      "Client - Prénom",
-      "Client - Nom",
-      "Client - Email",
-      "Client - Téléphone",
-      "Sous-total",
-      "Réduction",
-      "Type Réduction",
-      "Total",
-      "Date d'Envoi",
-      "Valide jusqu'au",
-      "Notes",
-      "Ligne - Nom du Service",
-      "Ligne - Description",
-      "Ligne - Prix Unitaire",
-      "Ligne - Quantité",
-      "Ligne - Total",
-    ].map(escapeCSVField).join(","));
+    csvLines.push(
+      [
+        "Numéro de Devis",
+        "Date de Création",
+        "Statut",
+        "Client - Prénom",
+        "Client - Nom",
+        "Client - Email",
+        "Client - Téléphone",
+        "Sous-total",
+        "Réduction",
+        "Type Réduction",
+        "Total",
+        "Date d'Envoi",
+        "Valide jusqu'au",
+        "Notes",
+        "Ligne - Nom du Service",
+        "Ligne - Description",
+        "Ligne - Prix Unitaire",
+        "Ligne - Quantité",
+        "Ligne - Total",
+      ]
+        .map(escapeCSVField)
+        .join(",")
+    );
 
     // Add data rows
     quotes.forEach((quote) => {
       if (quote.items.length === 0) {
         // If no items, still add a row for the quote
-        csvLines.push([
-          escapeCSVField(quote.quoteNumber),
-          escapeCSVField(quote.createdAt.toLocaleDateString("fr-FR")),
-          escapeCSVField(quote.status),
-          escapeCSVField(quote.client?.firstName || ""),
-          escapeCSVField(quote.client?.lastName || ""),
-          escapeCSVField(quote.client?.email || ""),
-          escapeCSVField(quote.client?.phone || ""),
-          escapeCSVField(quote.subtotal.toFixed(2)),
-          escapeCSVField(quote.discount.toFixed(2)),
-          escapeCSVField(quote.discountType),
-          escapeCSVField(quote.total.toFixed(2)),
-          escapeCSVField(quote.sentAt ? quote.sentAt.toLocaleDateString("fr-FR") : ""),
-          escapeCSVField(quote.validUntil ? quote.validUntil.toLocaleDateString("fr-FR") : ""),
-          escapeCSVField(quote.notes || ""),
-          "", // Line item fields empty
-          "",
-          "",
-          "",
-          "",
-        ].join(","));
+        csvLines.push(
+          [
+            escapeCSVField(quote.quoteNumber),
+            escapeCSVField(quote.createdAt.toLocaleDateString("fr-FR")),
+            escapeCSVField(quote.status),
+            escapeCSVField(quote.client?.firstName || ""),
+            escapeCSVField(quote.client?.lastName || ""),
+            escapeCSVField(quote.client?.email || ""),
+            escapeCSVField(quote.client?.phone || ""),
+            escapeCSVField(quote.subtotal.toFixed(2)),
+            escapeCSVField(quote.discount.toFixed(2)),
+            escapeCSVField(quote.discountType),
+            escapeCSVField(quote.total.toFixed(2)),
+            escapeCSVField(
+              quote.sentAt ? quote.sentAt.toLocaleDateString("fr-FR") : ""
+            ),
+            escapeCSVField(
+              quote.validUntil
+                ? quote.validUntil.toLocaleDateString("fr-FR")
+                : ""
+            ),
+            escapeCSVField(quote.notes || ""),
+            "", // Line item fields empty
+            "",
+            "",
+            "",
+            "",
+          ].join(",")
+        );
       } else {
         // Add a row for each item in the quote
         quote.items.forEach((item, index) => {
-          csvLines.push([
-            escapeCSVField(index === 0 ? quote.quoteNumber : ""),
-            escapeCSVField(index === 0 ? quote.createdAt.toLocaleDateString("fr-FR") : ""),
-            escapeCSVField(index === 0 ? quote.status : ""),
-            escapeCSVField(index === 0 ? quote.client?.firstName || "" : ""),
-            escapeCSVField(index === 0 ? quote.client?.lastName || "" : ""),
-            escapeCSVField(index === 0 ? quote.client?.email || "" : ""),
-            escapeCSVField(index === 0 ? quote.client?.phone || "" : ""),
-            escapeCSVField(index === 0 ? quote.subtotal.toFixed(2) : ""),
-            escapeCSVField(index === 0 ? quote.discount.toFixed(2) : ""),
-            escapeCSVField(index === 0 ? quote.discountType : ""),
-            escapeCSVField(index === 0 ? quote.total.toFixed(2) : ""),
-            escapeCSVField(index === 0 ? (quote.sentAt ? quote.sentAt.toLocaleDateString("fr-FR") : "") : ""),
-            escapeCSVField(index === 0 ? (quote.validUntil ? quote.validUntil.toLocaleDateString("fr-FR") : "") : ""),
-            escapeCSVField(index === 0 ? quote.notes || "" : ""),
-            escapeCSVField(item.name),
-            escapeCSVField(item.description || ""),
-            escapeCSVField(item.price.toFixed(2)),
-            escapeCSVField(item.quantity),
-            escapeCSVField(item.total.toFixed(2)),
-          ].join(","));
+          csvLines.push(
+            [
+              escapeCSVField(index === 0 ? quote.quoteNumber : ""),
+              escapeCSVField(
+                index === 0 ? quote.createdAt.toLocaleDateString("fr-FR") : ""
+              ),
+              escapeCSVField(index === 0 ? quote.status : ""),
+              escapeCSVField(
+                index === 0 ? quote.client?.firstName || "" : ""
+              ),
+              escapeCSVField(index === 0 ? quote.client?.lastName || "" : ""),
+              escapeCSVField(index === 0 ? quote.client?.email || "" : ""),
+              escapeCSVField(index === 0 ? quote.client?.phone || "" : ""),
+              escapeCSVField(
+                index === 0 ? quote.subtotal.toFixed(2) : ""
+              ),
+              escapeCSVField(index === 0 ? quote.discount.toFixed(2) : ""),
+              escapeCSVField(index === 0 ? quote.discountType : ""),
+              escapeCSVField(index === 0 ? quote.total.toFixed(2) : ""),
+              escapeCSVField(
+                index === 0
+                  ? quote.sentAt
+                    ? quote.sentAt.toLocaleDateString("fr-FR")
+                    : ""
+                  : ""
+              ),
+              escapeCSVField(
+                index === 0
+                  ? quote.validUntil
+                    ? quote.validUntil.toLocaleDateString("fr-FR")
+                    : ""
+                  : ""
+              ),
+              escapeCSVField(index === 0 ? quote.notes || "" : ""),
+              escapeCSVField(item.name),
+              escapeCSVField(item.description || ""),
+              escapeCSVField(item.price.toFixed(2)),
+              escapeCSVField(item.quantity),
+              escapeCSVField(item.total.toFixed(2)),
+            ].join(",")
+          );
         });
       }
     });
@@ -148,16 +176,8 @@ export async function exportAllQuotes(): Promise<ActionResult<string>> {
       },
     });
 
-    return successResult(csvContent);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "exportAllQuotes", businessId },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error exporting quotes:", error);
-    }
-
-    return errorResult("Erreur lors de l'export des devis");
-  }
-}
+    return csvContent;
+  },
+  "exportAllQuotes",
+  { logSuccess: true }
+);

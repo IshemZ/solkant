@@ -5,151 +5,83 @@ import {
   updateBusinessSchema,
   type UpdateBusinessInput,
 } from "@/lib/validations";
-import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
-import * as Sentry from "@sentry/nextjs";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import type { Business } from "@prisma/client";
+import { z } from "zod";
 
-export async function getBusinessInfo(): Promise<ActionResult<Business | null>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
+/**
+ * Récupère les informations du business
+ */
+export const getBusinessInfo = withAuth(
+  async (_input: Record<string, never>, session) => {
     const business = await prisma.business.findUnique({
-      where: { id: businessId },
+      where: { id: session.businessId },
     });
 
-    return successResult(business);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getBusinessInfo", businessId },
-    });
+    return business;
+  },
+  "getBusinessInfo"
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching business:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération des informations");
-  }
-}
-
-export async function updateBusiness(input: UpdateBusinessInput): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  // Validate input
-  const validation = updateBusinessSchema.safeParse(sanitized);
-  if (!validation.success) {
-    if (process.env.NODE_ENV === "development") {
-      console.error("Validation error:", validation.error.flatten());
-    }
-
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
+/**
+ * Met à jour les informations du business
+ */
+export const updateBusiness = withAuthAndValidation(
+  async (input: UpdateBusinessInput, session) => {
     const business = await prisma.business.update({
-      where: { id: businessId },
-      data: validation.data,
+      where: { id: session.businessId },
+      data: input,
     });
 
     revalidatePath("/dashboard/parametres");
-    return successResult(business);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "updateBusiness", businessId },
-      extra: { input: sanitized },
-    });
+    return business;
+  },
+  "updateBusiness",
+  updateBusinessSchema
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error updating business:", error);
+/**
+ * Upload le logo du business (data URL base64)
+ */
+export const uploadBusinessLogo = withAuthAndValidation(
+  async (input: { logoData: string }, session) => {
+    // Valider que c'est bien une data URL d'image
+    if (!input.logoData.startsWith("data:image/")) {
+      throw new Error("Format d'image invalide");
     }
 
-    return errorResult("Erreur lors de la mise à jour");
-  }
-}
+    // Limiter la taille (5MB en base64 ≈ 3.75MB original)
+    if (input.logoData.length > 5 * 1024 * 1024) {
+      throw new Error("L'image est trop volumineuse (max 5MB)");
+    }
 
-export async function uploadBusinessLogo(logoData: string): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  // Valider que c'est bien une data URL d'image
-  if (!logoData.startsWith("data:image/")) {
-    return errorResult("Format d'image invalide", "INVALID_FORMAT");
-  }
-
-  // Limiter la taille (5MB en base64 ≈ 3.75MB original)
-  if (logoData.length > 5 * 1024 * 1024) {
-    return errorResult("L'image est trop volumineuse (max 5MB)", "FILE_TOO_LARGE");
-  }
-
-  try {
     const business = await prisma.business.update({
-      where: { id: businessId },
-      data: { logo: logoData },
+      where: { id: session.businessId },
+      data: { logo: input.logoData },
     });
 
     revalidatePath("/dashboard/parametres");
-    return successResult(business);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "uploadBusinessLogo", businessId },
-    });
+    return business;
+  },
+  "uploadBusinessLogo",
+  z.object({
+    logoData: z.string().min(1, "Logo requis"),
+  })
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error uploading logo:", error);
-    }
-
-    return errorResult("Erreur lors de l'upload du logo");
-  }
-}
-
-export async function deleteBusinessLogo(): Promise<ActionResult<Business>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
+/**
+ * Supprime le logo du business
+ */
+export const deleteBusinessLogo = withAuth(
+  async (_input: Record<string, never>, session) => {
     const business = await prisma.business.update({
-      where: { id: businessId },
+      where: { id: session.businessId },
       data: { logo: null },
     });
 
     revalidatePath("/dashboard/parametres");
-    return successResult(business);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "deleteBusinessLogo", businessId },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error deleting logo:", error);
-    }
-
-    return errorResult("Erreur lors de la suppression du logo");
-  }
-}
+    return business;
+  },
+  "deleteBusinessLogo"
+);

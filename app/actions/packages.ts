@@ -1,8 +1,6 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import {
   createPackageSchema,
@@ -11,7 +9,8 @@ import {
   type UpdatePackageInput,
 } from "@/lib/validations";
 import type { Package, PackageItem, Service } from "@prisma/client";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
+import { z } from "zod";
 
 type PackageWithRelations = Package & {
   items: (PackageItem & { service: Service | null })[];
@@ -24,15 +23,13 @@ function serializePackage(
   const items = pkg.items || [];
   return {
     ...pkg,
-    // Prisma Decimal -> number
-    discountValue: Number((pkg as any).discountValue),
-    // Ensure nested service price is a number (should already be number for Float)
+    discountValue: Number((pkg as unknown as { discountValue: number }).discountValue),
     items: items.map((item) => ({
       ...item,
       service: item.service
         ? {
             ...item.service,
-            price: Number((item.service as any).price),
+            price: Number((item.service as unknown as { price: number }).price),
           }
         : null,
     })),
@@ -42,18 +39,11 @@ function serializePackage(
 /**
  * Get all active packages for the current business
  */
-export async function getPackages(): Promise<
-  ActionResult<PackageWithRelations[]>
-> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
+export const getPackages = withAuth(
+  async (_input: Record<string, never>, session) => {
     const packages = await prisma.package.findMany({
       where: {
-        businessId: session.user.businessId,
+        businessId: session.businessId,
         isActive: true,
       },
       include: {
@@ -66,30 +56,20 @@ export async function getPackages(): Promise<
       orderBy: { createdAt: "desc" },
     });
 
-    const serialized = packages.map((p) => serializePackage(p));
-    return successResult(serialized);
-  } catch (error) {
-    console.error("Error fetching packages:", error);
-    return errorResult("Erreur lors du chargement des forfaits");
-  }
-}
+    return packages.map((p) => serializePackage(p));
+  },
+  "getPackages"
+);
 
 /**
  * Get a single package by ID
  */
-export async function getPackageById(
-  id: string
-): Promise<ActionResult<PackageWithRelations>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
+export const getPackageById = withAuthAndValidation(
+  async (input: { id: string }, session) => {
     const packageData = await prisma.package.findFirst({
       where: {
-        id,
-        businessId: session.user.businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
       include: {
         items: {
@@ -101,69 +81,41 @@ export async function getPackageById(
     });
 
     if (!packageData) {
-      return errorResult("Forfait introuvable");
+      throw new Error("Forfait introuvable");
     }
 
-    return successResult(serializePackage(packageData));
-  } catch (error) {
-    console.error("Error fetching package:", error);
-    return errorResult("Erreur lors du chargement du forfait");
-  }
-}
+    return serializePackage(packageData);
+  },
+  "getPackageById",
+  z.object({ id: z.string() })
+);
 
 /**
  * Create a new package
  */
-export async function createPackage(
-  input: CreatePackageInput
-): Promise<ActionResult<Package>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
-    // Validate input
-    const validation = createPackageSchema.safeParse(input);
-    if (!validation.success) {
-      const fieldErrors: Record<string, string[]> = {};
-      validation.error.issues.forEach((issue) => {
-        const path = issue.path.join(".");
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = [];
-        }
-        fieldErrors[path].push(issue.message);
-      });
-      return errorResult(
-        validation.error.issues[0]?.message || "Données invalides",
-        "VALIDATION_ERROR",
-        fieldErrors
-      );
-    }
-
-    const { items, ...packageData } = validation.data;
+export const createPackage = withAuthAndValidation(
+  async (input: CreatePackageInput, session) => {
+    const { items, ...packageData } = input;
 
     // Verify all services exist and belong to the business
     const serviceIds = items.map((item) => item.serviceId);
     const services = await prisma.service.findMany({
       where: {
         id: { in: serviceIds },
-        businessId: session.user.businessId,
+        businessId: session.businessId,
         isActive: true,
       },
     });
 
     if (services.length !== serviceIds.length) {
-      return errorResult(
-        "Un ou plusieurs services sont invalides ou inactifs"
-      );
+      throw new Error("Un ou plusieurs services sont invalides ou inactifs");
     }
 
     // Create package and items in a transaction
     const newPackage = await prisma.package.create({
       data: {
         ...packageData,
-        businessId: session.user.businessId,
+        businessId: session.businessId,
         items: {
           create: items,
         },
@@ -178,57 +130,30 @@ export async function createPackage(
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(serializePackage(newPackage));
-  } catch (error) {
-    console.error("Error creating package:", error);
-    return errorResult("Erreur lors de la création du forfait");
-  }
-}
+    return serializePackage(newPackage);
+  },
+  "createPackage",
+  createPackageSchema
+);
 
 /**
  * Update an existing package
  */
-export async function updatePackage(
-  id: string,
-  input: UpdatePackageInput
-): Promise<ActionResult<Package>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
-    // Validate input
-    const validation = updatePackageSchema.safeParse(input);
-    if (!validation.success) {
-      const fieldErrors: Record<string, string[]> = {};
-      validation.error.issues.forEach((issue) => {
-        const path = issue.path.join(".");
-        if (!fieldErrors[path]) {
-          fieldErrors[path] = [];
-        }
-        fieldErrors[path].push(issue.message);
-      });
-      return errorResult(
-        validation.error.issues[0]?.message || "Données invalides",
-        "VALIDATION_ERROR",
-        fieldErrors
-      );
-    }
+export const updatePackage = withAuthAndValidation(
+  async (input: { id: string } & UpdatePackageInput, session) => {
+    const { id, items, ...packageData } = input;
 
     // Check package exists and belongs to business
     const existingPackage = await prisma.package.findFirst({
       where: {
         id,
-        businessId: session.user.businessId,
+        businessId: session.businessId,
       },
     });
 
     if (!existingPackage) {
-      return errorResult("Forfait introuvable");
+      throw new Error("Forfait introuvable");
     }
-
-    const { items, ...packageData } = validation.data;
 
     // Update package in transaction
     const updatedPackage = await prisma.$transaction(async (tx) => {
@@ -239,7 +164,7 @@ export async function updatePackage(
         const services = await tx.service.findMany({
           where: {
             id: { in: serviceIds },
-            businessId: session.user.businessId!,
+            businessId: session.businessId,
             isActive: true,
           },
         });
@@ -279,44 +204,32 @@ export async function updatePackage(
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(serializePackage(updatedPackage));
-  } catch (error) {
-    console.error("Error updating package:", error);
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Erreur lors de la mise à jour du forfait";
-    return errorResult(message);
-  }
-}
+    return serializePackage(updatedPackage);
+  },
+  "updatePackage",
+  z.object({ id: z.string() }).and(updatePackageSchema)
+);
 
 /**
  * Soft delete a package
  */
-export async function deletePackage(
-  id: string
-): Promise<ActionResult<{ id: string }>> {
-  try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user?.businessId) {
-      return errorResult("Non autorisé");
-    }
-
+export const deletePackage = withAuth(
+  async (input: { id: string }, session) => {
     // Check package exists and belongs to business
     const existingPackage = await prisma.package.findFirst({
       where: {
-        id,
-        businessId: session.user.businessId,
+        id: input.id,
+        businessId: session.businessId,
       },
     });
 
     if (!existingPackage) {
-      return errorResult("Forfait introuvable");
+      throw new Error("Forfait introuvable");
     }
 
     // Soft delete
     await prisma.package.update({
-      where: { id },
+      where: { id: input.id },
       data: {
         isActive: false,
         deletedAt: new Date(),
@@ -324,9 +237,8 @@ export async function deletePackage(
     });
 
     revalidatePath("/dashboard/services");
-    return successResult({ id });
-  } catch (error) {
-    console.error("Error deleting package:", error);
-    return errorResult("Erreur lors de l'archivage du forfait");
-  }
-}
+    return { id: input.id };
+  },
+  "deletePackage",
+  { logSuccess: true }
+);

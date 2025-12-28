@@ -1,9 +1,7 @@
 "use server";
 
 import prisma from "@/lib/prisma";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
-import * as Sentry from "@sentry/nextjs";
+import { withAuth } from "@/lib/action-wrapper";
 
 /**
  * Type pour les statistiques du dashboard
@@ -19,19 +17,11 @@ export type DashboardStats = {
  * Récupère les statistiques globales du dashboard
  *
  * SÉCURITÉ: Filtre automatiquement par businessId pour l'isolation multi-tenant
- *
- * @returns ActionResult<DashboardStats>
  */
-export async function getDashboardStats(): Promise<ActionResult<DashboardStats>> {
-  const validatedSession = await validateSession();
+export const getDashboardStats = withAuth(
+  async (_input: Record<string, never>, session): Promise<DashboardStats> => {
+    const { businessId } = session;
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
     // Exécuter les requêtes en parallèle pour optimiser les performances
     const [totalClients, quotes] = await Promise.all([
       // Compter le nombre total de clients
@@ -53,23 +43,12 @@ export async function getDashboardStats(): Promise<ActionResult<DashboardStats>>
     // Calculer la valeur moyenne des quotes (0 si aucun quote)
     const averageQuoteValue = totalQuotes > 0 ? totalRevenue / totalQuotes : 0;
 
-    const stats: DashboardStats = {
+    return {
       totalClients,
       totalQuotes,
       totalRevenue,
       averageQuoteValue,
     };
-
-    return successResult(stats);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getDashboardStats", businessId },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching dashboard stats:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération des statistiques");
-  }
-}
+  },
+  "getDashboardStats"
+);

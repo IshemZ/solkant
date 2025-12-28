@@ -7,72 +7,44 @@ import {
   type CreateServiceInput,
   type UpdateServiceInput,
 } from "@/lib/validations";
-import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
-import * as Sentry from "@sentry/nextjs";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { validateSession } from "@/lib/auth-helpers";
-import { type ActionResult, successResult, errorResult } from "@/lib/action-types";
+import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import type { Service } from "@prisma/client";
+import { z } from "zod";
 
-export async function getServices(): Promise<ActionResult<Service[]>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
+/**
+ * Récupère tous les services actifs du business
+ */
+export const getServices = withAuth(
+  async (_input: Record<string, never>, session) => {
     const services = await prisma.service.findMany({
       where: {
-        businessId,
+        businessId: session.businessId,
         isActive: true,
       },
       orderBy: { createdAt: "desc" },
     });
 
-    return successResult(services);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getServices", businessId },
-    });
+    return services;
+  },
+  "getServices"
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching services:", error);
-    }
+/**
+ * Crée un nouveau service
+ */
+export const createService = withAuthAndValidation(
+  async (input: CreateServiceInput, session) => {
+    const { businessId, userId } = session;
 
-    return errorResult("Erreur lors de la récupération des services");
-  }
-}
-
-export async function createService(input: CreateServiceInput): Promise<ActionResult<Service>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = createServiceSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     const service = await prisma.service.create({
       data: {
-        ...validation.data,
+        ...input,
         businessId,
       },
     });
 
-    // Audit log pour cohérence avec createClient et createQuote
     await auditLog({
       action: AuditAction.SERVICE_CREATED,
       level: AuditLevel.INFO,
@@ -87,89 +59,57 @@ export async function createService(input: CreateServiceInput): Promise<ActionRe
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(service);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "createService", businessId },
-      extra: { input },
-    });
+    return service;
+  },
+  "createService",
+  createServiceSchema
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error creating service:", error);
-    }
+/**
+ * Met à jour un service existant
+ */
+export const updateService = withAuthAndValidation(
+  async (input: { id: string } & UpdateServiceInput, session) => {
+    const { id, ...data } = input;
 
-    return errorResult("Erreur lors de la création du service");
-  }
-}
-
-export async function updateService(id: string, input: UpdateServiceInput): Promise<ActionResult<Service>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  // Sanitize input before validation
-  const sanitized = sanitizeObject(input);
-
-  const validation = updateServiceSchema.safeParse(sanitized);
-  if (!validation.success) {
-    return errorResult("Données invalides", "VALIDATION_ERROR");
-  }
-
-  try {
     const service = await prisma.service.update({
       where: {
         id,
-        businessId,
+        businessId: session.businessId,
       },
-      data: validation.data,
+      data,
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(service);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "updateService", businessId },
-      extra: { serviceId: id, input },
-    });
+    return service;
+  },
+  "updateService",
+  z.object({ id: z.string() }).and(updateServiceSchema)
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error updating service:", error);
-    }
+/**
+ * Archive un service (soft delete)
+ */
+export const deleteService = withAuth(
+  async (input: { id: string }, session) => {
+    const { businessId, userId } = session;
 
-    return errorResult("Erreur lors de la mise à jour du service");
-  }
-}
-
-export async function deleteService(id: string): Promise<ActionResult<void>> {
-  const validatedSession = await validateSession();
-
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId, userId } = validatedSession;
-
-  try {
-    // Récupérer les infos avant suppression
+    // Récupérer les infos avant archivage
     const service = await prisma.service.findFirst({
       where: {
-        id,
+        id: input.id,
         businessId,
       },
       select: { name: true, price: true },
     });
 
     if (!service) {
-      return errorResult("Service introuvable", "NOT_FOUND");
+      throw new Error("Service introuvable");
     }
 
     await prisma.service.update({
       where: {
-        id,
+        id: input.id,
         businessId,
       },
       data: {
@@ -183,7 +123,7 @@ export async function deleteService(id: string): Promise<ActionResult<void>> {
       level: AuditLevel.CRITICAL,
       userId,
       businessId,
-      resourceId: id,
+      resourceId: input.id,
       resourceType: "Service",
       metadata: {
         name: service.name,
@@ -192,35 +132,25 @@ export async function deleteService(id: string): Promise<ActionResult<void>> {
     });
 
     revalidatePath("/dashboard/services");
-    return successResult(undefined);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "deleteService", businessId },
-      extra: { serviceId: id },
-    });
+  },
+  "deleteService",
+  { logSuccess: true }
+);
 
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error deleting service:", error);
-    }
-
-    return errorResult("Erreur lors de l'archivage du service");
-  }
-}
-
+/**
+ * Interface pour service avec compteur de devis
+ */
 interface ServiceWithQuoteCount extends Service {
   quoteCount: number;
 }
 
-export async function getTopServices(): Promise<ActionResult<ServiceWithQuoteCount[]>> {
-  const validatedSession = await validateSession();
+/**
+ * Récupère les services les plus utilisés (top 10)
+ */
+export const getTopServices = withAuth(
+  async (_input: Record<string, never>, session) => {
+    const { businessId } = session;
 
-  if ("error" in validatedSession) {
-    return errorResult(validatedSession.error);
-  }
-
-  const { businessId } = validatedSession;
-
-  try {
     // Use raw SQL to efficiently count quotes per service with multi-tenant security
     const result = await prisma.$queryRaw<
       Array<{ serviceId: string; quoteCount: bigint }>
@@ -240,7 +170,7 @@ export async function getTopServices(): Promise<ActionResult<ServiceWithQuoteCou
     const serviceIds = result.map((r) => r.serviceId);
 
     if (serviceIds.length === 0) {
-      return successResult([]);
+      return [];
     }
 
     const services = await prisma.service.findMany({
@@ -266,16 +196,7 @@ export async function getTopServices(): Promise<ActionResult<ServiceWithQuoteCou
     // Sort by quote count descending
     servicesWithCounts.sort((a, b) => b.quoteCount - a.quoteCount);
 
-    return successResult(servicesWithCounts);
-  } catch (error) {
-    Sentry.captureException(error, {
-      tags: { action: "getTopServices", businessId },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error fetching top services:", error);
-    }
-
-    return errorResult("Erreur lors de la récupération des services populaires");
-  }
-}
+    return servicesWithCounts;
+  },
+  "getTopServices"
+);

@@ -66,9 +66,10 @@ export const deleteResource = withAuth(
     await prisma.resource.delete({
       where: { id: input.id, businessId: session.businessId }
     });
-    return successResult({ id: input.id });
+    revalidatePath('/dashboard/resources');
   },
-  "deleteResource"
+  "deleteResource",
+  { logSuccess: true } // Log deletions in Sentry
 );
 ```
 
@@ -79,7 +80,8 @@ export const createResource = withAuthAndValidation(
     const resource = await prisma.resource.create({
       data: { ...input, businessId: session.businessId }
     });
-    return successResult(resource);
+    revalidatePath('/dashboard/resources');
+    return resource; // Wrapper handles successResult() automatically
   },
   "createResource",
   createResourceSchema  // Zod schema from lib/validations/
@@ -91,11 +93,16 @@ export const createResource = withAuthAndValidation(
 - ✅ Consistent Zod validation with fieldErrors
 - ✅ Centralized error handling + Sentry logging
 - ✅ Type-safe handlers
+- ✅ Input sanitization (XSS protection)
 - ✅ 60% less boilerplate
 
-**Return Structure:** Always `{ data, error }` object.
+**Handler Return:** Return data directly (not `successResult()`). Wrapper converts to `ActionResult<T>` automatically.
+
+**Error Handling:** Throw errors in handler. Wrapper catches and converts to `errorResult()` with Sentry logging.
 
 **After Mutations:** Call `revalidatePath('/path')` to refresh Next.js cache.
+
+**Documentation:** See `/docs/action-wrapper-migration-guide.md` for migration guide and `/examples/action-wrapper-example.ts` for 10 complete examples.
 
 ---
 
