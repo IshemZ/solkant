@@ -6,11 +6,11 @@ import { FormField, Input } from "@/components/ui";
 export type DiscountType = "PERCENTAGE" | "FIXED";
 
 interface DiscountFieldProps {
-  value: number;
-  type: DiscountType;
-  subtotal: number;
-  onChange: (value: number, type: DiscountType) => void;
-  className?: string;
+  readonly value: number;
+  readonly type: DiscountType;
+  readonly subtotal: number;
+  readonly onChange: (value: number, type: DiscountType) => void;
+  readonly className?: string;
 }
 
 export default function DiscountField({
@@ -58,6 +58,10 @@ export default function DiscountField({
     }
   };
 
+  // Calculate max value for input
+  const maxFixedValue = Number.isFinite(subtotal) ? subtotal : undefined;
+  const maxInputValue = type === "PERCENTAGE" ? 100 : maxFixedValue;
+
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Type Toggle */}
@@ -93,7 +97,7 @@ export default function DiscountField({
             id="discount-value"
             type="number"
             min="0"
-            max={type === "PERCENTAGE" ? 100 : (Number.isFinite(subtotal) ? subtotal : undefined)}
+            max={maxInputValue}
             step={type === "PERCENTAGE" ? 1 : 0.01}
             value={localValue}
             onChange={handleValueChange}

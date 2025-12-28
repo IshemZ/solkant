@@ -277,7 +277,7 @@ export function generateQuoteEmail(props: QuoteEmailProps): string {
 
     <div class="footer">
       <p><strong>${businessName}</strong></p>
-      <p>${businessAddress.replace(/\n/g, "<br>")}</p>
+      <p>${businessAddress.replaceAll("\n", "<br>")}</p>
       <p>
         Email : <a href="mailto:${businessEmail}">${businessEmail}</a><br>
         Téléphone : ${businessPhone}

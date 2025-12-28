@@ -6,7 +6,7 @@
 import { generateArticleJsonLd, generateFAQJsonLd } from "@/lib/seo-config";
 
 interface JsonLdProps {
-  data: object;
+  readonly data: object;
 }
 
 /**
@@ -35,13 +35,13 @@ export function ArticleJsonLd({
   authorName,
   url,
 }: {
-  headline: string;
-  description: string;
-  image: string;
-  datePublished: string;
-  dateModified: string;
-  authorName: string;
-  url: string;
+  readonly headline: string;
+  readonly description: string;
+  readonly image: string;
+  readonly datePublished: string;
+  readonly dateModified: string;
+  readonly authorName: string;
+  readonly url: string;
 }) {
   const data = generateArticleJsonLd({
     headline,
@@ -62,7 +62,7 @@ export function ArticleJsonLd({
 export function FAQJsonLd({
   questions,
 }: {
-  questions: Array<{ question: string; answer: string }>;
+  readonly questions: ReadonlyArray<{ readonly question: string; readonly answer: string }>;
 }) {
   const data = generateFAQJsonLd(questions);
 
@@ -75,7 +75,7 @@ export function FAQJsonLd({
 export function BreadcrumbJsonLd({
   items,
 }: {
-  items: Array<{ name: string; url: string }>;
+  readonly items: ReadonlyArray<{ readonly name: string; readonly url: string }>;
 }) {
   const data = {
     "@context": "https://schema.org",

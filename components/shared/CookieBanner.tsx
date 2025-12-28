@@ -6,7 +6,7 @@ import Link from "next/link";
 export function CookieBanner() {
   // Initialiser l'état depuis localStorage si disponible
   const [preferences, setPreferences] = useState(() => {
-    if (typeof window === "undefined") {
+    if (globalThis.window === undefined) {
       return { necessary: true, analytics: false, functional: false };
     }
     const consent = localStorage.getItem("cookie-consent");
@@ -24,19 +24,15 @@ export function CookieBanner() {
   const [showPreferences, setShowPreferences] = useState(false);
 
   const enableGoogleAnalytics = useCallback(() => {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("consent", "update", {
-        analytics_storage: "granted",
-      });
-    }
+    globalThis.window?.gtag?.("consent", "update", {
+      analytics_storage: "granted",
+    });
   }, []);
 
   const disableGoogleAnalytics = useCallback(() => {
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("consent", "update", {
-        analytics_storage: "denied",
-      });
-    }
+    globalThis.window?.gtag?.("consent", "update", {
+      analytics_storage: "denied",
+    });
   }, []);
 
   const applyConsent = useCallback(
@@ -56,11 +52,11 @@ export function CookieBanner() {
 
   useEffect(() => {
     const consent = localStorage.getItem("cookie-consent");
-    if (!consent) {
-      setTimeout(() => setShowBanner(true), 1000);
-    } else {
+    if (consent) {
       // Appliquer le consentement déjà sauvegardé
       applyConsent(preferences);
+    } else {
+      setTimeout(() => setShowBanner(true), 1000);
     }
   }, [applyConsent, preferences]);
 
@@ -153,14 +149,13 @@ export function CookieBanner() {
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex min-h-screen items-center justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             {/* Overlay */}
-            <div
+            <button
+              type="button"
               className="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
               onClick={() => setShowPreferences(false)}
               onKeyDown={(e) => {
                 if (e.key === "Escape") setShowPreferences(false);
               }}
-              role="button"
-              tabIndex={0}
               aria-label="Fermer le panneau de préférences"
             />
 

@@ -43,16 +43,7 @@ export function formatZodErrors(error: z.ZodError): Record<string, string> {
  * ```
  */
 export function formatZodFlatErrors(error: z.ZodError): Record<string, string> {
-  const flattened = error.flatten()
-  const formattedErrors: Record<string, string> = {}
-
-  Object.entries(flattened.fieldErrors).forEach(([key, messages]) => {
-    if (Array.isArray(messages) && messages.length > 0) {
-      formattedErrors[key] = messages[0]
-    }
-  })
-
-  return formattedErrors
+  return formatZodErrors(error)
 }
 
 /**

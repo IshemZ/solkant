@@ -221,7 +221,7 @@ export function generateArticleJsonLd({
  * Génère les données structurées JSON-LD pour une FAQ
  */
 export function generateFAQJsonLd(
-  questions: Array<{ question: string; answer: string }>
+  questions: ReadonlyArray<{ readonly question: string; readonly answer: string }>
 ) {
   return {
     "@context": "https://schema.org",
@@ -246,14 +246,14 @@ export function generateProductJsonLd({
   image,
   offers,
 }: {
-  name: string;
-  description: string;
-  image: string;
-  offers: Array<{
-    name: string;
-    price: string;
-    priceCurrency: string;
-    description?: string;
+  readonly name: string;
+  readonly description: string;
+  readonly image: string;
+  readonly offers: ReadonlyArray<{
+    readonly name: string;
+    readonly price: string;
+    readonly priceCurrency: string;
+    readonly description?: string;
   }>;
 }) {
   return {
@@ -282,7 +282,7 @@ export function generateProductJsonLd({
  * Génère les données structurées JSON-LD pour fil d'Ariane (Breadcrumb)
  */
 export function generateBreadcrumbJsonLd(
-  items: Array<{ name: string; url: string }>
+  items: ReadonlyArray<{ readonly name: string; readonly url: string }>
 ) {
   return {
     "@context": "https://schema.org",

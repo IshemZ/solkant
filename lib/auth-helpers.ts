@@ -106,7 +106,7 @@ export async function validateSessionWithEmail(): Promise<
 
       return {
         userId: session.user.id,
-        userEmail: session.user.email!,
+        userEmail: session.user.email,
         businessId: user.business.id,
       };
     }
@@ -142,7 +142,7 @@ export async function validateSessionWithEmail(): Promise<
 
     return {
       userId: session.user.id,
-      userEmail: session.user.email!,
+      userEmail: session.user.email,
       businessId: session.user.businessId,
     };
   } catch (error) {
@@ -192,7 +192,7 @@ export async function validateSession(): Promise<ValidatedSession | AuthError> {
 
     return {
       userId: session.user.id,
-      userEmail: session.user.email!,
+      userEmail: session.user.email,
       businessId: session.user.businessId,
     };
   } catch (error) {

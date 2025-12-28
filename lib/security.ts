@@ -69,6 +69,21 @@ export function sanitizeUserInput(
 }
 
 /**
+ * Sanitize a single array item (string or object)
+ */
+function sanitizeArrayItem(item: unknown, allowRichText: boolean): unknown {
+  if (typeof item === "string") {
+    return sanitizeUserInput(item, allowRichText);
+  }
+
+  if (item && typeof item === "object") {
+    return sanitizeObject(item as Record<string, unknown>, allowRichText);
+  }
+
+  return item;
+}
+
+/**
  * Sanitize un objet entier (récursif)
  * Utile pour sanitizer tous les champs texte d'un formulaire
  *
@@ -118,11 +133,7 @@ export function sanitizeObject<T extends Record<string, unknown>>(
     } else if (Array.isArray(value)) {
       // Sanitize arrays
       sanitized[key as keyof T] = value.map((item) =>
-        typeof item === "string"
-          ? sanitizeUserInput(item, allowRichText)
-          : item && typeof item === "object"
-          ? sanitizeObject(item as Record<string, unknown>, allowRichText)
-          : item
+        sanitizeArrayItem(item, allowRichText)
       ) as T[keyof T];
     } else {
       // Garder autres types (numbers, booleans, null) tels quels
@@ -255,10 +266,22 @@ export function sanitizeEmail(email: string | null | undefined): string | null {
 
   const trimmed = email.trim().toLowerCase();
 
-  // Regex email basique (Zod fait validation stricte après)
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  // Prevent DoS: reject emails that are too long
+  if (trimmed.length > 254) {
+    // RFC 5321: max email length is 254 characters
+    return null;
+  }
 
-  if (!emailRegex.test(trimmed)) {
+  // Basic email validation (Zod does strict validation after)
+  // Simple checks to avoid regex backtracking vulnerabilities
+  if (
+    !trimmed.includes("@") ||
+    trimmed.startsWith("@") ||
+    trimmed.endsWith("@") ||
+    trimmed.indexOf("@") !== trimmed.lastIndexOf("@") || // Only one @
+    !trimmed.includes(".", trimmed.indexOf("@")) || // Must have . after @
+    trimmed.includes(" ")
+  ) {
     return null;
   }
 

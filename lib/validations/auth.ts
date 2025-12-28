@@ -7,6 +7,7 @@ export const loginSchema = z.object({
   email: z
     .string()
     .min(1, 'L\'email est requis')
+    .max(254, 'L\'email ne peut pas dépasser 254 caractères')
     .email('Format d\'email invalide')
     .toLowerCase()
     .trim(),
@@ -30,6 +31,7 @@ export const registerSchema = z
     email: z
       .string()
       .min(1, 'L\'email est requis')
+      .max(254, 'L\'email ne peut pas dépasser 254 caractères')
       .email('Format d\'email invalide')
       .toLowerCase()
       .trim(),

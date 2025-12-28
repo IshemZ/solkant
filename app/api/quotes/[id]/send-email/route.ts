@@ -36,7 +36,7 @@ export async function POST(
       return NextResponse.json({ error: "Devis non trouvé" }, { status: 404 });
     }
 
-    if (!quote.client || !quote.client.email) {
+    if (!quote.client?.email) {
       return NextResponse.json(
         { error: "Le client n'a pas d'adresse email ou a été supprimé" },
         { status: 400 }

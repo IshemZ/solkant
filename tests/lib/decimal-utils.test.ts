@@ -111,57 +111,6 @@ describe('decimal-utils', () => {
     });
   });
 
-  // TODO: safeParsePrice was removed from decimal-utils
-  // Re-enable these tests if safeParsePrice is re-added
-  // describe('safeParsePrice', () => {
-  //   it('should parse valid number correctly', () => {
-  //     expect(safeParsePrice(100)).toBe(100);
-  //     expect(safeParsePrice(50.99)).toBe(50.99);
-  //     expect(safeParsePrice(0)).toBe(0);
-  //   });
-
-  //   it('should parse valid string number correctly', () => {
-  //     expect(safeParsePrice('100')).toBe(100);
-  //     expect(safeParsePrice('50.99')).toBe(50.99);
-  //   });
-
-  //   it('should return 0 for null', () => {
-  //     expect(safeParsePrice(null)).toBe(0);
-  //   });
-
-  //   it('should return 0 for undefined', () => {
-  //     expect(safeParsePrice(undefined)).toBe(0);
-  //   });
-
-  //   it('should return 0 for NaN', () => {
-  //     expect(safeParsePrice(NaN)).toBe(0);
-  //   });
-
-  //   it('should return 0 for invalid string', () => {
-  //     expect(safeParsePrice('invalid')).toBe(0);
-  //     expect(safeParsePrice('abc')).toBe(0);
-  //   });
-
-  //   it('should return 0 for negative numbers', () => {
-  //     expect(safeParsePrice(-10)).toBe(0);
-  //     expect(safeParsePrice(-0.01)).toBe(0);
-  //   });
-
-  //   it('should return 0 for Infinity', () => {
-  //     expect(safeParsePrice(Infinity)).toBe(0);
-  //     expect(safeParsePrice(-Infinity)).toBe(0);
-  //   });
-
-  //   it('should parse Decimal correctly', () => {
-  //     const decimal = new Decimal('99.99');
-  //     expect(safeParsePrice(decimal)).toBe(99.99);
-  //   });
-
-  //   it('should handle objects gracefully', () => {
-  //     expect(safeParsePrice({})).toBe(0);
-  //     expect(safeParsePrice({ price: 100 })).toBe(0);
-  //   });
-  // });
 
   describe('serializeDecimalFields', () => {
     it('should convert Decimal to number', () => {

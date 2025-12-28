@@ -128,6 +128,24 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   console.log(`✅ Abonnement PRO activé pour Business ${businessId}`);
 }
 
+/**
+ * Map Stripe subscription status to app subscription status
+ */
+function mapStripeStatusToAppStatus(
+  stripeStatus: string
+): "TRIAL" | "ACTIVE" | "PAST_DUE" | "CANCELED" | "EXPIRED" {
+  const statusMap: Record<string, "TRIAL" | "ACTIVE" | "PAST_DUE" | "CANCELED" | "EXPIRED"> = {
+    trialing: "TRIAL",
+    active: "ACTIVE",
+    past_due: "PAST_DUE",
+    canceled: "CANCELED",
+    unpaid: "EXPIRED",
+    incomplete_expired: "EXPIRED",
+  };
+
+  return statusMap[stripeStatus] || "ACTIVE";
+}
+
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   const business = await prisma.business.findUnique({
     where: { stripeSubscriptionId: subscription.id } as any, // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -141,26 +159,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   // Mettre à jour le statut selon Stripe
   const isPro =
     subscription.status === "active" || subscription.status === "trialing";
-
-  let subscriptionStatus:
-    | "TRIAL"
-    | "ACTIVE"
-    | "PAST_DUE"
-    | "CANCELED"
-    | "EXPIRED" = "ACTIVE";
-
-  if (subscription.status === "trialing") {
-    subscriptionStatus = "TRIAL";
-  } else if (subscription.status === "past_due") {
-    subscriptionStatus = "PAST_DUE";
-  } else if (subscription.status === "canceled") {
-    subscriptionStatus = "CANCELED";
-  } else if (
-    subscription.status === "unpaid" ||
-    subscription.status === "incomplete_expired"
-  ) {
-    subscriptionStatus = "EXPIRED";
-  }
+  const subscriptionStatus = mapStripeStatusToAppStatus(subscription.status);
 
   // Cast pour accéder à current_period_end
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

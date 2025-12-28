@@ -56,7 +56,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
   }
 
   async function handleSendEmail() {
-    if (!quote.client || !quote.client.email) {
+    if (!quote.client?.email) {
       alert("Le client n'a pas d'adresse email");
       return;
     }

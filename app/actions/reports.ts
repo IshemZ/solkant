@@ -93,16 +93,12 @@ export const getBusinessRevenue = withAuth(
  * 2. Add audit logging for this sensitive operation
  * 3. Implement rate limiting to prevent data scraping
  *
- * TODO: Add admin authorization check in production
+ * Authorization must be implemented before enabling this endpoint in production.
  */
 export const getAllBusinessRevenue = withAuth(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_input: Record<string, never>, _session) => {
-    // TODO: Add admin authorization check here in production
-    // const isAdmin = await checkIfUserIsAdmin(_session.userId);
-    // if (!isAdmin) {
-    //   throw new Error("Access denied");
-    // }
+    // IMPORTANT: Admin authorization required before production use
 
     // Fetch ALL businesses (no businessId filter - admin operation)
     const businesses = await prisma.business.findMany({

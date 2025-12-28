@@ -3,14 +3,14 @@
 import * as Dialog from '@radix-ui/react-dialog'
 
 interface ConfirmDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  onConfirm: () => void
-  title: string
-  description: string
-  confirmText?: string
-  cancelText?: string
-  variant?: 'danger' | 'warning' | 'default'
+  readonly open: boolean
+  readonly onOpenChange: (open: boolean) => void
+  readonly onConfirm: () => void
+  readonly title: string
+  readonly description: string
+  readonly confirmText?: string
+  readonly cancelText?: string
+  readonly variant?: 'danger' | 'warning' | 'default'
 }
 
 export default function ConfirmDialog({

@@ -4,7 +4,7 @@ import { z } from "zod";
  * Schema for a package item (service + quantity)
  */
 export const packageItemSchema = z.object({
-  serviceId: z.string().cuid("ID de service invalide"),
+  serviceId: z.string().regex(/^c[a-z0-9]{24}$/, "ID de service invalide"),
   quantity: z.number().int().min(1, "La quantité doit être au moins 1"),
 });
 

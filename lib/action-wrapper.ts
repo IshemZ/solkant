@@ -82,7 +82,7 @@ export function withAuth<TInput, TOutput>(
  * @example
  * const createClientSchema = z.object({
  *   nom: z.string().min(1),
- *   email: z.string().email(),
+ *   email: z.string().regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Email invalide'),
  * });
  *
  * export const createClient = withAuthAndValidation(

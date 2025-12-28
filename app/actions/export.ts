@@ -19,7 +19,7 @@ function escapeCSVField(field: unknown): string {
     fieldStr.includes('"') ||
     fieldStr.includes("\n")
   ) {
-    return `"${fieldStr.replace(/"/g, '""')}"`;
+    return `"${fieldStr.replaceAll('"', '""')}"`;
   }
   return fieldStr;
 }

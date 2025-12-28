@@ -16,6 +16,7 @@ export const requestPasswordResetSchema = z.object({
   email: z
     .string()
     .min(1, "L'adresse email est requise")
+    .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'adresse email invalide")
     .toLowerCase()
     .trim(),
@@ -29,7 +30,10 @@ export const resetPasswordWithOTPSchema = z
     email: z
       .string()
       .min(1, "L'adresse email est requise")
-      .email("Format d'adresse email invalide")
+      .regex(
+        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+        "Format d'adresse email invalide"
+      )
       .toLowerCase()
       .trim(),
     code: z

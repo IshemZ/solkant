@@ -26,12 +26,12 @@ export type DiscountType = z.infer<typeof discountTypeEnum>
 export const quoteItemSchema = z.object({
   serviceId: z
     .string()
-    .cuid('ID de service invalide')
+    .regex(/^c[a-z0-9]{24}$/, 'ID de service invalide')
     .optional()
     .nullable(),
   packageId: z
     .string()
-    .cuid('ID de package invalide')
+    .regex(/^c[a-z0-9]{24}$/, 'ID de package invalide')
     .optional()
     .nullable(),
   name: z
@@ -75,11 +75,14 @@ export const quoteItemSchema = z.object({
 export const createQuoteSchema = z.object({
   clientId: z
     .string('Le client est requis')
-    .cuid('ID de client invalide'),
+    .regex(/^c[a-z0-9]{24}$/, 'ID de client invalide'),
   status: quoteStatusEnum.default('DRAFT').optional(),
   validUntil: z
     .string()
-    .datetime('Date de validité invalide')
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/,
+      'Date de validité invalide'
+    )
     .optional()
     .nullable()
     .or(z.date().optional().nullable()),
@@ -138,7 +141,7 @@ export const createQuoteSchema = z.object({
 export const updateQuoteSchema = z.object({
   clientId: z
     .string()
-    .cuid('ID de client invalide')
+    .regex(/^c[a-z0-9]{24}$/, 'ID de client invalide')
     .optional(),
   quoteNumber: z
     .string()
@@ -153,7 +156,10 @@ export const updateQuoteSchema = z.object({
   status: quoteStatusEnum.optional(),
   validUntil: z
     .string()
-    .datetime('Date de validité invalide')
+    .regex(
+      /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/,
+      'Date de validité invalide'
+    )
     .optional()
     .nullable()
     .or(z.date().optional().nullable()),

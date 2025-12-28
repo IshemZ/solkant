@@ -19,7 +19,7 @@ export function FormField({
   children,
   className,
   hint,
-}: FormFieldProps) {
+}: Readonly<FormFieldProps>) {
   return (
     <div className={cn("space-y-2", className)}>
       <Label htmlFor={id} className="flex items-center gap-1">

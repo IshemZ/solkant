@@ -135,7 +135,7 @@ export const updateClient = withAuthAndValidation(
   "updateClient",
   // Schema composé : ID + données de mise à jour
   z.object({
-    id: z.string().cuid(),
+    id: z.string().regex(/^c[a-z0-9]{24}$/, "ID invalide"),
   }).merge(updateClientSchema)
 );
 
@@ -216,7 +216,7 @@ export const getClientById = withAuthAndValidation(
   },
   "getClientById",
   z.object({
-    id: z.string().cuid("ID invalide"),
+    id: z.string().regex(/^c[a-z0-9]{24}$/, "ID invalide"),
   })
 );
 

@@ -18,9 +18,9 @@ export function CheckoutButton() {
       size="lg"
       className="w-full"
       title={
-        !paymentsEnabled
-          ? "Inscription gratuite disponible - Les paiements seront bientôt disponibles"
-          : undefined
+        paymentsEnabled
+          ? undefined
+          : "Inscription gratuite disponible - Les paiements seront bientôt disponibles"
       }
     >
       Commencer gratuitement

@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { MouseEvent } from "react";
 
 type CTALocation =
   | "hero"
@@ -12,11 +11,11 @@ type CTALocation =
   | "features_section";
 
 interface CTARegisterButtonProps {
-  location: CTALocation;
-  text: string;
-  className?: string;
-  variant?: "button" | "link";
-  children?: React.ReactNode;
+  readonly location: CTALocation;
+  readonly text: string;
+  readonly className?: string;
+  readonly variant?: "button" | "link";
+  readonly children?: React.ReactNode;
 }
 
 /**
@@ -37,16 +36,14 @@ export function CTARegisterButton({
   variant = "button",
   children,
 }: CTARegisterButtonProps) {
-  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = () => {
     // Track CTA click event
-    if (typeof window !== "undefined" && window.gtag) {
-      window.gtag("event", "click_cta_register", {
-        cta_location: location,
-        cta_text: text,
-        page_path: window.location.pathname,
-        cta_type: variant,
-      });
-    }
+    globalThis.window?.gtag?.("event", "click_cta_register", {
+      cta_location: location,
+      cta_text: text,
+      page_path: globalThis.window?.location?.pathname,
+      cta_type: variant,
+    });
   };
 
   return (
