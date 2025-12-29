@@ -62,7 +62,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
   const mockSession = {
     user: {
       id: "clxxx11111111111111111111", // Format CUID (25 chars: c + 24)
-      businessId: "clxxx2222222222222222222222222",
+      businessId: "clxxx22222222222222222222",
       email: "test@example.com",
       name: "Test User",
     },

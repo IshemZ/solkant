@@ -499,7 +499,7 @@ describe("Quote Server Actions", () => {
             total: 30,
           },
           {
-            serviceId: "clxxx555555555555555",
+            serviceId: "clxxx55555555555555555555",
             name: "Couleur",
             description: null,
             price: 80,
@@ -507,7 +507,7 @@ describe("Quote Server Actions", () => {
             total: 80,
           },
           {
-            serviceId: "clxxx666666666666666",
+            serviceId: "clxxx66666666666666666666",
             name: "Brushing",
             description: null,
             price: 20,
