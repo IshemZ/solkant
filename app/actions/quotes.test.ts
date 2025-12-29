@@ -35,8 +35,8 @@ vi.mock("next/cache", () => ({
 describe("Quote Server Actions", () => {
   const mockSession = {
     user: {
-      id: "clxxx111111111111111",
-      businessId: "clxxx222222222222222",
+      id: "clxxx11111111111111111111",
+      businessId: "clxxx22222222222222222222",
       email: "test@example.com",
       name: "Test User",
     },
@@ -55,8 +55,8 @@ describe("Quote Server Actions", () => {
     updatedAt: new Date(),
   };
 
-  const mockClientId = "clxxx333333333333333";
-  const mockServiceId = "clxxx444444444444444";
+  const mockClientId = "clxxx33333333333333333333";
+  const mockServiceId = "clxxx44444444444444444444";
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -70,8 +70,8 @@ describe("Quote Server Actions", () => {
         {
           id: "quote_1",
           quoteNumber: "DEVIS-2024-001",
-          clientId: "clxxx333333333333333",
-          businessId: "clxxx222222222222222",
+          clientId: "clxxx33333333333333333333",
+          businessId: "clxxx22222222222222222222",
           status: "DRAFT",
           validUntil: new Date("2025-01-15"),
           discount: new Decimal(0),
@@ -83,7 +83,7 @@ describe("Quote Server Actions", () => {
           createdAt: new Date(),
           updatedAt: new Date(),
           client: {
-            id: "clxxx333333333333333",
+            id: "clxxx33333333333333333333",
             firstName: "Marie",
             lastName: "Dupont",
             email: "marie@example.com",
@@ -91,7 +91,7 @@ describe("Quote Server Actions", () => {
             address: null,
             city: null,
             postalCode: null,
-            businessId: "clxxx222222222222222",
+            businessId: "clxxx22222222222222222222",
             createdAt: new Date(),
             updatedAt: new Date(),
           },
@@ -99,7 +99,7 @@ describe("Quote Server Actions", () => {
             {
               id: "item_1",
               quoteId: "quote_1",
-              serviceId: "clxxx444444444444444",
+              serviceId: "clxxx44444444444444444444",
               packageId: null,
               name: "Coupe classique",
               description: null,
@@ -110,7 +110,7 @@ describe("Quote Server Actions", () => {
               createdAt: new Date(),
               updatedAt: new Date(),
               service: {
-                id: "clxxx444444444444444",
+                id: "clxxx44444444444444444444",
                 name: "Coupe classique",
                 description: null,
                 price: new Decimal(30),
@@ -118,7 +118,7 @@ describe("Quote Server Actions", () => {
                 category: null,
                 isActive: true,
                 deletedAt: null,
-                businessId: "clxxx222222222222222",
+                businessId: "clxxx22222222222222222222",
                 createdAt: new Date(),
                 updatedAt: new Date(),
               },
@@ -139,7 +139,7 @@ describe("Quote Server Actions", () => {
 
       // ✅ CRITIQUE: Vérifier filtrage businessId
       expect(prisma.quote.findMany).toHaveBeenCalledWith({
-        where: { businessId: "clxxx222222222222222" },
+        where: { businessId: "clxxx22222222222222222222" },
         include: {
           client: true,
           items: {
@@ -187,8 +187,8 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
         id: "quote_1",
         quoteNumber: "DEVIS-2024-001",
-        clientId: "clxxx333333333333333",
-        businessId: "clxxx222222222222222",
+        clientId: "clxxx33333333333333333333",
+        businessId: "clxxx22222222222222222222",
         status: "DRAFT",
         validUntil: new Date("2025-01-15"),
         discount: new Decimal(0),
@@ -200,7 +200,7 @@ describe("Quote Server Actions", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Marie",
           lastName: "Dupont",
           email: "marie@example.com",
@@ -208,12 +208,12 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
         business: {
-          id: "clxxx222222222222222",
+          id: "clxxx22222222222222222222",
           name: "Mon Salon",
           siret: "12345678901234",
           address: "1 rue de la Paix",
@@ -222,7 +222,7 @@ describe("Quote Server Actions", () => {
           phone: "0123456789",
           email: "contact@monsalon.fr",
           logo: null,
-          userId: "clxxx111111111111111",
+          userId: "clxxx11111111111111111111",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -230,7 +230,7 @@ describe("Quote Server Actions", () => {
           {
             id: "item_1",
             quoteId: "quote_1",
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Coupe classique",
             description: null,
             price: 30,
@@ -239,14 +239,14 @@ describe("Quote Server Actions", () => {
             createdAt: new Date(),
             updatedAt: new Date(),
             service: {
-              id: "clxxx444444444444444",
+              id: "clxxx44444444444444444444",
               name: "Coupe classique",
               description: null,
               price: 30,
               duration: 45,
               category: null,
               isActive: true,
-              businessId: "clxxx222222222222222",
+              businessId: "clxxx22222222222222222222",
               createdAt: new Date(),
               updatedAt: new Date(),
             },
@@ -267,7 +267,7 @@ describe("Quote Server Actions", () => {
       expect(prisma.quote.findFirst).toHaveBeenCalledWith({
         where: {
           id: "quote_1",
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
         },
         include: {
           client: true,
@@ -316,14 +316,14 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Coupe classique",
             description: null,
             price: 30,
@@ -344,11 +344,11 @@ describe("Quote Server Actions", () => {
         total: 30,
         notes: null,
         sentAt: null,
-        businessId: "clxxx222222222222222",
+        businessId: "clxxx22222222222222222222",
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Marie",
           lastName: "Dupont",
           email: "marie@example.com",
@@ -356,7 +356,7 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -364,7 +364,7 @@ describe("Quote Server Actions", () => {
           {
             id: "item_new",
             quoteId: "quote_new",
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Coupe classique",
             description: null,
             price: 30,
@@ -395,8 +395,8 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
         id: "quote_last",
         quoteNumber: "DEVIS-2024-042",
-        clientId: "clxxx333333333333333",
-        businessId: "clxxx222222222222222",
+        clientId: "clxxx33333333333333333333",
+        businessId: "clxxx22222222222222222222",
         status: "SENT",
         validUntil: new Date(),
         discount: new Decimal(0),
@@ -410,14 +410,14 @@ describe("Quote Server Actions", () => {
       });
 
       const quoteInput = {
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Test Service",
             description: null,
             price: 50,
@@ -434,11 +434,11 @@ describe("Quote Server Actions", () => {
         subtotal: 50,
         total: 50,
         notes: null,
-        businessId: "clxxx222222222222222",
+        businessId: "clxxx22222222222222222222",
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "User",
           email: "test@example.com",
@@ -446,7 +446,7 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -454,7 +454,7 @@ describe("Quote Server Actions", () => {
           {
             id: "item_new",
             quoteId: "quote_new",
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Test Service",
             description: null,
             price: 50,
@@ -484,14 +484,14 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Coupe",
             description: null,
             price: 30,
@@ -524,11 +524,11 @@ describe("Quote Server Actions", () => {
         subtotal: 130, // 30 + 80 + 20
         total: 130,
         notes: null,
-        businessId: "clxxx222222222222222",
+        businessId: "clxxx22222222222222222222",
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Marie",
           lastName: "Dupont",
           email: "marie@example.com",
@@ -536,7 +536,7 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -566,14 +566,14 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 20, // Remise de 20€
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Service Test",
             description: null,
             price: 100,
@@ -590,11 +590,11 @@ describe("Quote Server Actions", () => {
         subtotal: 100,
         total: 80, // 100 - 20
         notes: null,
-        businessId: "clxxx222222222222222",
+        businessId: "clxxx22222222222222222222",
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "User",
           email: "test@example.com",
@@ -602,7 +602,7 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -634,14 +634,14 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Extension cils",
             description: null,
             price: 50,
@@ -658,11 +658,11 @@ describe("Quote Server Actions", () => {
         subtotal: 150,
         total: 150,
         notes: null,
-        businessId: "clxxx222222222222222",
+        businessId: "clxxx22222222222222222222",
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "User",
           email: "test@example.com",
@@ -670,7 +670,7 @@ describe("Quote Server Actions", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -726,14 +726,14 @@ describe("Quote Server Actions", () => {
       vi.mocked(getServerSession).mockResolvedValue(null);
 
       const result = await createQuote({
-        clientId: "clxxx333333333333333",
+        clientId: "clxxx33333333333333333333",
         validUntil: new Date("2025-01-15").toISOString(),
         status: "DRAFT" as const,
         discount: 0,
         discountType: "FIXED" as const,
         items: [
           {
-            serviceId: "clxxx444444444444444",
+            serviceId: "clxxx44444444444444444444",
             name: "Test",
             description: null,
             price: 50,
@@ -760,8 +760,8 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
         id: "quote_123",
         quoteNumber: "DEVIS-2024-001",
-        clientId: "clxxx333333333333333",
-        businessId: "clxxx222222222222222",
+        clientId: "clxxx33333333333333333333",
+        businessId: "clxxx22222222222222222222",
         status: "DRAFT",
         validUntil: new Date(),
         discount: new Decimal(0),
@@ -777,8 +777,8 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.quote.delete).mockResolvedValue({
         id: "quote_123",
         quoteNumber: "DEVIS-2024-001",
-        clientId: "clxxx333333333333333",
-        businessId: "clxxx222222222222222",
+        clientId: "clxxx33333333333333333333",
+        businessId: "clxxx22222222222222222222",
         status: "DRAFT",
         validUntil: new Date(),
         discount: new Decimal(0),
@@ -799,7 +799,7 @@ describe("Quote Server Actions", () => {
       expect(prisma.quote.findFirst).toHaveBeenCalledWith({
         where: {
           id: "quote_123",
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
         },
         select: { quoteNumber: true, clientId: true, total: true },
       });
@@ -808,7 +808,7 @@ describe("Quote Server Actions", () => {
       expect(prisma.quote.delete).toHaveBeenCalledWith({
         where: {
           id: "quote_123",
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
         },
       });
     });
