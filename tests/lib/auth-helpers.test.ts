@@ -67,36 +67,6 @@ describe("validateSessionWithEmail", () => {
     });
   });
 
-  it("devrait retourner une erreur si l'email n'est pas vérifié", async () => {
-    const mockSession = {
-      user: {
-        id: "user123",
-        email: "test@example.com",
-        businessId: "biz123",
-      },
-      expires: new Date().toISOString(),
-    };
-
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({
-      id: "user123",
-      email: "test@example.com",
-      emailVerified: null, // ❌ Email non vérifié
-      name: "Test User",
-      password: null,
-      image: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-
-    const result = await validateSessionWithEmail();
-
-    expect(result).toEqual({
-      error: "Email non vérifié. Veuillez vérifier votre email.",
-      code: "EMAIL_NOT_VERIFIED",
-    });
-  });
-
   it("devrait retourner ValidatedSession si tout est OK", async () => {
     const mockSession = {
       user: {
@@ -108,16 +78,6 @@ describe("validateSessionWithEmail", () => {
     };
 
     vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({
-      id: "user123",
-      email: "test@example.com",
-      emailVerified: new Date(), // ✅ Email vérifié
-      name: "Test User",
-      password: null,
-      image: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
 
     const result = await validateSessionWithEmail();
 
@@ -125,27 +85,6 @@ describe("validateSessionWithEmail", () => {
       userId: "user123",
       userEmail: "test@example.com",
       businessId: "biz123",
-    });
-  });
-
-  it("devrait retourner une erreur si l'utilisateur n'existe plus en BDD", async () => {
-    const mockSession = {
-      user: {
-        id: "user123",
-        email: "test@example.com",
-        businessId: "biz123",
-      },
-      expires: new Date().toISOString(),
-    };
-
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
-    vi.mocked(prisma.user.findUnique).mockResolvedValue(null); // User supprimé
-
-    const result = await validateSessionWithEmail();
-
-    expect(result).toEqual({
-      error: "Non autorisé",
-      code: "UNAUTHORIZED",
     });
   });
 
@@ -227,58 +166,12 @@ describe("validateSessionWithEmail", () => {
     });
   });
 
-  it("devrait retourner une erreur si businessId absent et email non vérifié (fallback)", async () => {
-    const mockSession = {
-      user: {
-        id: "user123",
-        email: "test@example.com",
-        // businessId manquant !
-      },
-      expires: new Date().toISOString(),
-    };
-
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
-    vi.mocked(prisma.user.findUnique).mockResolvedValue({
-      id: "user123",
-      email: "test@example.com",
-      emailVerified: null, // ❌ Email non vérifié
-      name: "Test User",
-      password: null,
-      image: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      business: {
-        id: "biz456",
-        name: "Test Business",
-        userId: "user123",
-        email: null,
-        phone: null,
-        address: null,
-        city: null,
-        postalCode: null,
-        country: null,
-        siret: null,
-        tva: null,
-        logo: null,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-    } as any);
-
-    const result = await validateSessionWithEmail();
-
-    expect(result).toEqual({
-      error: "Email non vérifié. Veuillez vérifier votre email.",
-      code: "EMAIL_NOT_VERIFIED",
-    });
-  });
-
   it("devrait gérer les erreurs Prisma gracieusement", async () => {
     const mockSession = {
       user: {
         id: "user123",
         email: "test@example.com",
-        businessId: "biz123",
+        // businessId manquant pour forcer le fallback BDD
       },
       expires: new Date().toISOString(),
     };
@@ -335,7 +228,7 @@ describe("validateSession", () => {
     });
   });
 
-  it("devrait retourner ValidatedSession sans vérifier emailVerified", async () => {
+  it("devrait retourner ValidatedSession directement depuis la session", async () => {
     const mockSession = {
       user: {
         id: "user123",
@@ -349,7 +242,7 @@ describe("validateSession", () => {
 
     const result = await validateSession();
 
-    // Ne devrait PAS appeler prisma car emailVerified n'est pas vérifié
+    // Ne devrait PAS appeler prisma si businessId est présent dans la session
     expect(prisma.user.findUnique).not.toHaveBeenCalled();
 
     expect(result).toEqual({

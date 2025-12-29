@@ -78,7 +78,7 @@ export async function POST(request: Request) {
         name,
         email,
         password: hashedPassword,
-        emailVerified: new Date(), // Auto-vérifié (email verification désactivée)
+        emailVerified: new Date(), // Auto-set for all new users
         business: {
           create: {
             name: `Institut de ${name || "beauté"}`,

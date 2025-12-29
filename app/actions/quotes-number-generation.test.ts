@@ -47,7 +47,7 @@ const { createQuote } = await import("@/app/actions/quotes");
 
 describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
   const mockUser = {
-    id: "clxxx111111111111111",
+    id: "clxxx11111111111111111111",
     email: "test@example.com",
     emailVerified: new Date("2024-01-01"),
     name: "Test User",
@@ -61,22 +61,22 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
 
   const mockSession = {
     user: {
-      id: "clxxx111111111111111", // Format CUID
-      businessId: "clxxx222222222222222",
+      id: "clxxx11111111111111111111", // Format CUID (25 chars: c + 24)
+      businessId: "clxxx22222222222222222222",
       email: "test@example.com",
       name: "Test User",
     },
   };
 
   const validQuoteInput = {
-    clientId: "clxxx333333333333333", // Format CUID
+    clientId: "clxxx33333333333333333333", // Format CUID (25 chars: c + 24)
     validUntil: new Date("2025-12-31").toISOString(),
     status: "DRAFT" as const,
     discount: 0,
     discountType: "FIXED" as const,
     items: [
       {
-        serviceId: "clxxx444444444444444", // Format CUID
+        serviceId: "clxxx44444444444444444444", // Format CUID (25 chars: c + 24)
         name: "Service Test",
         price: 100,
         quantity: 1,
@@ -100,8 +100,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockResolvedValueOnce({
         id: "quote_1",
         quoteNumber: `DEVIS-${currentYear}-001`,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -112,7 +112,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "Client",
           email: "test@example.com",
@@ -120,7 +120,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -134,8 +134,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       }
       vi.mocked(getServerSession).mockResolvedValueOnce({
         user: {
-          id: "clxxx777777777777777",
-          businessId: "clxxx555555555555555", // Autre business
+          id: "clxxx77777777777777777777",
+          businessId: "clxxx55555555555555555555", // Autre business
           email: "other@example.com",
           name: "Other User",
         },
@@ -145,8 +145,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockResolvedValueOnce({
         id: "quote_2",
         quoteNumber: `DEVIS-${currentYear}-001`, // ✅ Même numéro OK car différent businessId
-        businessId: "clxxx555555555555555",
-        clientId: "clxxx666666666666666",
+        businessId: "clxxx55555555555555555555",
+        clientId: "clxxx66666666666666666666",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -157,7 +157,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx666666666666666",
+          id: "clxxx66666666666666666666",
           firstName: "Other",
           lastName: "Client",
           email: "other@example.com",
@@ -165,7 +165,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx555555555555555",
+          businessId: "clxxx55555555555555555555",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -178,10 +178,10 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       expect(result2.success).toBe(true);
       if (result2.success) {
         expect(result2.data.quoteNumber).toBe(`DEVIS-${currentYear}-001`);
-        expect(result2.data.businessId).toBe("clxxx555555555555555");
+        expect(result2.data.businessId).toBe("clxxx55555555555555555555");
       }
       if (result1.success) {
-        expect(result1.data.businessId).toBe("clxxx222222222222222");
+        expect(result1.data.businessId).toBe("clxxx22222222222222222222");
       }
     });
 
@@ -192,8 +192,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockResolvedValueOnce({
         id: "quote_new",
         quoteNumber: `DEVIS-${currentYear}-001`,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -204,7 +204,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "Client",
           email: "test@example.com",
@@ -212,7 +212,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -225,7 +225,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       expect(mockFindFirst).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            businessId: "clxxx222222222222222",
+            businessId: "clxxx22222222222222222222",
             quoteNumber: expect.objectContaining({
               startsWith: `DEVIS-${currentYear}-`,
             }),
@@ -255,8 +255,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockRejectedValueOnce(p2002Error).mockResolvedValueOnce({
         id: "quote_retry_success",
         quoteNumber: `DEVIS-${currentYear}-001`,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -267,7 +267,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "Client",
           email: "test@example.com",
@@ -275,7 +275,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -345,8 +345,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockResolvedValueOnce({
         id: "quote_first",
         quoteNumber: expectedNumber,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -357,7 +357,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "Client",
           email: "test@example.com",
@@ -365,7 +365,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -388,8 +388,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockFindFirst.mockResolvedValueOnce({
         id: "quote_last",
         quoteNumber: `DEVIS-${currentYear}-005`,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "SENT",
         validUntil: new Date(),
         discount: 0,
@@ -405,8 +405,8 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
       mockCreate.mockResolvedValueOnce({
         id: "quote_new",
         quoteNumber: `DEVIS-${currentYear}-006`,
-        businessId: "clxxx222222222222222",
-        clientId: "clxxx333333333333333",
+        businessId: "clxxx22222222222222222222",
+        clientId: "clxxx33333333333333333333",
         status: "DRAFT",
         validUntil: new Date("2025-12-31"),
         discount: 0,
@@ -417,7 +417,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         client: {
-          id: "clxxx333333333333333",
+          id: "clxxx33333333333333333333",
           firstName: "Test",
           lastName: "Client",
           email: "test@example.com",
@@ -425,7 +425,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
           address: null,
           city: null,
           postalCode: null,
-          businessId: "clxxx222222222222222",
+          businessId: "clxxx22222222222222222222",
           createdAt: new Date(),
           updatedAt: new Date(),
         },

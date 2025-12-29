@@ -73,6 +73,7 @@ export default async function ModifierDevisPage({ params }: PageProps) {
   // Serialize Decimal fields to numbers for client component
   const serializedServices = serializeDecimalFields(services) as unknown as SerializedService[];
   const serializedPackages = serializeDecimalFields(packages) as unknown as SerializedPackage[];
+  const serializedQuote = serializeDecimalFields(quote);
 
   return (
     <div className="mx-auto max-w-5xl py-8">
@@ -81,7 +82,7 @@ export default async function ModifierDevisPage({ params }: PageProps) {
         <p className="mt-2 text-muted-foreground">Devis {quote.quoteNumber}</p>
       </div>
 
-      <QuoteForm mode="edit" initialQuote={quote} clients={clients} services={serializedServices} packages={serializedPackages} />
+      <QuoteForm mode="edit" initialQuote={serializedQuote} clients={clients} services={serializedServices} packages={serializedPackages} />
     </div>
   );
 }

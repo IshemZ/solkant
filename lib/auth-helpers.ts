@@ -23,14 +23,14 @@ export type ValidatedSession = {
  */
 export type AuthError = {
   error: string;
-  code?: "UNAUTHORIZED" | "EMAIL_NOT_VERIFIED" | "NO_BUSINESS";
+  code?: "UNAUTHORIZED" | "NO_BUSINESS";
 };
 
 /**
- * Valide la session utilisateur ET vérifie que l'email est vérifié
+ * Valide la session utilisateur et vérifie que l'utilisateur a un businessId
  *
  * SÉCURITÉ: Cette fonction doit être appelée au début de TOUTES les Server Actions
- * pour garantir que seuls les utilisateurs avec email vérifié peuvent effectuer des actions.
+ * pour garantir que seuls les utilisateurs authentifiés peuvent effectuer des actions.
  *
  * @returns ValidatedSession si succès, AuthError si échec
  *
@@ -68,7 +68,6 @@ export async function validateSessionWithEmail(): Promise<
       const user = await prisma.user.findUnique({
         where: { id: session.user.id },
         select: {
-          emailVerified: true,
           business: { select: { id: true } },
         },
       });
@@ -88,14 +87,6 @@ export async function validateSessionWithEmail(): Promise<
         };
       }
 
-      // Vérifier email pour ce fallback également
-      if (!user.emailVerified) {
-        return {
-          error: "Email non vérifié. Veuillez vérifier votre email.",
-          code: "EMAIL_NOT_VERIFIED",
-        };
-      }
-
       // Ajouter contexte Sentry (lazy import)
       const Sentry = await import("@sentry/nextjs");
       Sentry.setContext("user", {
@@ -111,28 +102,7 @@ export async function validateSessionWithEmail(): Promise<
       };
     }
 
-    // 3. Vérifier que l'email est vérifié (requête BDD nécessaire)
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { emailVerified: true },
-    });
-
-    if (!user) {
-      // User supprimé entre temps ?
-      return {
-        error: "Non autorisé",
-        code: "UNAUTHORIZED",
-      };
-    }
-
-    if (!user.emailVerified) {
-      return {
-        error: "Email non vérifié. Veuillez vérifier votre email.",
-        code: "EMAIL_NOT_VERIFIED",
-      };
-    }
-
-    // 4. Tout est OK - ajouter contexte Sentry pour traçabilité (lazy import)
+    // 3. Tout est OK - ajouter contexte Sentry pour traçabilité (lazy import)
     const Sentry = await import("@sentry/nextjs");
     Sentry.setContext("user", {
       userId: session.user.id,
@@ -164,11 +134,9 @@ export async function validateSessionWithEmail(): Promise<
 }
 
 /**
- * Valide uniquement la session (sans vérifier emailVerified)
+ * Valide la session utilisateur (alias de validateSessionWithEmail pour compatibilité)
  *
- * USAGE: À utiliser UNIQUEMENT pour les actions qui ne nécessitent pas d'email vérifié
- * (ex: resendVerificationEmail, requestPasswordReset, etc.)
- *
+ * @deprecated Utilisez validateSessionWithEmail à la place
  * @returns ValidatedSession si succès, AuthError si échec
  */
 export async function validateSession(): Promise<ValidatedSession | AuthError> {
