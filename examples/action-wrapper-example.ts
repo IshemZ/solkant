@@ -221,24 +221,26 @@ export const getClientById = withAuthAndValidation(
 );
 
 // ============================================================================
-// EXEMPLE 6: Action Sans Email Vérifié
+// EXEMPLE 6: Action Simple avec Session
 // ============================================================================
 
 /**
- * Renvoie l'email de vérification
- * Pattern: withAuthUnverified (avant vérification email)
+ * Récupère les préférences utilisateur
+ * Pattern: withAuth (ou withAuthUnverified - identique maintenant)
  */
-export const resendVerificationEmail = withAuthUnverified(
+export const getUserPreferences = withAuth(
   async (input: {}, session) => {
-    const { userEmail } = session;
+    const { userId, userEmail } = session;
 
-    // Logique d'envoi d'email
-    // await sendVerificationEmail(userEmail);
+    // Récupérer préférences depuis la base
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true, image: true }
+    });
 
-    console.log(`Email de vérification envoyé à ${userEmail}`);
-    return successResult({ email: userEmail });
+    return successResult({ user });
   },
-  "resendVerificationEmail"
+  "getUserPreferences"
 );
 
 // ============================================================================
@@ -460,15 +462,14 @@ export const searchClients = withAuthAndValidation(
    ✅ PUT/PATCH (mises à jour)
    ✅ Actions avec inputs complexes
 
-3. withAuthUnverified() - Pour actions pré-vérification email
-   ✅ resendVerificationEmail
-   ✅ requestPasswordReset
-   ⚠️  À utiliser avec PRÉCAUTION
+3. withAuthUnverified() - DEPRECATED: Identique à withAuth maintenant
+   ⚠️  Email verification has been removed
+   ✅ Use withAuth() instead for all authenticated actions
 
-4. Options disponibles:
-   - requireEmailVerification: boolean (défaut: true)
-   - sanitizeInput: boolean (défaut: true)
-   - logSuccess: boolean (défaut: false - activer pour actions critiques)
+4. Best Practices:
+   - Toujours filtrer par businessId pour multi-tenancy
+   - Utiliser revalidatePath() après mutations
+   - Logger les actions critiques avec auditLog()
 
 5. Gestion d'erreurs:
    - Lancer throw new Error() pour erreurs métier

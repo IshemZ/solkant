@@ -1,6 +1,5 @@
 import {
   validateSessionWithEmail,
-  validateSession,
   type ValidatedSession,
 } from "@/lib/auth-helpers";
 import { errorResult, type ActionResult } from "@/lib/action-types";
@@ -150,13 +149,13 @@ export function withAuthAndValidation<TInput, TOutput>(
 }
 
 /**
- * Higher-order function for actions that don't require email verification
- * (e.g., resendVerificationEmail, requestPasswordReset)
+ * Higher-order function for authenticated actions (alias de withAuth)
  *
+ * @deprecated Email verification has been removed - this is now identical to withAuth. Use withAuth instead.
  * @param handler - The server action handler function
  * @param actionName - Name of the action for error logging
  * @param errorMessage - Optional custom error message
- * @returns Wrapped function with auth (no email check) and error handling
+ * @returns Wrapped function with auth and error handling
  */
 export function withAuthUnverified<TInput, TOutput>(
   handler: (
@@ -167,8 +166,8 @@ export function withAuthUnverified<TInput, TOutput>(
   errorMessage?: string
 ) {
   return async (input: TInput): Promise<ActionResult<TOutput>> => {
-    // Validate session WITHOUT email verification check
-    const validatedSession = await validateSession();
+    // Validate session (identical to withAuth now that email verification is removed)
+    const validatedSession = await validateSessionWithEmail();
     if ("error" in validatedSession) {
       return errorResult(validatedSession.error);
     }
