@@ -62,9 +62,13 @@ if (!email) {
   process.exit(1)
 }
 
-makeSuperAdmin(email)
-  .catch((error) => {
+(async () => {
+  try {
+    await makeSuperAdmin(email)
+  } catch (error) {
     console.error('❌ Erreur:', error)
     process.exit(1)
-  })
-  .finally(() => prisma.$disconnect())
+  } finally {
+    await prisma.$disconnect()
+  }
+})()
