@@ -8,6 +8,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { UserRole } from '@prisma/client';
 
 /**
  * Type retourné par validateSessionWithEmail
@@ -184,29 +185,61 @@ export async function validateSession(): Promise<ValidatedSession | AuthError> {
 /**
  * Valide que l'utilisateur connecté est un super admin
  *
+ * IMPORTANT: businessId peut être vide pour les super admins (opérations système)
+ *
  * @returns ValidatedSession si succès, AuthError si échec
+ *
+ * @example
+ * ```typescript
+ * export async function getAllBusinesses() {
+ *   const validatedSession = await validateSuperAdmin();
+ *
+ *   if ("error" in validatedSession) {
+ *     return validatedSession;
+ *   }
+ *
+ *   // ... super admin logic (no businessId filter)
+ * }
+ * ```
  */
 export async function validateSuperAdmin(): Promise<ValidatedSession | AuthError> {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session?.user?.id) {
-    return { error: "Non authentifié", code: "UNAUTHORIZED" };
+    if (!session?.user?.id) {
+      return { error: "Non authentifié", code: "UNAUTHORIZED" };
+    }
+
+    if (session.user.role !== UserRole.SUPER_ADMIN) {
+      return { error: "Accès interdit - Super Admin requis", code: "UNAUTHORIZED" };
+    }
+
+    // Lazy import Sentry
+    const Sentry = await import("@sentry/nextjs");
+    Sentry.setContext("super_admin", {
+      userId: session.user.id,
+      email: session.user.email,
+    });
+
+    return {
+      userId: session.user.id,
+      userEmail: session.user.email,
+      businessId: session.user.businessId || '', // Optionnel pour super admin
+    };
+  } catch (error) {
+    // Lazy import Sentry
+    const Sentry = await import("@sentry/nextjs");
+    Sentry.captureException(error, {
+      tags: { action: "validateSuperAdmin" },
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      console.error("Error in validateSuperAdmin:", error);
+    }
+
+    return {
+      error: "Erreur lors de la validation de la session",
+      code: "UNAUTHORIZED",
+    };
   }
-
-  if (session.user.role !== 'SUPER_ADMIN') {
-    return { error: "Accès interdit - Super Admin requis", code: "UNAUTHORIZED" };
-  }
-
-  // Lazy import Sentry
-  const Sentry = await import("@sentry/nextjs");
-  Sentry.setContext("super_admin", {
-    userId: session.user.id,
-    email: session.user.email,
-  });
-
-  return {
-    userId: session.user.id,
-    userEmail: session.user.email,
-    businessId: session.user.businessId || '', // Optionnel pour super admin
-  };
 }
