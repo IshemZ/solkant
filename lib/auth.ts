@@ -236,10 +236,11 @@ export const authOptions: NextAuthOptions = {
         if (user) {
           token.id = user.id;
 
-          // Fetch businessId and subscription info for the user
+          // Fetch businessId, subscription info, and role for the user
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
             select: {
+              role: true,
               business: {
                 select: {
                   id: true,
@@ -250,12 +251,13 @@ export const authOptions: NextAuthOptions = {
             },
           });
 
+          token.role = dbUser?.role || 'USER';
           token.businessId = dbUser?.business?.id || null;
           token.subscriptionStatus =
             dbUser?.business?.subscriptionStatus || null;
           token.isPro = dbUser?.business?.isPro || null;
 
-          if (!token.businessId) {
+          if (!token.businessId && token.role !== 'SUPER_ADMIN') {
             console.warn(
               "[JWT Callback] ⚠️ Aucun businessId trouvé pour user:",
               user.id
@@ -278,6 +280,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
+        session.user.role = token.role;
         session.user.businessId = token.businessId;
         session.user.subscriptionStatus = token.subscriptionStatus;
         session.user.isPro = token.isPro;
