@@ -12,12 +12,12 @@ export function GoogleAnalytics() {
 
     // Lazy-load Google Analytics après l'hydratation
     // Réduit le bundle initial de ~30-50KB
-    const timer = setTimeout(() => {
-      import("@next/third-parties/google").then((module) => {
-        setGA(() => module.GoogleAnalytics);
-      });
-    }, 1500);
+    const loadGA = async () => {
+      const { GoogleAnalytics: GAComponent } = await import("@next/third-parties/google");
+      setGA(GAComponent);
+    };
 
+    const timer = setTimeout(loadGA, 1500);
     return () => clearTimeout(timer);
   }, [gaId]);
 

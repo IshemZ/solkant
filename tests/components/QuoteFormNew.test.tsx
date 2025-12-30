@@ -15,9 +15,8 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { Decimal } from "@prisma/client/runtime/library";
 import QuoteForm from "@/app/(dashboard)/dashboard/devis/_components/QuoteFormUnified";
-import type { Client, Service, Package, PackageItem } from "@prisma/client";
+import type { Client } from "@prisma/client";
 import type { SerializedService, SerializedPackage } from "@/types/quote";
 
 // Mock des dépendances EXTERNES uniquement

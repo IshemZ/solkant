@@ -32,7 +32,7 @@ vi.mock('next/cache', () => ({
 }));
 
 // Import des actions
-import { getServices, createService, updateService, deleteService } from './services';
+import { getServices, createService, deleteService } from './services';
 import { revalidatePath } from 'next/cache';
 
 // Import des mocks
@@ -155,7 +155,7 @@ describe('Service Actions', () => {
       };
 
       // ACT
-      const result = await createService(invalidInput as any);
+      const result = await createService(invalidInput as { name: string; price: number });
 
       // ASSERT
       expect(result.success).toBe(false);

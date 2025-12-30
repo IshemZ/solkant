@@ -11,7 +11,6 @@ import prisma from "@/lib/prisma";
 import {
   withAuth,
   withAuthAndValidation,
-  withAuthUnverified,
 } from "@/lib/action-wrapper";
 import {
   createClientSchema,
@@ -23,7 +22,6 @@ import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
 import { successResult } from "@/lib/action-types";
 import { z } from "zod";
-import type { Client } from "@prisma/client";
 
 // ============================================================================
 // EXEMPLE 1: Action de Liste (Simple GET)
@@ -230,7 +228,7 @@ export const getClientById = withAuthAndValidation(
  */
 export const getUserPreferences = withAuth(
   async (input: {}, session) => {
-    const { userId, userEmail } = session;
+    const { userId } = session;
 
     // Récupérer préférences depuis la base
     const user = await prisma.user.findUnique({

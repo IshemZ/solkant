@@ -91,13 +91,13 @@ export default function ArticlePage() {
           </h1>
 
           <p className="text-xl text-muted-foreground leading-relaxed">
-            Entre options gratuites et abonnements premium, découvrez le vrai coût d'un logiciel de devis et calculez votre retour sur investissement.
+            Entre options gratuites et abonnements premium, découvrez le vrai coût d&apos;un logiciel de devis et calculez votre retour sur investissement.
           </p>
         </header>
 
         <div className="prose prose-lg max-w-none">
           <p className="text-foreground/80 leading-relaxed mb-6">
-            "C'est trop cher pour mon petit institut." Vous avez déjà pensé ça en regardant les tarifs des{" "}
+            &ldquo;C&apos;est trop cher pour mon petit institut.&rdquo; Vous avez déjà pensé ça en regardant les tarifs des{" "}
             <Link href="/logiciel-devis-institut-beaute" className="text-foreground font-semibold hover:underline">
               logiciels de devis
             </Link>
@@ -117,8 +117,8 @@ export default function ArticlePage() {
           </p>
 
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
-            <li><strong>Ce qui est inclus :</strong> Généralement 5-10 devis par mois, fonctionnalités de base, parfois publicité ou logo de l'éditeur</li>
-            <li><strong>Pour qui :</strong> Instituts débutants (&lt; 5 clientes/mois) ou test avant de s'engager</li>
+            <li><strong>Ce qui est inclus :</strong> Généralement 5-10 devis par mois, fonctionnalités de base, parfois publicité ou logo de l&apos;éditeur</li>
+            <li><strong>Pour qui :</strong> Instituts débutants (&lt; 5 clientes/mois) ou test avant de s&apos;engager</li>
             <li><strong>Limites :</strong> Nombre de devis restreint, fonctionnalités limitées, pas de personnalisation complète</li>
           </ul>
 
@@ -158,15 +158,15 @@ export default function ArticlePage() {
           </ul>
 
           <h2 className="text-2xl font-bold text-foreground mt-12 mb-4">
-            Le vrai coût caché du "gratuit" (papier/Word)
+            Le vrai coût caché du &ldquo;gratuit&rdquo; (papier/Word)
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Avant de juger qu'un logiciel est "trop cher", calculons le coût réel de la méthode manuelle que vous utilisez peut-être encore :
+            Avant de juger qu&apos;un logiciel est &ldquo;trop cher&rdquo;, calculons le coût réel de la méthode manuelle que vous utilisez peut-être encore :
           </p>
 
           <div className="rounded-lg bg-red-50 p-6 mb-6 border border-red-100">
-            <h4 className="font-semibold text-foreground mb-3">📊 Calcul du coût "papier/Word"</h4>
+            <h4 className="font-semibold text-foreground mb-3">📊 Calcul du coût &ldquo;papier/Word&rdquo;</h4>
 
             <div className="space-y-3 text-sm text-foreground/80">
               <div>
@@ -202,7 +202,7 @@ export default function ArticlePage() {
           </div>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Conclusion surprenante : votre méthode "gratuite" vous coûte en réalité <strong>195€ par mois</strong> en temps et matériel. Un logiciel à 20€/mois représente une économie de 175€/mois !
+            Conclusion surprenante : votre méthode &ldquo;gratuite&rdquo; vous coûte en réalité <strong>195€ par mois</strong> en temps et matériel. Un logiciel à 20€/mois représente une économie de 175€/mois !
           </p>
 
           <h2 className="text-2xl font-bold text-foreground mt-12 mb-4">
@@ -267,13 +267,13 @@ export default function ArticlePage() {
               <strong>Augmentation du taux de conversion :</strong> Un devis professionnel et rapide convertit mieux (+10-15% en moyenne). Sur 15 devis/mois à 150€ de panier moyen, cela représente 225-340€ de CA supplémentaire mensuel.
             </li>
             <li>
-              <strong>Réduction des erreurs :</strong> Zéro erreur de calcul = zéro perte d'argent par sous-facturation
+              <strong>Réduction des erreurs :</strong> Zéro erreur de calcul = zéro perte d&apos;argent par sous-facturation
             </li>
             <li>
               <strong>Image de marque valorisée :</strong> Professionnalisme renforcé = tarifs premium justifiés
             </li>
             <li>
-              <strong>Moins de stress :</strong> Organisation mentale, pas de risque d'oubli = qualité de vie améliorée
+              <strong>Moins de stress :</strong> Organisation mentale, pas de risque d&apos;oubli = qualité de vie améliorée
             </li>
           </ul>
 
@@ -288,7 +288,7 @@ export default function ArticlePage() {
                 <strong>Idéal si :</strong> Vous débutez ou envoyez &lt; 10 devis/mois
               </p>
               <p className="text-sm text-muted-foreground">
-                Testez Solkant gratuitement (10 devis/mois) pour valider l'utilité avant d'investir
+                Testez Solkant gratuitement (10 devis/mois) pour valider l&apos;utilité avant d&apos;investir
               </p>
             </div>
 
@@ -319,7 +319,7 @@ export default function ArticlePage() {
 
           <ul className="list-disc pl-6 space-y-2 text-foreground/80 mb-6">
             <li>❌ <strong>Choisir le moins cher sans tester :</strong> Un logiciel inadapté ne sera pas utilisé, argent perdu</li>
-            <li>❌ <strong>Payer à l'année dès le départ :</strong> Testez en mensuel d'abord (1-2 mois minimum)</li>
+            <li>❌ <strong>Payer à l&apos;année dès le départ :</strong> Testez en mensuel d&apos;abord (1-2 mois minimum)</li>
             <li>❌ <strong>Prendre trop de fonctionnalités inutiles :</strong> Payez uniquement ce dont vous avez besoin</li>
             <li>❌ <strong>Négliger le support client :</strong> Un bon support vaut son prix en cas de blocage</li>
           </ul>
@@ -329,11 +329,11 @@ export default function ArticlePage() {
           </h2>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Un logiciel de devis n'est pas une dépense, c'est un <strong>investissement rentable</strong> dès le premier mois. Pour 15-25€/mois, vous économisez 5 heures de travail administratif, augmentez votre taux de conversion et renforcez votre image professionnelle.
+            Un logiciel de devis n&apos;est pas une dépense, c&apos;est un <strong>investissement rentable</strong> dès le premier mois. Pour 15-25€/mois, vous économisez 5 heures de travail administratif, augmentez votre taux de conversion et renforcez votre image professionnelle.
           </p>
 
           <p className="text-foreground/80 leading-relaxed mb-6">
-            Le vrai luxe pour un petit institut, ce n'est pas d'avoir un logiciel coûteux. C'est de continuer à perdre 5 heures par mois sur des tâches qu'un outil pourrait faire en 30 minutes.
+            Le vrai luxe pour un petit institut, ce n&apos;est pas d&apos;avoir un logiciel coûteux. C&apos;est de continuer à perdre 5 heures par mois sur des tâches qu&apos;un outil pourrait faire en 30 minutes.
           </p>
         </div>
 

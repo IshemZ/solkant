@@ -11,13 +11,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { redirect, notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import ModifierDevisPage from "@/app/(dashboard)/dashboard/devis/[id]/modifier/page";
 import prisma from "@/lib/prisma";
 import { getPackages } from "@/app/actions/packages";
-import type { Client, Service, Package, Quote, QuoteItem } from "@prisma/client";
+import type { Client, Service, Quote } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import type { SerializedService, SerializedPackage, QuoteWithItems } from "@/types/quote";
 
 // Mock des dépendances EXTERNES
 vi.mock("next/navigation", () => ({
@@ -52,7 +52,13 @@ vi.mock("@/app/actions/packages", () => ({
 }));
 
 vi.mock("@/app/(dashboard)/dashboard/devis/_components/QuoteFormUnified", () => ({
-  default: ({ mode, initialQuote, clients, services, packages }: any) => (
+  default: ({ mode, initialQuote, clients, services, packages }: {
+    mode: 'create' | 'edit';
+    initialQuote?: QuoteWithItems;
+    clients: Client[];
+    services: SerializedService[];
+    packages: SerializedPackage[];
+  }) => (
     <div data-testid="quote-form-unified">
       <span data-testid="mode">{mode}</span>
       <span data-testid="quote-number">{initialQuote?.quoteNumber}</span>
@@ -155,7 +161,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
 
     // Setup par défaut: devis DRAFT trouvé
     const mockQuoteWithRelations = createMockQuoteWithRelations();
-    vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuoteWithRelations as any);
+    vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuoteWithRelations as never);
 
     // Setup par défaut: clients, services, packages
     vi.mocked(prisma.client.findMany).mockResolvedValue([
@@ -187,7 +193,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       vi.mocked(getServerSession).mockResolvedValue({
         user: { id: "user-1", email: "test@example.com" },
         expires: "2025-01-01",
-      } as any);
+      } as never);
 
       const params = Promise.resolve({ id: "quote-1" });
 
@@ -254,7 +260,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("devrait autoriser la modification si le devis est DRAFT", async () => {
       const draftQuote = createMockQuoteWithRelations();
       draftQuote.status = "DRAFT";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(draftQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(draftQuote as never);
 
       const params = Promise.resolve({ id: "quote-1" });
       const result = await ModifierDevisPage({ params });
@@ -267,7 +273,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("devrait rediriger vers la page de visualisation si le devis est SENT", async () => {
       const sentQuote = createMockQuoteWithRelations();
       sentQuote.status = "SENT";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(sentQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(sentQuote as never);
 
       const params = Promise.resolve({ id: "quote-sent" });
 
@@ -277,7 +283,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("devrait rediriger vers la page de visualisation si le devis est ACCEPTED", async () => {
       const acceptedQuote = createMockQuoteWithRelations();
       acceptedQuote.status = "ACCEPTED";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(acceptedQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(acceptedQuote as never);
 
       const params = Promise.resolve({ id: "quote-accepted" });
 
@@ -287,7 +293,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("devrait rediriger vers la page de visualisation si le devis est REJECTED", async () => {
       const rejectedQuote = createMockQuoteWithRelations();
       rejectedQuote.status = "REJECTED";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(rejectedQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(rejectedQuote as never);
 
       const params = Promise.resolve({ id: "quote-rejected" });
 
@@ -355,7 +361,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("devrait afficher le numéro de devis dans la description", async () => {
       const mockQuote = createMockQuoteWithRelations();
       mockQuote.quoteNumber = "DEVIS-2024-042";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as never);
 
       const params = Promise.resolve({ id: "quote-1" });
       const result = await ModifierDevisPage({ params });
@@ -403,14 +409,14 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       const mockPackage = {
         id: "package-1",
         name: "Forfait test",
-        discountValue: new Decimal(15.50),
+        discountValue: new Decimal(15.5),
         discountType: "FIXED",
         items: [],
       };
 
       vi.mocked(getPackages).mockResolvedValue({
         success: true,
-        data: [mockPackage] as any,
+        data: [mockPackage] as never,
       });
 
       const params = Promise.resolve({ id: "quote-1" });
@@ -426,10 +432,10 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
     it("🔴 BUG FIX: devrait sérialiser les champs Decimal du QUOTE (discount, subtotal, total)", async () => {
       // Créer un quote avec des Decimal (comme Prisma le retourne)
       const quoteWithDecimals = createMockQuoteWithRelations();
-      quoteWithDecimals.discount = new Decimal(10.50);
-      quoteWithDecimals.subtotal = new Decimal(100.00);
-      quoteWithDecimals.total = new Decimal(89.50);
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as any);
+      quoteWithDecimals.discount = new Decimal(10.5);
+      quoteWithDecimals.subtotal = new Decimal(100);
+      quoteWithDecimals.total = new Decimal(89.5);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as never);
 
       const params = Promise.resolve({ id: "quote-1" });
       const result = await ModifierDevisPage({ params });
@@ -453,8 +459,8 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       const quoteWithDecimals = createMockQuoteWithRelations();
       quoteWithDecimals.items[0].price = new Decimal(50.99);
       quoteWithDecimals.items[0].total = new Decimal(50.99);
-      quoteWithDecimals.items[0].packageDiscount = new Decimal(5.00);
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as any);
+      quoteWithDecimals.items[0].packageDiscount = new Decimal(5);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as never);
 
       const params = Promise.resolve({ id: "quote-1" });
       const result = await ModifierDevisPage({ params });
@@ -471,14 +477,14 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       // Vérifier les valeurs
       expect(firstItem.price).toBe(50.99);
       expect(firstItem.total).toBe(50.99);
-      expect(firstItem.packageDiscount).toBe(5.00);
+      expect(firstItem.packageDiscount).toBe(5);
     });
 
     it("🔴 BUG FIX: devrait sérialiser les services DANS les items du quote", async () => {
       // Les items ont une relation service qui contient aussi un Decimal price
       const quoteWithDecimals = createMockQuoteWithRelations();
-      quoteWithDecimals.items[0].service!.price = new Decimal(75.50);
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as any);
+      quoteWithDecimals.items[0].service!.price = new Decimal(75.5);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(quoteWithDecimals as never);
 
       const params = Promise.resolve({ id: "quote-1" });
       const result = await ModifierDevisPage({ params });
@@ -579,7 +585,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       const draftQuote = createMockQuoteWithRelations();
       draftQuote.status = "DRAFT";
       draftQuote.businessId = "business-1";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(draftQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(draftQuote as never);
 
       // 3. Données disponibles
       vi.mocked(prisma.client.findMany).mockResolvedValue([createMockClient()]);
@@ -597,7 +603,7 @@ describe("Page de modification de devis (/dashboard/devis/[id]/modifier)", () =>
       const sentQuote = createMockQuoteWithRelations();
       sentQuote.status = "SENT";
       sentQuote.id = "quote-sent-123";
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(sentQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(sentQuote as never);
 
       const params = Promise.resolve({ id: "quote-sent-123" });
 

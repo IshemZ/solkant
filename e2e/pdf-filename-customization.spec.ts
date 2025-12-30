@@ -3,7 +3,7 @@
  * Tests all scenarios for the pdfFileNamePrefix feature
  */
 
-import { test, expect, type Page, type Download } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import { loginUser } from "./helpers";
 
 // NOTE: Ces tests nécessitent un environnement de test avec base de données
@@ -42,10 +42,11 @@ test.describe("PDF Filename Customization", () => {
 
   /**
    * Helper: Create a test quote and return its ID
+   * @deprecated Not currently used - kept for future test scenarios
    */
-  async function createTestQuote(
+  async function _createTestQuote(
     page: Page,
-    clientName: { firstName: string; lastName: string }
+    _clientName: { firstName: string; lastName: string }
   ): Promise<string> {
     // Navigate to quotes
     await page.goto("/dashboard/devis");
@@ -71,7 +72,7 @@ test.describe("PDF Filename Customization", () => {
 
     // Extract quote ID from URL
     const url = page.url();
-    const match = url.match(/\/devis\/([a-z0-9]+)/);
+    const match = /\/devis\/([a-z0-9]+)/.exec(url);
     return match ? match[1] : "";
   }
 

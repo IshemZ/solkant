@@ -71,7 +71,7 @@ export default function ClientForm({
       const address = client.address.trim();
 
       // Try to find postal code (5 digits)
-      const postalCodeMatch = address.match(/\b(\d{5})\b/);
+      const postalCodeMatch = /\b(\d{5})\b/.exec(address);
       const postalCode = postalCodeMatch ? postalCodeMatch[1] : "";
 
       // Try to extract city (word(s) after postal code)

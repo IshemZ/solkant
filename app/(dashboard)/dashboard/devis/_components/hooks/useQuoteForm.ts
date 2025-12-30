@@ -1,8 +1,7 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
-import { createQuote } from "@/app/actions/quotes";
-import { updateQuote } from "@/app/actions/quotes";
+import { createQuote, updateQuote } from "@/app/actions/quotes";
 import type { Client } from "@prisma/client";
 import type { DiscountType } from "@/components/shared/DiscountField";
 import type {
@@ -36,25 +35,14 @@ export function useQuoteForm({
   router,
 }: UseQuoteFormProps) {
 
-  // Form state
-  const [selectedClientId, setSelectedClientId] = useState("");
-  const [items, setItems] = useState<QuoteItemInput[]>([]);
-  const [discount, setDiscount] = useState(0);
-  const [discountType, setDiscountType] = useState<DiscountType>("FIXED");
-  const [notes, setNotes] = useState("");
-  const [validUntil, setValidUntil] = useState("");
+  // Form state - use lazy initialization for edit mode
+  const [selectedClientId, setSelectedClientId] = useState(() =>
+    mode === 'edit' && initialQuote ? initialQuote.clientId || "" : ""
+  );
 
-  // UI state
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [clientSearch, setClientSearch] = useState("");
-
-  // Initialize from initialQuote for edit mode
-  useEffect(() => {
-    if (mode === 'edit' && initialQuote) {
-      setSelectedClientId(initialQuote.clientId || "");
-      setItems(
-        initialQuote.items.map((item) => ({
+  const [items, setItems] = useState<QuoteItemInput[]>(() =>
+    mode === 'edit' && initialQuote
+      ? initialQuote.items.map((item) => ({
           id: crypto.randomUUID(), // Generate unique ID for React keys
           serviceId: item.serviceId || undefined,
           packageId: item.packageId || undefined,
@@ -65,12 +53,27 @@ export function useQuoteForm({
           total: safeParsePrice(item.total),
           packageDiscount: safeParsePrice(item.packageDiscount),
         }))
-      );
-      setDiscount(Number(initialQuote.discount));
-      setDiscountType(initialQuote.discountType as DiscountType);
-      setNotes(initialQuote.notes || "");
-    }
-  }, []); // Only run once on mount
+      : []
+  );
+
+  const [discount, setDiscount] = useState(() =>
+    mode === 'edit' && initialQuote ? Number(initialQuote.discount) : 0
+  );
+
+  const [discountType, setDiscountType] = useState<DiscountType>(() =>
+    mode === 'edit' && initialQuote ? initialQuote.discountType as DiscountType : "FIXED"
+  );
+
+  const [notes, setNotes] = useState(() =>
+    mode === 'edit' && initialQuote ? initialQuote.notes || "" : ""
+  );
+
+  const [validUntil, setValidUntil] = useState("");
+
+  // UI state
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [clientSearch, setClientSearch] = useState("");
 
   // Filtered clients for search
   const filteredClients = useMemo(() => {
@@ -229,7 +232,7 @@ export function useQuoteForm({
     // Build payload - strip UI-only id field from items
     const quoteData = {
       clientId: selectedClientId,
-      items: items.map(({ id: _id, ...item }) => item), // eslint-disable-line @typescript-eslint/no-unused-vars
+      items: items.map(({ id: _id, ...item }) => item),
       discount,
       discountType,
       notes: notes || undefined,

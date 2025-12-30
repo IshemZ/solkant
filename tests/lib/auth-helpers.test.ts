@@ -57,7 +57,7 @@ describe("validateSessionWithEmail", () => {
         email: "test@example.com",
       },
       expires: new Date().toISOString(),
-    } as any);
+    } as never);
 
     const result = await validateSessionWithEmail();
 
@@ -77,7 +77,7 @@ describe("validateSessionWithEmail", () => {
       expires: new Date().toISOString(),
     };
 
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
 
     const result = await validateSessionWithEmail();
 
@@ -98,7 +98,7 @@ describe("validateSessionWithEmail", () => {
       expires: new Date().toISOString(),
     };
 
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user123",
       email: "test@example.com",
@@ -124,7 +124,7 @@ describe("validateSessionWithEmail", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    } as any);
+    } as never);
 
     const result = await validateSessionWithEmail();
 
@@ -145,7 +145,7 @@ describe("validateSessionWithEmail", () => {
       expires: new Date().toISOString(),
     };
 
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
       id: "user123",
       email: "test@example.com",
@@ -156,7 +156,7 @@ describe("validateSessionWithEmail", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       business: null, // ❌ Pas de Business
-    } as any);
+    } as never);
 
     const result = await validateSessionWithEmail();
 
@@ -176,7 +176,7 @@ describe("validateSessionWithEmail", () => {
       expires: new Date().toISOString(),
     };
 
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
     vi.mocked(prisma.user.findUnique).mockRejectedValue(
       new Error("Database connection failed")
     );
@@ -218,7 +218,7 @@ describe("validateSession", () => {
         // businessId manquant
       },
       expires: new Date().toISOString(),
-    } as any);
+    } as never);
 
     const result = await validateSession();
 
@@ -238,7 +238,7 @@ describe("validateSession", () => {
       expires: new Date().toISOString(),
     };
 
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as any);
+    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
 
     const result = await validateSession();
 

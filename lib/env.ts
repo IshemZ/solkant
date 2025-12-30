@@ -294,15 +294,13 @@ let cachedEnv: Env | undefined;
 
 export function getEnv(): Env {
   // En mode développement avec Turbopack, s'assurer que les variables sont chargées
-  if (typeof window === "undefined" && !cachedEnv) {
+  if (typeof globalThis.window === "undefined" && !cachedEnv) {
     // Si on est côté serveur et pas encore validé
     cachedEnv = validateEnv();
   }
 
-  if (!cachedEnv) {
-    // Fallback : si pas de cache, valider (ne devrait arriver qu'en tests)
-    cachedEnv = validateEnv();
-  }
+  // Fallback : si pas de cache, valider (ne devrait arriver qu'en tests)
+  cachedEnv ??= validateEnv();
 
   return cachedEnv;
 }
@@ -324,14 +322,14 @@ export function resetEnvCache(): void {
 export const features = {
   /** Google OAuth login disponible */
   get googleOAuth(): boolean {
-    if (typeof window !== "undefined") return false; // Côté client
+    if (typeof globalThis.window !== "undefined") return false; // Côté client
     const env = getEnv();
     return !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET);
   },
 
   /** Sentry error monitoring activé */
   get sentryMonitoring(): boolean {
-    if (typeof window !== "undefined") return false; // Côté client
+    if (typeof globalThis.window !== "undefined") return false; // Côté client
     const env = getEnv();
     return !!env.SENTRY_DSN;
   },
@@ -344,7 +342,7 @@ export const features = {
 
   /** Stripe payments activés */
   get stripePayments(): boolean {
-    if (typeof window !== "undefined") return false; // Côté client
+    if (typeof globalThis.window !== "undefined") return false; // Côté client
     const env = getEnv();
     return !!(
       env.ENABLE_PAYMENTS &&
@@ -355,14 +353,14 @@ export const features = {
 
   /** Rate limiting activé (Upstash Redis) */
   get rateLimiting(): boolean {
-    if (typeof window !== "undefined") return false; // Côté client
+    if (typeof globalThis.window !== "undefined") return false; // Côté client
     const env = getEnv();
     return !!(env.UPSTASH_REDIS_URL && env.UPSTASH_REDIS_TOKEN);
   },
 
   /** Resend email service activé */
   get emailService(): boolean {
-    if (typeof window !== "undefined") return false; // Côté client
+    if (typeof globalThis.window !== "undefined") return false; // Côté client
     const env = getEnv();
     return !!env.RESEND_API_KEY;
   },
@@ -420,7 +418,7 @@ function maskSecret(secret: string): string {
   if (secret.length < 10) return "***";
 
   // Extraire partie visible (protocole + début + fin)
-  const protocol = secret.match(/^[a-z]+:\/\//);
+  const protocol = /^[a-z]+:\/\//.exec(secret);
   const visible = secret.slice(0, 15) + "..." + secret.slice(-5);
 
   return protocol ? visible : `${secret.slice(0, 5)}...${secret.slice(-3)}`;

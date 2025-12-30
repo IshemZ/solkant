@@ -34,7 +34,7 @@ Sentry.init({
 
 // Lazy-load Replay Integration après le chargement initial
 // Réduit le bundle initial de ~100-150KB
-if (typeof window !== "undefined") {
+if (typeof globalThis.window !== "undefined") {
   // Attendre 2 secondes après le chargement pour ne pas bloquer le rendu initial
   setTimeout(() => {
     const replayIntegration = Sentry.replayIntegration({

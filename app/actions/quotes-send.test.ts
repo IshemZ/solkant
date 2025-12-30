@@ -165,14 +165,14 @@ describe("sendQuote - Envoi d'emails", () => {
 
   describe("✅ Cas de succès", () => {
     it("should send quote email successfully", async () => {
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as never);
 
       const updatedQuote = {
         ...mockQuote,
         status: "SENT" as const,
         sentAt: new Date(),
       };
-      vi.mocked(prisma.quote.update).mockResolvedValue(updatedQuote as any);
+      vi.mocked(prisma.quote.update).mockResolvedValue(updatedQuote as never);
 
       // Mock Resend success
       mockResendSend.mockResolvedValue({
@@ -268,7 +268,7 @@ describe("sendQuote - Envoi d'emails", () => {
       };
 
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(
-        quoteWithoutEmail as any
+        quoteWithoutEmail as never
       );
 
       const result = await sendQuote({ id: "quote_123" });
@@ -282,7 +282,7 @@ describe("sendQuote - Envoi d'emails", () => {
     });
 
     it("should return error if Resend fails", async () => {
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as never);
 
       // Mock Resend error
       mockResendSend.mockResolvedValue({
@@ -306,7 +306,7 @@ describe("sendQuote - Envoi d'emails", () => {
 
   describe("🔒 Multi-tenancy Security", () => {
     it("should only send quotes from own business", async () => {
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as never);
 
       await sendQuote({ id: "quote_123" });
 
@@ -352,14 +352,14 @@ describe("sendQuote - Envoi d'emails", () => {
       const originalNodeEnv = process.env.NODE_ENV;
       process.env.NODE_ENV = "development";
 
-      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as any);
+      vi.mocked(prisma.quote.findFirst).mockResolvedValue(mockQuote as never);
 
       const updatedQuote = {
         ...mockQuote,
         status: "SENT" as const,
         sentAt: new Date(),
       };
-      vi.mocked(prisma.quote.update).mockResolvedValue(updatedQuote as any);
+      vi.mocked(prisma.quote.update).mockResolvedValue(updatedQuote as never);
 
       const consoleLogSpy = vi
         .spyOn(console, "log")

@@ -45,6 +45,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Test templates (contain intentional commented code as examples):
+    "tests/templates/**",
   ]),
 ]);
 

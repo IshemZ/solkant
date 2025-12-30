@@ -32,7 +32,7 @@ export default function QuoteView({ quote }: QuoteViewProps) {
       let filename = `${quote.quoteNumber}.pdf`; // Fallback par défaut
 
       if (contentDisposition) {
-        const filenameMatch = contentDisposition.match(/filename="(.+)"/);
+        const filenameMatch = /filename="(.+)"/.exec(contentDisposition);
         if (filenameMatch && filenameMatch[1]) {
           filename = filenameMatch[1];
         }

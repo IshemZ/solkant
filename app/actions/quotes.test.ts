@@ -55,9 +55,6 @@ describe("Quote Server Actions", () => {
     updatedAt: new Date(),
   };
 
-  const mockClientId = "clxxx33333333333333333333";
-  const mockServiceId = "clxxx44444444444444444444";
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -376,7 +373,7 @@ describe("Quote Server Actions", () => {
         ],
       };
 
-      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
+      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as never);
 
       const result = await createQuote(quoteInput);
 
@@ -466,7 +463,7 @@ describe("Quote Server Actions", () => {
         ],
       };
 
-      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
+      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as never);
 
       const result = await createQuote(quoteInput);
 
@@ -549,7 +546,7 @@ describe("Quote Server Actions", () => {
         })),
       };
 
-      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
+      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as never);
 
       const result = await createQuote(quoteInput);
 
@@ -617,7 +614,7 @@ describe("Quote Server Actions", () => {
         ],
       };
 
-      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
+      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as never);
 
       const result = await createQuote(quoteInput);
 
@@ -685,7 +682,7 @@ describe("Quote Server Actions", () => {
         ],
       };
 
-      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as any);
+      vi.mocked(prisma.quote.create).mockResolvedValue(createdQuote as never);
 
       const result = await createQuote(quoteInput);
 

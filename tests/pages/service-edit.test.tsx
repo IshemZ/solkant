@@ -11,12 +11,12 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import EditServicePage from "@/app/(dashboard)/dashboard/services/[id]/edit/page";
 import prisma from "@/lib/prisma";
 import type { Service } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
+import type { SerializedService } from "@/types/quote";
 
 // Mock des dépendances EXTERNES
 vi.mock("next/navigation", () => ({
@@ -38,7 +38,10 @@ vi.mock("@/lib/prisma", () => ({
 }));
 
 vi.mock("@/app/(dashboard)/dashboard/services/_components/ServiceForm", () => ({
-  default: ({ service, mode }: any) => (
+  default: ({ service, mode }: {
+    service?: SerializedService;
+    mode?: "create" | "edit";
+  }) => (
     <div data-testid="service-form">
       <span data-testid="mode">{mode}</span>
       <span data-testid="service-name">{service?.name}</span>
@@ -98,7 +101,7 @@ describe("Page de modification de service (/dashboard/services/[id]/edit)", () =
       vi.mocked(getServerSession).mockResolvedValue({
         user: { id: "user-1", email: "test@example.com" },
         expires: "2025-01-01",
-      } as any);
+      } as never);
 
       const params = Promise.resolve({ id: "service-1" });
 

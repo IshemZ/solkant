@@ -10,53 +10,54 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+function suppressDeprecationWarnings() {
+  // Only run in Node.js runtime, not Edge Runtime
+  if (process.env.NEXT_RUNTIME === "edge") return;
+
+  if (typeof process !== "undefined" && process.emitWarning) {
+    const originalEmitWarning = process.emitWarning;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    process.emitWarning = function (warning, ...args: any[]) {
+      // Filtrer uniquement DEP0169 (url.parse deprecation)
+      if (typeof warning === "string" && warning.includes("DEP0169")) {
+        return; // Ignorer ce warning spécifique
+      }
+      return originalEmitWarning.call(this, warning, ...args);
+    };
+  }
+}
+
+async function validateEnvironment() {
+  const { getEnv, logEnvSummary } = await import("./lib/env");
+
+  try {
+    getEnv();
+    if (process.env.NODE_ENV === "development") {
+      logEnvSummary();
+    }
+  } catch (error) {
+    console.error("❌ Échec de validation des variables d'environnement:");
+    console.error(error);
+
+    if (process.env.NODE_ENV === "production") {
+      Sentry.captureException(error, {
+        tags: { context: "env-validation" },
+      });
+      throw error;
+    }
+  }
+}
+
 export async function register() {
   // Node.js runtime (Server Components, API Routes, Server Actions)
   if (process.env.NEXT_RUNTIME === "nodejs") {
-    // Supprimer le warning DEP0169 (url.parse) des dépendances
-    // Ce warning provient de Sentry/Next.js et sera corrigé dans leurs mises à jour
-    if (typeof process !== "undefined" && process.emitWarning) {
-      const originalEmitWarning = process.emitWarning;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      process.emitWarning = function (warning, ...args: any[]) {
-        // Filtrer uniquement DEP0169 (url.parse deprecation)
-        if (typeof warning === "string" && warning.includes("DEP0169")) {
-          return; // Ignorer ce warning spécifique
-        }
-        return originalEmitWarning.call(this, warning, ...args);
-      };
-    }
-    // Import Sentry config
+    suppressDeprecationWarnings();
     await import("./sentry.server.config");
 
-    // SKIP validation pendant le build (Vercel, GitHub Actions, etc.)
-    // La validation se fera à la première requête runtime
+    // SKIP validation pendant le build
     const isBuilding = process.env.NEXT_PHASE === "phase-production-build";
-
     if (!isBuilding) {
-      // Validate environment variables au runtime uniquement
-      const { getEnv, logEnvSummary } = await import("./lib/env");
-
-      try {
-        // Valider les variables d'environnement au démarrage
-        getEnv();
-
-        // Log summary en développement
-        if (process.env.NODE_ENV === "development") {
-          logEnvSummary();
-        }
-      } catch (error) {
-        console.error("❌ Échec de validation des variables d'environnement:");
-        console.error(error);
-
-        // Log to Sentry in production
-        if (process.env.NODE_ENV === "production") {
-          Sentry.captureException(error, {
-            tags: { context: "env-validation" },
-          });
-          throw error;
-        }
-      }
+      await validateEnvironment();
     }
   }
 

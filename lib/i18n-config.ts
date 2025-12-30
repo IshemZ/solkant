@@ -35,8 +35,6 @@ export function generateHreflangLinks(pathname: string): Array<{
 }> {
   const baseUrl = "https://solkant.com";
 
-  // Pour le moment, seulement français
-  // À activer quand les autres langues seront disponibles
   const links: Array<{ hreflang: string; href: string }> = [
     {
       hreflang: "fr",
@@ -47,29 +45,6 @@ export function generateHreflangLinks(pathname: string): Array<{
       href: `${baseUrl}${pathname}`,
     },
   ];
-
-  // Future expansion multilingue (décommenter quand prêt)
-  /*
-  locales.forEach((locale) => {
-    if (locale === defaultLocale) {
-      links.push({
-        hreflang: locale,
-        href: `${baseUrl}${pathname}`,
-      });
-    } else {
-      links.push({
-        hreflang: locale,
-        href: `${baseUrl}/${locale}${pathname}`,
-      });
-    }
-  });
-
-  // Ajouter x-default pour la version par défaut
-  links.push({
-    hreflang: "x-default",
-    href: `${baseUrl}${pathname}`,
-  });
-  */
 
   return links;
 }
@@ -85,11 +60,6 @@ export function generateAlternates(pathname: string) {
     canonical: `${baseUrl}${pathname}`,
     languages: {
       fr: `${baseUrl}${pathname}`,
-      // Future expansion multilingue (décommenter quand prêt)
-      // "en": `${baseUrl}/en${pathname}`,
-      // "es": `${baseUrl}/es${pathname}`,
-      // "de": `${baseUrl}/de${pathname}`,
-      // "it": `${baseUrl}/it${pathname}`,
       "x-default": `${baseUrl}${pathname}`,
     },
   };

@@ -234,7 +234,7 @@ export default function ArticleComptabiliteInstitutPage() {
             <span>4 min de lecture</span>
           </div>
           <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl mb-6">
-            Comptabilité d'institut de beauté : guide simplifié pour débutants
+            Comptabilité d&apos;institut de beauté : guide simplifié pour débutants
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
             Un guide simplifié pour comprendre la comptabilité de votre institut

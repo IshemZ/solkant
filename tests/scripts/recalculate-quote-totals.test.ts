@@ -17,7 +17,7 @@ import { calculateQuoteTotals } from '../../scripts/recalculate-quote-totals';
 
 describe('calculateQuoteTotals', () => {
   it('should calculate simple quote without discounts', () => {
-    const quote: any = {
+    const quote: never = {
       id: '1',
       discount: 0,
       discountType: 'FIXED',
@@ -33,7 +33,7 @@ describe('calculateQuoteTotals', () => {
   });
 
   it('should calculate quote with PERCENTAGE discount', () => {
-    const quote: any = {
+    const quote: never = {
       id: '2',
       discount: 10,
       discountType: 'PERCENTAGE',
@@ -48,7 +48,7 @@ describe('calculateQuoteTotals', () => {
   });
 
   it('should calculate quote with FIXED discount', () => {
-    const quote: any = {
+    const quote: never = {
       id: '3',
       discount: 15,
       discountType: 'FIXED',
@@ -62,7 +62,7 @@ describe('calculateQuoteTotals', () => {
   });
 
   it('should calculate quote with package PERCENTAGE discount', () => {
-    const quote: any = {
+    const quote: never = {
       id: '4',
       discount: 0,
       discountType: 'FIXED',
@@ -87,7 +87,7 @@ describe('calculateQuoteTotals', () => {
 
   it('should handle Float rounding errors correctly', () => {
     // Famous Float bug: 0.1 + 0.2 !== 0.3
-    const quote: any = {
+    const quote: never = {
       id: '5',
       discount: 0,
       discountType: 'FIXED',

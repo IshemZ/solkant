@@ -4,6 +4,8 @@ import { getPackages } from "@/app/actions/packages";
 import ServicesList from "./_components/ServicesList";
 import PackagesList from "./_components/PackagesList";
 import ServiceTabs from "./_components/ServiceTabs";
+import type { ActionResult } from "@/lib/action-types";
+import type { SerializedService, SerializedPackage } from "@/types/quote";
 
 export const metadata: Metadata = {
   title: "Services | Solkant",
@@ -12,10 +14,10 @@ export const metadata: Metadata = {
 
 function renderTabContent(
   activeTab: string,
-  servicesResult: any,
-  packagesResult: any,
-  services: any[],
-  packages: any[]
+  servicesResult: ActionResult<SerializedService[]>,
+  packagesResult: ActionResult<SerializedPackage[]>,
+  services: SerializedService[],
+  packages: SerializedPackage[]
 ) {
   if (activeTab === "services") {
     if (!servicesResult.success) {

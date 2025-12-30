@@ -175,7 +175,7 @@ describe('Client Actions', () => {
       };
 
       // ACT
-      const result = await createClient(invalidInput as any);
+      const result = await createClient(invalidInput as never);
 
       // ASSERT
       expect(result.success).toBe(false);

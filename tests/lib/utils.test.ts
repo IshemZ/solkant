@@ -68,7 +68,7 @@ describe("Security Helper Functions", () => {
       };
 
       vi.mocked(getServerSession).mockResolvedValue(
-        mockSessionWithUndefined as any
+        mockSessionWithUndefined as never
       );
 
       await expect(getSessionWithBusiness()).rejects.toThrow(

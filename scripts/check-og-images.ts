@@ -83,6 +83,39 @@ async function checkImage(filename: string): Promise<ImageCheck> {
   return result;
 }
 
+function printImageStatus(
+  file: string,
+  page: string,
+  check: ImageCheck,
+  stats: { missing: number; issues: number }
+) {
+  if (!check.exists) {
+    console.log(`❌ ${file.padEnd(35)} → ${page}`);
+    console.log(`   Manquant`);
+    stats.missing++;
+  } else if (!check.valid) {
+    console.log(`⚠️  ${file.padEnd(35)} → ${page}`);
+    check.issues?.forEach(issue => console.log(`   ${issue}`));
+    stats.issues++;
+  } else {
+    console.log(`✅ ${file.padEnd(35)} → ${page} (${(check.size! / 1024).toFixed(0)} KB)`);
+  }
+}
+
+async function checkPriorityGroup(
+  priority: number,
+  images: Array<{ file: string; page: string; priority: number }>,
+  stats: { missing: number; issues: number }
+) {
+  console.log(`\n📊 PRIORITÉ ${priority}${priority === 1 ? ' (Critique - à créer en premier)' : ''}`);
+  console.log('─'.repeat(70));
+
+  for (const { file, page } of images) {
+    const check = await checkImage(file);
+    printImageStatus(file, page, check, stats);
+  }
+}
+
 async function main() {
   console.log('🔍 Vérification des images OpenGraph pour Solkant\n');
   console.log('📁 Dossier:', OG_DIR, '\n');
@@ -94,31 +127,15 @@ async function main() {
     return acc;
   }, {} as Record<number, typeof REQUIRED_IMAGES>);
 
-  let totalMissing = 0;
-  let totalIssues = 0;
+  const stats = { missing: 0, issues: 0 };
 
   for (const priority of [1, 2, 3]) {
-    console.log(`\n📊 PRIORITÉ ${priority}${priority === 1 ? ' (Critique - à créer en premier)' : ''}`);
-    console.log('─'.repeat(70));
-
     const images = byPriority[priority] || [];
-
-    for (const { file, page } of images) {
-      const check = await checkImage(file);
-
-      if (!check.exists) {
-        console.log(`❌ ${file.padEnd(35)} → ${page}`);
-        console.log(`   Manquant`);
-        totalMissing++;
-      } else if (!check.valid) {
-        console.log(`⚠️  ${file.padEnd(35)} → ${page}`);
-        check.issues?.forEach(issue => console.log(`   ${issue}`));
-        totalIssues++;
-      } else {
-        console.log(`✅ ${file.padEnd(35)} → ${page} (${(check.size! / 1024).toFixed(0)} KB)`);
-      }
-    }
+    await checkPriorityGroup(priority, images, stats);
   }
+
+  const totalMissing = stats.missing;
+  const totalIssues = stats.issues;
 
   // Résumé
   console.log('\n' + '═'.repeat(70));

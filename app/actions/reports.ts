@@ -96,7 +96,6 @@ export const getBusinessRevenue = withAuth(
  * Authorization must be implemented before enabling this endpoint in production.
  */
 export const getAllBusinessRevenue = withAuth(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (_input: Record<string, never>, _session) => {
     // IMPORTANT: Admin authorization required before production use
 

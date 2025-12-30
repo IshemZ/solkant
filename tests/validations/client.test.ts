@@ -332,10 +332,9 @@ describe("Client Validation Schema", () => {
       }
     });
 
-    it("should reject invalid postal code format", () => {
-      const invalidCodes = ["1234", "123456", "ABCDE", "7500a"];
-
-      invalidCodes.forEach((code) => {
+    it.each(["1234", "123456", "ABCDE", "7500a"])(
+      "should reject invalid postal code format: %s",
+      (code) => {
         const data = {
           firstName: "Jean",
           lastName: "Dupont",
@@ -352,8 +351,8 @@ describe("Client Validation Schema", () => {
           );
           expect(error?.message).toMatch(/5 chiffres/);
         }
-      });
-    });
+      }
+    );
 
     it("should accept valid French postal codes", () => {
       const validCodes = ["75001", "13001", "69001", "33000"];

@@ -24,14 +24,14 @@ export function SignUpTracker() {
       !tracked &&
       status === "authenticated" &&
       session?.user?.businessId &&
-      typeof window !== "undefined" &&
-      window.gtag
+      typeof globalThis.window !== "undefined" &&
+      globalThis.window.gtag
     ) {
       const pendingSignUp = sessionStorage.getItem("new_signup");
 
       if (pendingSignUp === "google") {
         // Track sign_up for OAuth
-        window.gtag("event", "sign_up", {
+        globalThis.window.gtag("event", "sign_up", {
           method: "google",
           user_id: session.user.businessId,
         });

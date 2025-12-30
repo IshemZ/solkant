@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { redirect } from "next/navigation";
 import { Users, Briefcase } from "lucide-react";
 import type { SerializedService, SerializedPackage } from "@/types/quote";
+import type { Client } from "@prisma/client";
 
 export const metadata: Metadata = {
   title: "Nouveau devis | Solkant",
@@ -15,7 +16,7 @@ export const metadata: Metadata = {
 };
 
 function getPageContent(
-  clients: any[],
+  clients: Client[],
   services: SerializedService[],
   packages: SerializedPackage[]
 ) {
