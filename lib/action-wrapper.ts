@@ -198,6 +198,70 @@ export function withAuthUnverified<TInput, TOutput>(
 }
 
 /**
+ * Higher-order function that wraps public (unauthenticated) server action handlers
+ * with validation and error handling.
+ *
+ * @param handler - The server action handler function (no session required)
+ * @param actionName - Name of the action for error logging
+ * @param schema - Zod schema for input validation
+ * @param errorMessage - Optional custom error message (defaults to "Erreur lors de {actionName}")
+ * @returns Wrapped function with validation and error handling
+ *
+ * @example
+ * export const submitContactForm = withValidation(
+ *   async (input) => {
+ *     // Send email notification
+ *     await sendEmail(input);
+ *     return successResult({ sent: true });
+ *   },
+ *   "submitContactForm",
+ *   contactFormSchema
+ * );
+ */
+export function withValidation<TInput, TOutput>(
+  handler: (input: TInput) => Promise<ActionResult<TOutput>>,
+  actionName: string,
+  schema: ZodType<TInput>,
+  errorMessage?: string
+) {
+  return async (input: unknown): Promise<ActionResult<TOutput>> => {
+    // Validate input
+    const validation = schema.safeParse(input);
+    if (!validation.success) {
+      return errorResult(
+        "Données invalides",
+        "VALIDATION_ERROR",
+        formatZodFieldErrors(validation.error)
+      );
+    }
+
+    try {
+      // Call the wrapped handler with validated input
+      return await handler(validation.data);
+    } catch (error) {
+      // BusinessError: preserve user-facing message
+      if (error instanceof BusinessError) {
+        return errorResult(error.message, error.code);
+      }
+
+      // Technical errors: log to Sentry and return generic message
+      const Sentry = await import("@sentry/nextjs");
+      Sentry.captureException(error, {
+        tags: { action: actionName, type: "public_action" },
+        extra: { input },
+      });
+
+      // Development logging
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error in ${actionName}:`, error);
+      }
+
+      return errorResult(errorMessage || `Erreur lors de ${actionName}`);
+    }
+  };
+}
+
+/**
  * Higher-order function that wraps server action handlers with super admin authentication.
  *
  * @param handler - The server action handler function

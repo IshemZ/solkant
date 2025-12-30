@@ -18,22 +18,48 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   useEffect(() => {
-    if (!gaId || status === "loading") return;
+    if (!gaId || status !== "authenticated" || !session?.user?.businessId) {
+      return;
+    }
 
-    // Configure User ID if authenticated
-    if (
-      status === "authenticated" &&
-      session?.user?.businessId &&
-      window.gtag
-    ) {
-      window.gtag("config", gaId, {
-        user_id: session.user.businessId,
-        user_properties: {
+    // Attendre que gtag soit disponible (lazy-loaded dans GoogleAnalytics.tsx)
+    const configureUserId = () => {
+      if (globalThis.window?.gtag && session.user.businessId) {
+        const businessId = session.user.businessId;
+
+        // 1. Set user_id globally for all events
+        globalThis.window.gtag("set", { user_id: businessId });
+
+        // 2. Set user properties
+        globalThis.window.gtag("set", "user_properties", {
           subscription_status: session.user.subscriptionStatus || null,
           is_pro: session.user.isPro || false,
-        },
-      });
-    }
+        });
+
+        console.log("[GA4] User ID configured:", businessId);
+        return true;
+      }
+      return false;
+    };
+
+    // Essayer immédiatement
+    if (configureUserId()) return;
+
+    // Sinon, attendre avec polling (max 5 secondes)
+    const interval = setInterval(() => {
+      if (configureUserId()) {
+        clearInterval(interval);
+      }
+    }, 100);
+
+    const timeout = setTimeout(() => {
+      clearInterval(interval);
+    }, 5000);
+
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [session, status, gaId]);
 
   return <>{children}</>;
