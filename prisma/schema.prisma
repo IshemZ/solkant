@@ -8,9 +8,15 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum UserRole {
+  USER
+  SUPER_ADMIN
+}
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
+  role              UserRole  @default(USER)
   emailVerified     DateTime?
   password          String?
   name              String?
