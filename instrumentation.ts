@@ -10,21 +10,30 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+type ProcessLike = {
+  env?: Record<string, string | undefined>;
+} & Record<string, unknown>;
+
 function suppressDeprecationWarnings() {
   // Only run in Node.js runtime, not Edge Runtime
-  if (process.env.NEXT_RUNTIME === "edge") return;
+  const proc = (globalThis as unknown as { process?: ProcessLike }).process;
+  if (!proc || proc.env?.NEXT_RUNTIME === "edge") return;
 
-  if (typeof process !== "undefined" && process.emitWarning) {
-    const originalEmitWarning = process.emitWarning;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    process.emitWarning = function (warning, ...args: any[]) {
-      // Filtrer uniquement DEP0169 (url.parse deprecation)
-      if (typeof warning === "string" && warning.includes("DEP0169")) {
-        return; // Ignorer ce warning spécifique
-      }
-      return originalEmitWarning.call(this, warning, ...args);
-    };
-  }
+  // Additional safety check for Edge runtime compatibility
+  const emitWarning = proc["emitWarning"] as
+    | ((warning: unknown, ...args: unknown[]) => unknown)
+    | undefined;
+  if (!emitWarning) return;
+
+  const originalEmitWarning = emitWarning.bind(proc);
+
+  proc["emitWarning"] = function (warning: unknown, ...args: unknown[]) {
+    // Filtrer uniquement DEP0169 (url.parse deprecation)
+    if (typeof warning === "string" && warning.includes("DEP0169")) {
+      return; // Ignorer ce warning spécifique
+    }
+    return originalEmitWarning(warning, ...args);
+  };
 }
 
 async function validateEnvironment() {
