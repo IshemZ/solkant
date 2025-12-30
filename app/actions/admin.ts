@@ -5,6 +5,7 @@ import { successResult } from "@/lib/action-types";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { SubscriptionStatus } from "@prisma/client";
+import { BusinessError } from "@/lib/errors";
 
 /**
  * Get all businesses (super admin only)
@@ -62,7 +63,7 @@ export const getBusinessDetails = withSuperAdminAuth(
     });
 
     if (!business) {
-      throw new Error("Business introuvable");
+      throw new BusinessError("Business introuvable");
     }
 
     return successResult(business);
