@@ -50,12 +50,15 @@ async function makeSuperAdmin(email: string) {
 }
 
 // Main execution
-const email = process.argv[2]
+const email = process.argv[2] || process.env.SUPER_ADMIN_EMAIL
 
 if (!email) {
   console.error('❌ Email manquant')
-  console.log('\nUsage: npx tsx scripts/make-super-admin.ts <email>')
-  console.log('Exemple: npx tsx scripts/make-super-admin.ts admin@solkant.com')
+  console.log('\nUsage:')
+  console.log('  1. npx tsx scripts/make-super-admin.ts <email>')
+  console.log('  2. SUPER_ADMIN_EMAIL=<email> npx tsx scripts/make-super-admin.ts')
+  console.log('  3. Ajouter SUPER_ADMIN_EMAIL dans .env.local')
+  console.log('\nExemple: npx tsx scripts/make-super-admin.ts admin@solkant.com')
   process.exit(1)
 }
 
