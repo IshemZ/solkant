@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { ContactForm } from "./_components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact Solkant – Contactez-nous pour vos questions",
@@ -123,87 +124,7 @@ export default function ContactPage() {
               Envoyez-nous un message
             </h2>
 
-            <form className="space-y-6">
-              <div>
-                <label
-                  htmlFor="name"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Nom complet
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground placeholder:text-foreground/40 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                  placeholder="Votre nom"
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground placeholder:text-foreground/40 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                  placeholder="votre@email.com"
-                  required
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="subject"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Sujet
-                </label>
-                <select
-                  id="subject"
-                  name="subject"
-                  className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
-                  required
-                >
-                  <option value="">Sélectionnez un sujet</option>
-                  <option value="demo">Demande de démonstration</option>
-                  <option value="support">Support technique</option>
-                  <option value="pricing">Questions sur les tarifs</option>
-                  <option value="feature">Suggestion de fonctionnalité</option>
-                  <option value="other">Autre question</option>
-                </select>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="message"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  rows={6}
-                  className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground placeholder:text-foreground/40 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground resize-none"
-                  placeholder="Décrivez votre demande..."
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full rounded-md bg-foreground px-6 py-3 text-base font-semibold text-background hover:bg-foreground/90 focus:outline-none focus:ring-2 focus:ring-foreground focus:ring-offset-2"
-              >
-                Envoyer le message
-              </button>
-            </form>
+            <ContactForm />
           </div>
 
           {/* Informations de contact */}
