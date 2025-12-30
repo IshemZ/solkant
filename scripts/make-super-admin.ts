@@ -19,7 +19,12 @@ async function makeSuperAdmin(email: string) {
   console.log(`🔍 Recherche du user avec email: ${email}...`)
 
   const user = await prisma.user.findUnique({
-    where: { email }
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      role: true
+    }
   })
 
   if (!user) {
