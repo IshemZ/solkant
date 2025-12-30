@@ -202,6 +202,7 @@ export function withAuthUnverified<TInput, TOutput>(
  *
  * @param handler - The server action handler function
  * @param actionName - Name of the action for error logging
+ * @param errorMessage - Optional custom error message (defaults to "Erreur lors de {actionName}")
  * @returns Wrapped function that validates super admin role
  *
  * @example
@@ -218,7 +219,8 @@ export function withSuperAdminAuth<TInput, TOutput>(
     input: TInput,
     session: ValidatedSession
   ) => Promise<ActionResult<TOutput>>,
-  actionName: string
+  actionName: string,
+  errorMessage?: string
 ) {
   return async (input: TInput): Promise<ActionResult<TOutput>> => {
     // Validate super admin session
@@ -244,6 +246,7 @@ export function withSuperAdminAuth<TInput, TOutput>(
           action: actionName,
           type: 'super_admin_action',
         },
+        extra: { input },
         user: { id: validation.userId, email: validation.userEmail }
       });
 
@@ -252,7 +255,7 @@ export function withSuperAdminAuth<TInput, TOutput>(
         console.error(`Error in super admin action ${actionName}:`, error);
       }
 
-      return errorResult(`Erreur lors de ${actionName}`);
+      return errorResult(errorMessage || `Erreur lors de ${actionName}`);
     }
   };
 }
