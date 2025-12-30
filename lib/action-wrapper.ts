@@ -1,5 +1,6 @@
 import {
   validateSessionWithEmail,
+  validateSuperAdmin,
   type ValidatedSession,
 } from "@/lib/auth-helpers";
 import { errorResult, type ActionResult } from "@/lib/action-types";
@@ -192,6 +193,66 @@ export function withAuthUnverified<TInput, TOutput>(
       }
 
       return errorResult(errorMessage || `Erreur lors de ${actionName}`);
+    }
+  };
+}
+
+/**
+ * Higher-order function that wraps server action handlers with super admin authentication.
+ *
+ * @param handler - The server action handler function
+ * @param actionName - Name of the action for error logging
+ * @returns Wrapped function that validates super admin role
+ *
+ * @example
+ * export const getAllBusinesses = withSuperAdminAuth(
+ *   async (_input: void, _session) => {
+ *     const businesses = await prisma.business.findMany({});
+ *     return successResult(businesses);
+ *   },
+ *   "getAllBusinesses"
+ * );
+ */
+export function withSuperAdminAuth<TInput, TOutput>(
+  handler: (
+    input: TInput,
+    session: ValidatedSession
+  ) => Promise<ActionResult<TOutput>>,
+  actionName: string
+) {
+  return async (input: TInput): Promise<ActionResult<TOutput>> => {
+    // Validate super admin session
+    const validation = await validateSuperAdmin();
+
+    if ('error' in validation) {
+      return errorResult(validation.error);
+    }
+
+    try {
+      // Call the wrapped handler
+      return await handler(input, validation);
+    } catch (error) {
+      // BusinessError: preserve user-facing message
+      if (error instanceof BusinessError) {
+        return errorResult(error.message, error.code);
+      }
+
+      // Technical errors: log to Sentry with super_admin tag
+      const Sentry = await import("@sentry/nextjs");
+      Sentry.captureException(error, {
+        tags: {
+          action: actionName,
+          type: 'super_admin_action',
+        },
+        user: { id: validation.userId, email: validation.userEmail }
+      });
+
+      // Development logging
+      if (process.env.NODE_ENV === "development") {
+        console.error(`Error in super admin action ${actionName}:`, error);
+      }
+
+      return errorResult(`Erreur lors de ${actionName}`);
     }
   };
 }
