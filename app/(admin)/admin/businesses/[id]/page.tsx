@@ -35,44 +35,36 @@ export default async function BusinessDetailsPage({
       </Link>
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">{business.name}</h1>
+        <h1 className="text-2xl font-bold">{business.name}</h1>
         <p className="text-gray-600">{business.user.email}</p>
       </div>
 
       {/* Info section */}
-      <div className="bg-white rounded-lg border p-6 mb-8">
+      <div className="bg-white p-6 rounded-lg border mb-8">
         <h2 className="text-xl font-bold mb-4">Informations</h2>
-        <div className="space-y-3">
+        <div className="grid grid-cols-2 gap-4">
           <div>
-            <span className="text-sm text-gray-600">Nom :</span>
+            <p className="text-sm text-gray-600">Nom</p>
             <p className="font-medium">{business.name}</p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Email :</span>
+            <p className="text-sm text-gray-600">Email</p>
             <p className="font-medium">{business.email || 'Non renseigné'}</p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Téléphone :</span>
+            <p className="text-sm text-gray-600">Téléphone</p>
             <p className="font-medium">{business.phone || 'Non renseigné'}</p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Adresse :</span>
+            <p className="text-sm text-gray-600">Adresse</p>
             <p className="font-medium">{business.address || 'Non renseignée'}</p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Statut abonnement :</span>
-            <p className="font-medium">
-              <span className={`inline-block px-2 py-1 text-xs rounded ${
-                business.subscriptionStatus === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                business.subscriptionStatus === 'TRIAL' ? 'bg-orange-100 text-orange-800' :
-                'bg-red-100 text-red-800'
-              }`}>
-                {business.subscriptionStatus}
-              </span>
-            </p>
+            <p className="text-sm text-gray-600">Statut abonnement</p>
+            <p className="font-medium">{business.subscriptionStatus}</p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Pro :</span>
+            <p className="text-sm text-gray-600">Pro</p>
             <p className="font-medium">{business.isPro ? 'Oui' : 'Non'}</p>
           </div>
         </div>
@@ -80,21 +72,21 @@ export default async function BusinessDetailsPage({
 
       {/* Stats section */}
       <div className="grid grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg border">
+        <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Clients</p>
-          <p className="text-3xl font-bold">{business.clients.length}</p>
+          <p className="text-2xl font-bold">{business.clients.length}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg border">
+        <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Devis</p>
-          <p className="text-3xl font-bold">{business.quotes.length}</p>
+          <p className="text-2xl font-bold">{business.quotes.length}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg border">
+        <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Services</p>
-          <p className="text-3xl font-bold">{business.services.length}</p>
+          <p className="text-2xl font-bold">{business.services.length}</p>
         </div>
-        <div className="bg-white p-6 rounded-lg border">
+        <div className="bg-white p-4 rounded-lg border">
           <p className="text-sm text-gray-600">Forfaits</p>
-          <p className="text-3xl font-bold">{business.packages.length}</p>
+          <p className="text-2xl font-bold">{business.packages.length}</p>
         </div>
       </div>
     </div>
