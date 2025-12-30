@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-**Solkant** is a French-language quote/estimate management SaaS for beauty salons and service businesses. Built with Next.js 16 (App Router), NextAuth v4, Prisma ORM, and PostgreSQL.
+**Solkant** is a French-language quote/estimate management SaaS for beauty salons and service businesses. Built with Next.js 16 (App Router), NextAuth v4, Prisma ORM, and PostgreSQL (Neon).
 
 ## Architecture
 
@@ -10,7 +10,8 @@
 
 ```
 User (auth) → Business (1:1) → Clients, Services, Quotes (1:many)
-Quote → QuoteItems (line items referencing Services)
+Quote → QuoteItems (line items referencing Services or Packages)
+Package → PackageItems (services with quantities)
 ```
 
 Every authenticated user MUST have a Business record. The `businessId` is stored in JWT tokens and used for multi-tenant data isolation.
@@ -19,32 +20,51 @@ Every authenticated user MUST have a Business record. The `businessId` is stored
 
 - **JWT Strategy**: Session stored in JWT (not database), configured in `lib/auth.ts`
 - **Providers**: Credentials (email/password with bcrypt) + Google OAuth
-- **Session Extension**: Custom `businessId` added via JWT/session callbacks
-- **Google OAuth Flow**: Auto-creates User + Business on first login in `signIn` callback
+- **Session Extension**: Custom `businessId`, `role`, `subscriptionStatus`, `isPro` added via JWT/session callbacks
+- **Google OAuth Flow**: Auto-creates User + Business on first login in `signIn` callback with retry logic (3 attempts, exponential backoff)
 - **Protected Routes**: Use `(dashboard)` route group with layout checking `getServerSession()`
 
 ### Server Actions Pattern
 
-All CRUD operations use Next.js Server Actions in `app/actions/*.ts`:
+All CRUD operations use Next.js Server Actions in `app/actions/*.ts` wrapped with action wrappers from `lib/action-wrapper.ts`:
 
-1. Validate session → extract `businessId` from JWT
-2. Validate input with Zod schemas from `lib/validations/`
-3. Query Prisma with `businessId` filter (security-critical for multi-tenancy)
-4. Call `revalidatePath()` after mutations (e.g., `/dashboard/devis`)
-5. Return `{ data, error }` object structure
+1. **withAuth()**: For actions without input validation
+2. **withAuthAndValidation()**: For actions with Zod schema validation
 
-**Example**:
+Both wrappers:
+
+- Validate session → extract `businessId` from JWT
+- Validate input with Zod schemas from `lib/validations/`
+- Query Prisma with `businessId` filter (security-critical for multi-tenancy)
+- Call `revalidatePath()` after mutations (e.g., `/dashboard/devis`)
+- Return `{ data, error }` object structure with Sentry logging
+
+**Example withAuthAndValidation**:
 
 ```typescript
-export async function createClient(input: CreateClientInput) {
-  const session = await getServerSession(authOptions);
-  if (!session?.user?.businessId) return { error: "Non autorisé" };
+export const createClient = withAuthAndValidation(
+  async (input: CreateClientInput, session) => {
+    const client = await prisma.client.create({
+      data: { ...input, businessId: session.businessId },
+    });
+    revalidatePath("/dashboard/clients");
+    return successResult(client);
+  },
+  "createClient",
+  createClientSchema
+);
+```
 
-  const validation = createClientSchema.safeParse(input);
-  // ... create with businessId filter
+**Example withAuth**:
+
+```typescript
+export const deleteClient = withAuth(async (input: { id: string }, session) => {
+  await prisma.client.delete({
+    where: { id: input.id, businessId: session.businessId },
+  });
   revalidatePath("/dashboard/clients");
-  return { data: client };
-}
+  return successResult({ id: input.id });
+}, "deleteClient");
 ```
 
 ### Validation Architecture
@@ -71,7 +91,7 @@ npx prisma migrate dev      # Create & apply migration
 npx prisma generate          # Regenerate client after schema changes
 npx prisma studio            # GUI database explorer
 
-# Required env vars: DATABASE_URL (pooler), DIRECT_URL (direct connection)
+# Required env vars: DATABASE_URL (Neon pooled), DIRECT_URL (direct connection)
 ```
 
 ### Scripts
@@ -190,11 +210,13 @@ Auto-generated in format `DEVIS-{YEAR}-{SEQUENCE}` (e.g., `DEVIS-2024-001`). The
 
 3. **Prisma Singleton**: Import from `lib/prisma.ts`, NOT `new PrismaClient()` directly (prevents connection leaks in dev).
 
-4. **Route Params in App Router**: `params` is a Promise in Next.js 16: `const { id } = await params`
+4. **Route Params in Next.js 16**: `params` is a Promise in Next.js 16: `const { id } = await params`
 
 5. **PDF Streaming**: Use `renderToStream()` not `renderToBuffer()` for better performance with large PDFs.
 
 6. **Zod v4 Changes**: String validation methods changed (e.g., `.cuid()` vs `.uuid()`). See `lib/validations/` for patterns.
+
+7. **Action Wrappers**: Handlers MUST return `ActionResult<T>` using `successResult(data)` wrapper. The wrappers do NOT auto-convert - you must explicitly wrap your return value.
 
 ## Common Tasks
 
