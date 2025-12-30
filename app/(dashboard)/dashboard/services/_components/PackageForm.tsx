@@ -36,6 +36,13 @@ interface PackageFormProps {
   mode: "create" | "edit";
 }
 
+function getSubmitButtonText(isSubmitting: boolean, isEdit: boolean): string {
+  if (isSubmitting) {
+    return isEdit ? "Modification..." : "Création...";
+  }
+  return isEdit ? "Modifier" : "Créer";
+}
+
 export default function PackageForm({ initialData, mode }: PackageFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit";
@@ -447,13 +454,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
           Annuler
         </Button>
         <Button type="submit" disabled={isSubmitting || fields.length === 0}>
-          {isSubmitting
-            ? isEdit
-              ? "Modification..."
-              : "Création..."
-            : isEdit
-            ? "Modifier"
-            : "Créer"}
+          {getSubmitButtonText(isSubmitting, isEdit)}
         </Button>
       </div>
     </form>

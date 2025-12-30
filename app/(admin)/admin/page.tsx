@@ -3,6 +3,16 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
+function getSubscriptionStatusClass(status: string): string {
+  if (status === 'ACTIVE') {
+    return 'bg-green-100 text-green-800';
+  }
+  if (status === 'TRIAL') {
+    return 'bg-orange-100 text-orange-800';
+  }
+  return 'bg-red-100 text-red-800';
+}
+
 export default async function AdminDashboardPage() {
   const result = await getAllBusinesses();
 
@@ -70,11 +80,7 @@ export default async function AdminDashboardPage() {
                     <p className="text-sm text-gray-600">{business.user.email}</p>
                   </div>
                   <div className="text-right">
-                    <span className={`inline-block px-2 py-1 text-xs rounded ${
-                      business.subscriptionStatus === 'ACTIVE' ? 'bg-green-100 text-green-800' :
-                      business.subscriptionStatus === 'TRIAL' ? 'bg-orange-100 text-orange-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
+                    <span className={`inline-block px-2 py-1 text-xs rounded ${getSubscriptionStatusClass(business.subscriptionStatus)}`}>
                       {business.subscriptionStatus}
                     </span>
                     <p className="text-sm text-gray-600 mt-1">

@@ -10,6 +10,13 @@ interface LogoUploadProps {
   onLogoChange?: () => void;
 }
 
+function getUploadButtonText(isUploading: boolean, hasLogo: boolean): string {
+  if (isUploading) {
+    return "Upload en cours...";
+  }
+  return hasLogo ? "Changer le logo" : "Ajouter un logo";
+}
+
 export default function LogoUpload({
   currentLogo,
   onLogoChange,
@@ -145,11 +152,7 @@ export default function LogoUpload({
             }`}
           >
             <Upload className="h-4 w-4" />
-            {isUploading
-              ? "Upload en cours..."
-              : previewUrl
-              ? "Changer le logo"
-              : "Ajouter un logo"}
+            {getUploadButtonText(isUploading, !!previewUrl)}
           </label>
           <p className="mt-2 text-xs text-muted-foreground">
             PNG, JPG ou GIF (max 5MB)

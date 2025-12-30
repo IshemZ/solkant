@@ -14,6 +14,38 @@ export const metadata: Metadata = {
   description: "Créer un nouveau devis",
 };
 
+function getPageContent(
+  clients: any[],
+  services: SerializedService[],
+  packages: SerializedPackage[]
+) {
+  if (clients.length === 0) {
+    return (
+      <EmptyState
+        icon={Users}
+        title="Aucun client"
+        description="Vous devez créer au moins un client avant de pouvoir générer un devis."
+        actionLabel="Créer un client"
+        actionHref="/dashboard/clients/nouveau"
+      />
+    );
+  }
+
+  if (services.length === 0) {
+    return (
+      <EmptyState
+        icon={Briefcase}
+        title="Aucun service"
+        description="Vous devez créer au moins un service avant de pouvoir générer un devis."
+        actionLabel="Créer un service"
+        actionHref="/dashboard/services/nouveau"
+      />
+    );
+  }
+
+  return <QuoteForm mode="create" clients={clients} services={services} packages={packages} />;
+}
+
 export default async function NewQuotePage() {
   const [clientsResult, servicesResult, packagesResult] = await Promise.all([
     getClients(),
@@ -42,25 +74,7 @@ export default async function NewQuotePage() {
         </p>
       </div>
 
-      {clients.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="Aucun client"
-          description="Vous devez créer au moins un client avant de pouvoir générer un devis."
-          actionLabel="Créer un client"
-          actionHref="/dashboard/clients/nouveau"
-        />
-      ) : services.length === 0 ? (
-        <EmptyState
-          icon={Briefcase}
-          title="Aucun service"
-          description="Vous devez créer au moins un service avant de pouvoir générer un devis."
-          actionLabel="Créer un service"
-          actionHref="/dashboard/services/nouveau"
-        />
-      ) : (
-        <QuoteForm mode="create" clients={clients} services={serializedServices} packages={serializedPackages} />
-      )}
+      {getPageContent(clients, serializedServices, serializedPackages)}
     </div>
   );
 }

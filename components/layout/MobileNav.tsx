@@ -14,6 +14,16 @@ interface MobileNavProps {
   session?: Session | null;
 }
 
+function getLinkClassName(isPrimary: boolean, isActive: boolean): string {
+  if (isPrimary) {
+    return "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90";
+  }
+  if (isActive) {
+    return "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors";
+  }
+  return "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground";
+}
+
 export default function MobileNav({ userName, userEmail, session }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -102,13 +112,7 @@ export default function MobileNav({ userName, userEmail, session }: MobileNavPro
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className={
-                      link.primary
-                        ? "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-                        : isActive
-                        ? "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors"
-                        : "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-                    }
+                    className={getLinkClassName(!!link.primary, isActive)}
                   >
                     {link.primary && (
                       <svg

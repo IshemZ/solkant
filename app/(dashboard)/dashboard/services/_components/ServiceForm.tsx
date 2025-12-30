@@ -35,6 +35,13 @@ interface ServiceFormProps {
   mode?: "create" | "edit";
 }
 
+function getSubmitButtonText(isSubmitting: boolean, isEdit: boolean): string {
+  if (isSubmitting) {
+    return isEdit ? "Modification..." : "Création...";
+  }
+  return isEdit ? "Modifier" : "Créer";
+}
+
 export default function ServiceForm({
   service,
   mode = "create",
@@ -262,13 +269,7 @@ export default function ServiceForm({
               Annuler
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
-                ? isEdit
-                  ? "Modification..."
-                  : "Création..."
-                : isEdit
-                ? "Modifier"
-                : "Créer"}
+              {getSubmitButtonText(isSubmitting, isEdit)}
             </Button>
           </div>
         </form>

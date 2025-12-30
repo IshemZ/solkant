@@ -1,12 +1,24 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import sonarjs from "eslint-plugin-sonarjs";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  sonarjs.configs.recommended,
   {
     rules: {
+      // Allow unused vars prefixed with underscore (intentionally unused parameters)
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          "argsIgnorePattern": "^_",
+          "varsIgnorePattern": "^_",
+          "caughtErrorsIgnorePattern": "^_"
+        }
+      ],
+
       // Règles A11y supplémentaires pour Solkant
       "jsx-a11y/anchor-is-valid": "error",
       "jsx-a11y/alt-text": "error",

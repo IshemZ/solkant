@@ -295,9 +295,11 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Code invalide ou expiré. Veuillez demander un nouveau code."
-      );
+      if (!result.success) {
+        expect(result.error).toBe(
+          "Code invalide ou expiré. Veuillez demander un nouveau code."
+        );
+      }
     });
 
     it("should reject expired OTP code", async () => {
@@ -312,9 +314,11 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Code invalide ou expiré. Veuillez demander un nouveau code."
-      );
+      if (!result.success) {
+        expect(result.error).toBe(
+          "Code invalide ou expiré. Veuillez demander un nouveau code."
+        );
+      }
     });
 
     it("should reject already used OTP code", async () => {
@@ -328,9 +332,11 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe(
-        "Code invalide ou expiré. Veuillez demander un nouveau code."
-      );
+      if (!result.success) {
+        expect(result.error).toBe(
+          "Code invalide ou expiré. Veuillez demander un nouveau code."
+        );
+      }
     });
 
     it("should normalize email (lowercase and trim)", async () => {
