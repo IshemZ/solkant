@@ -9,6 +9,23 @@ interface LoginFormProps {
   initialError?: string;
 }
 
+function getSuccessMessage(
+  verified: string | null,
+  resetParam: string | null,
+  registeredParam: string | null
+): string {
+  if (verified === "true") {
+    return "✅ Email vérifié ! Vous pouvez maintenant vous connecter.";
+  }
+  if (resetParam === "success") {
+    return "✅ Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter.";
+  }
+  if (registeredParam === "success") {
+    return "✅ Compte créé avec succès ! Vous pouvez maintenant vous connecter.";
+  }
+  return "";
+}
+
 function LoginFormContent({ initialError }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -23,14 +40,7 @@ function LoginFormContent({ initialError }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   // Afficher message de succès
-  const successMessage =
-    verified === "true"
-      ? "✅ Email vérifié ! Vous pouvez maintenant vous connecter."
-      : resetParam === "success"
-      ? "✅ Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter."
-      : registeredParam === "success"
-      ? "✅ Compte créé avec succès ! Vous pouvez maintenant vous connecter."
-      : "";
+  const successMessage = getSuccessMessage(verified, resetParam, registeredParam);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

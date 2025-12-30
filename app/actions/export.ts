@@ -25,6 +25,19 @@ function escapeCSVField(field: unknown): string {
 }
 
 /**
+ * Formats a date for CSV or returns empty string
+ */
+function formatDateForCSV(date: Date | null | undefined, isFirstRow: boolean): string {
+  if (!isFirstRow) {
+    return "";
+  }
+  if (!date) {
+    return "";
+  }
+  return date.toLocaleDateString("fr-FR");
+}
+
+/**
  * Exports all quotes to CSV format for accounting
  * Returns CSV string with all quotes and their line items
  */
@@ -135,20 +148,8 @@ export const exportAllQuotes = withAuth(
               escapeCSVField(index === 0 ? quote.discount.toFixed(2) : ""),
               escapeCSVField(index === 0 ? quote.discountType : ""),
               escapeCSVField(index === 0 ? quote.total.toFixed(2) : ""),
-              escapeCSVField(
-                index === 0
-                  ? quote.sentAt
-                    ? quote.sentAt.toLocaleDateString("fr-FR")
-                    : ""
-                  : ""
-              ),
-              escapeCSVField(
-                index === 0
-                  ? quote.validUntil
-                    ? quote.validUntil.toLocaleDateString("fr-FR")
-                    : ""
-                  : ""
-              ),
+              escapeCSVField(formatDateForCSV(quote.sentAt, index === 0)),
+              escapeCSVField(formatDateForCSV(quote.validUntil, index === 0)),
               escapeCSVField(index === 0 ? quote.notes || "" : ""),
               escapeCSVField(item.name),
               escapeCSVField(item.description || ""),

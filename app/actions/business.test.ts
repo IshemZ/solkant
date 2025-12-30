@@ -7,6 +7,7 @@ import {
 } from "@/app/actions/business";
 import prisma from "@/lib/prisma";
 import { getServerSession } from "next-auth";
+import { UserRole } from "@prisma/client";
 
 // Mock dependencies
 vi.mock("next-auth", () => ({
@@ -36,7 +37,9 @@ describe("Business Server Actions", () => {
       businessId: "business_123",
       email: "test@example.com",
       name: "Test User",
+      role: UserRole.USER,
     },
+    expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };
 
   const mockUser = {
@@ -44,15 +47,12 @@ describe("Business Server Actions", () => {
     email: "test@example.com",
     emailVerified: new Date("2024-01-01"),
     name: "Test User",
+    role: UserRole.USER,
     password: null,
     image: null,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),
-    city: null,
-    postalCode: null,
-    country: null,
-    tva: null,
     updatedAt: new Date(),
   };
 
@@ -99,7 +99,10 @@ describe("Business Server Actions", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data).toBeDefined();
-        expect(result.data.name).toBe("Mon Institut");
+        expect(result.data).not.toBeNull();
+        if (result.data) {
+          expect(result.data.name).toBe("Mon Institut");
+        }
       }
 
       expect(prisma.business.findUnique).toHaveBeenCalledWith({

@@ -25,6 +25,13 @@ interface ClientFormProps {
   mode?: "create" | "edit";
 }
 
+function getSubmitButtonText(isSubmitting: boolean, isEdit: boolean): string {
+  if (isSubmitting) {
+    return isEdit ? "Modification..." : "Création...";
+  }
+  return isEdit ? "Modifier" : "Créer";
+}
+
 export default function ClientForm({
   client,
   mode = "create",
@@ -299,13 +306,7 @@ export default function ClientForm({
               Annuler
             </Button>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting
-                ? isEdit
-                  ? "Modification..."
-                  : "Création..."
-                : isEdit
-                ? "Modifier"
-                : "Créer"}
+              {getSubmitButtonText(isSubmitting, isEdit)}
             </Button>
           </div>
         </form>

@@ -6,12 +6,14 @@
 import { vi } from "vitest";
 import type { Session } from "next-auth";
 import type { Mock } from "vitest";
+import { UserRole } from "@prisma/client";
 
 export interface MockSessionOptions {
   userId?: string;
   businessId?: string;
   email?: string;
   name?: string;
+  role?: UserRole;
 }
 
 interface SessionWithNullBusiness extends Omit<Session, "user"> {
@@ -20,6 +22,7 @@ interface SessionWithNullBusiness extends Omit<Session, "user"> {
     businessId: null;
     email: string;
     name: string;
+    role: UserRole;
   };
 }
 
@@ -32,6 +35,7 @@ export function createMockSession(options: MockSessionOptions = {}): Session {
     businessId = "test_business_123",
     email = "test@example.com",
     name = "Test User",
+    role = UserRole.USER,
   } = options;
 
   return {
@@ -40,6 +44,7 @@ export function createMockSession(options: MockSessionOptions = {}): Session {
       businessId,
       email,
       name,
+      role,
     },
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // 24h
   };
@@ -55,6 +60,7 @@ export function createSessionWithoutBusiness(): SessionWithNullBusiness {
       businessId: null,
       email: "nobusiness@example.com",
       name: "User Without Business",
+      role: UserRole.USER,
     },
     expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
   };

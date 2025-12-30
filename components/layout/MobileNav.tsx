@@ -3,15 +3,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Session } from "next-auth";
+import { UserRole } from "@prisma/client";
 import * as Dialog from "@radix-ui/react-dialog";
 import SignOutButton from "./SignOutButton";
 
 interface MobileNavProps {
   userName?: string | null;
   userEmail?: string | null;
+  session?: Session | null;
 }
 
-export default function MobileNav({ userName, userEmail }: MobileNavProps) {
+function getLinkClassName(isPrimary: boolean, isActive: boolean): string {
+  if (isPrimary) {
+    return "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90";
+  }
+  if (isActive) {
+    return "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors";
+  }
+  return "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground";
+}
+
+export default function MobileNav({ userName, userEmail, session }: MobileNavProps) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -99,13 +112,7 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                     key={link.href}
                     href={link.href}
                     onClick={() => setOpen(false)}
-                    className={
-                      link.primary
-                        ? "flex items-center gap-3 rounded-md bg-foreground px-4 py-3 text-sm font-medium text-background transition-colors hover:bg-foreground/90"
-                        : isActive
-                        ? "flex items-center gap-3 rounded-md bg-foreground/10 px-4 py-3 text-sm font-semibold text-foreground transition-colors"
-                        : "flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-muted-foreground transition-colors hover:bg-foreground/5 hover:text-foreground"
-                    }
+                    className={getLinkClassName(!!link.primary, isActive)}
                   >
                     {link.primary && (
                       <svg
@@ -126,6 +133,28 @@ export default function MobileNav({ userName, userEmail }: MobileNavProps) {
                   </Link>
                 );
               })}
+              {session?.user?.role === UserRole.SUPER_ADMIN && (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-3 rounded-md px-4 py-3 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 hover:text-blue-800"
+                >
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                    />
+                  </svg>
+                  Admin Plateforme
+                </Link>
+              )}
             </nav>
 
             {/* Sign Out Button */}

@@ -5,6 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import prisma from "./prisma";
 import bcrypt from "bcryptjs";
 import { getEnv, features } from "./env";
+import { UserRole } from '@prisma/client';
 
 /**
  * NextAuth configuration
@@ -236,10 +237,11 @@ export const authOptions: NextAuthOptions = {
         if (user) {
           token.id = user.id;
 
-          // Fetch businessId and subscription info for the user
+          // Fetch businessId, subscription info, and role for the user
           const dbUser = await prisma.user.findUnique({
             where: { id: user.id },
             select: {
+              role: true,  // Needed for permission checks and SUPER_ADMIN businessId exemption
               business: {
                 select: {
                   id: true,
@@ -250,12 +252,13 @@ export const authOptions: NextAuthOptions = {
             },
           });
 
+          token.role = dbUser?.role ?? UserRole.USER;
           token.businessId = dbUser?.business?.id || null;
           token.subscriptionStatus =
             dbUser?.business?.subscriptionStatus || null;
           token.isPro = dbUser?.business?.isPro || null;
 
-          if (!token.businessId) {
+          if (!token.businessId && token.role !== UserRole.SUPER_ADMIN) {
             console.warn(
               "[JWT Callback] ⚠️ Aucun businessId trouvé pour user:",
               user.id
@@ -270,7 +273,7 @@ export const authOptions: NextAuthOptions = {
 
         return token;
       } catch (error) {
-        console.error("[JWT Callback] ERREUR:", error);
+        console.error("[JWT Callback] ERREUR lors de la récupération du rôle/business:", error);
         throw error; // Re-throw pour que NextAuth gère l'erreur proprement
       }
     },
@@ -278,6 +281,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.id;
+        session.user.role = token.role;
         session.user.businessId = token.businessId;
         session.user.subscriptionStatus = token.subscriptionStatus;
         session.user.isPro = token.isPro;

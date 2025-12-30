@@ -47,6 +47,7 @@ export default async function DashboardLayout({
         <DashboardNav
           userName={session.user?.name}
           userEmail={session.user?.email}
+          session={session}
         />
       </header>
 

@@ -4,6 +4,16 @@ import { redirect } from "next/navigation";
 import { getSubscriptionStatus } from "@/app/actions/stripe";
 import SubscriptionCard from "./_components/SubscriptionCard";
 
+function getStatusLabel(status: string): string {
+  if (status === "active") {
+    return "Actif";
+  }
+  if (status === "canceled") {
+    return "Annulé";
+  }
+  return status;
+}
+
 export default async function AbonnementPage() {
   const session = await getServerSession(authOptions);
 
@@ -46,12 +56,7 @@ export default async function AbonnementPage() {
             {subscription.plan === "pro" && (
               <div className="mt-2 space-y-1 text-sm text-foreground/70">
                 <p>
-                  Statut :{" "}
-                  {subscription.status === "active"
-                    ? "Actif"
-                    : subscription.status === "canceled"
-                    ? "Annulé"
-                    : subscription.status}
+                  Statut : {getStatusLabel(subscription.status)}
                 </p>
                 {subscription.currentPeriodEnd && (
                   <p>

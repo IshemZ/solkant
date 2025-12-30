@@ -10,6 +10,34 @@ export const metadata: Metadata = {
   description: "Gérez votre catalogue de services",
 };
 
+function renderTabContent(
+  activeTab: string,
+  servicesResult: any,
+  packagesResult: any,
+  services: any[],
+  packages: any[]
+) {
+  if (activeTab === "services") {
+    if (!servicesResult.success) {
+      return (
+        <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+          {servicesResult.error}
+        </div>
+      );
+    }
+    return <ServicesList initialServices={services} />;
+  }
+
+  if (!packagesResult.success) {
+    return (
+      <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
+        {packagesResult.error}
+      </div>
+    );
+  }
+  return <PackagesList initialPackages={packages} />;
+}
+
 export default async function ServicesPage({
   searchParams,
 }: {
@@ -38,23 +66,7 @@ export default async function ServicesPage({
 
       <ServiceTabs />
 
-      {activeTab === "services" ? (
-        !servicesResult.success ? (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
-            {servicesResult.error}
-          </div>
-        ) : (
-          <ServicesList initialServices={services} />
-        )
-      ) : (
-        !packagesResult.success ? (
-          <div className="rounded-md bg-red-50 p-4 text-sm text-red-800 dark:bg-red-900/20 dark:text-red-200">
-            {packagesResult.error}
-          </div>
-        ) : (
-          <PackagesList initialPackages={packages} />
-        )
-      )}
+      {renderTabContent(activeTab, servicesResult, packagesResult, services, packages)}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { Session } from 'next-auth';
-import { Business, Client, Service, Quote, QuoteItem } from '@prisma/client';
+import { Business, Client, Service, Quote, QuoteItem, UserRole } from '@prisma/client';
 import { Decimal } from '@prisma/client/runtime/library';
 
 /**
@@ -14,6 +14,7 @@ export const mockSession: Session = {
     email: 'test@solkant.com',
     name: 'Test User',
     businessId: 'business-test-123',
+    role: UserRole.USER,
   },
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
 };
@@ -25,6 +26,7 @@ export const mockOtherSession: Session = {
     email: 'other@solkant.com',
     name: 'Other User',
     businessId: 'business-other-456',
+    role: UserRole.USER,
   },
   expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
 };
@@ -126,6 +128,8 @@ export const mockQuoteItem: QuoteItem = {
 };
 
 // Helpers pour créer des variations de données
+let testCounter = 0;
+
 export const createMockClient = (overrides: Partial<Client> = {}): Client => ({
   ...mockClient,
   id: `client-${Date.now()}`,
@@ -141,6 +145,6 @@ export const createMockService = (overrides: Partial<Service> = {}): Service => 
 export const createMockQuote = (overrides: Partial<Quote> = {}): Quote => ({
   ...mockQuote,
   id: `quote-${Date.now()}`,
-  quoteNumber: `DEVIS-2025-${Math.floor(Math.random() * 1000)}`,
+  quoteNumber: `DEVIS-2025-${String(++testCounter).padStart(3, '0')}`,
   ...overrides,
 });
