@@ -16,59 +16,47 @@ const prisma = new PrismaClient({
 })
 
 async function makeSuperAdmin(email: string) {
-  console.log(`🔍 Recherche de l'utilisateur avec l'email: ${email}\n`)
+  console.log(`🔍 Recherche du user avec email: ${email}...`)
 
-  // Find user by email
   const user = await prisma.user.findUnique({
-    where: { email },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-    }
+    where: { email }
   })
 
   if (!user) {
-    console.error(`❌ Aucun utilisateur trouvé avec l'email: ${email}`)
+    console.error(`❌ User avec email ${email} introuvable`)
+    console.log('\n💡 Vérifiez que le user existe dans la base de données.')
     process.exit(1)
   }
 
-  console.log(`📝 Utilisateur trouvé: ${user.name || 'Sans nom'} (${user.email})`)
-  console.log(`   Rôle actuel: ${user.role}\n`)
-
-  // Check if already super admin
   if (user.role === 'SUPER_ADMIN') {
-    console.log(`✅ L'utilisateur est déjà SUPER_ADMIN. Aucune action nécessaire.`)
+    console.log(`✅ ${email} est déjà super admin`)
     return
   }
 
-  // Update user role to SUPER_ADMIN
+  console.log(`📝 Promotion de ${email} en SUPER_ADMIN...`)
+
   await prisma.user.update({
-    where: { id: user.id },
+    where: { email },
     data: { role: 'SUPER_ADMIN' }
   })
 
-  console.log(`🔐 Rôle mis à jour avec succès!`)
-  console.log(`✅ ${user.email} est maintenant SUPER_ADMIN\n`)
-  console.log(`💡 L'utilisateur doit se déconnecter et se reconnecter pour que les changements prennent effet.`)
+  console.log(`✅ ${email} promu SUPER_ADMIN avec succès`)
+  console.log('\n🔐 Déconnectez-vous et reconnectez-vous pour que les changements prennent effet.')
 }
 
 // Main execution
 const email = process.argv[2]
 
 if (!email) {
-  console.error('❌ Erreur: Email requis\n')
-  console.log('Usage: npx tsx scripts/make-super-admin.ts <email>')
-  console.log('Exemple: npx tsx scripts/make-super-admin.ts admin@example.com')
+  console.error('❌ Email manquant')
+  console.log('\nUsage: npx tsx scripts/make-super-admin.ts <email>')
+  console.log('Exemple: npx tsx scripts/make-super-admin.ts admin@solkant.com')
   process.exit(1)
 }
 
 makeSuperAdmin(email)
   .catch((error) => {
-    console.error('Erreur:', error)
+    console.error('❌ Erreur:', error)
     process.exit(1)
   })
-  .finally(async () => {
-    await prisma.$disconnect()
-  })
+  .finally(() => prisma.$disconnect())
