@@ -1,8 +1,8 @@
 /**
  * Script to promote a user to SUPER_ADMIN role
  *
- * Usage: npx tsx scripts/make-super-admin.ts <email>
- * Example: npx tsx scripts/make-super-admin.ts admin@example.com
+ * Usage: npx tsx scripts/make-super-admin.mts <email>
+ * Example: npx tsx scripts/make-super-admin.mts admin@example.com
  */
 
 import { PrismaClient } from '@prisma/client'
@@ -55,20 +55,18 @@ const email = process.argv[2] || process.env.SUPER_ADMIN_EMAIL
 if (!email) {
   console.error('❌ Email manquant')
   console.log('\nUsage:')
-  console.log('  1. npx tsx scripts/make-super-admin.ts <email>')
-  console.log('  2. SUPER_ADMIN_EMAIL=<email> npx tsx scripts/make-super-admin.ts')
+  console.log('  1. npx tsx scripts/make-super-admin.mts <email>')
+  console.log('  2. SUPER_ADMIN_EMAIL=<email> npx tsx scripts/make-super-admin.mts')
   console.log('  3. Ajouter SUPER_ADMIN_EMAIL dans .env.local')
-  console.log('\nExemple: npx tsx scripts/make-super-admin.ts admin@solkant.com')
+  console.log('\nExemple: npx tsx scripts/make-super-admin.mts admin@solkant.com')
   process.exit(1)
 }
 
-(async () => {
-  try {
-    await makeSuperAdmin(email)
-  } catch (error) {
-    console.error('❌ Erreur:', error)
-    process.exit(1)
-  } finally {
-    await prisma.$disconnect()
-  }
-})()
+try {
+  await makeSuperAdmin(email)
+} catch (error) {
+  console.error('❌ Erreur:', error)
+  process.exit(1)
+} finally {
+  await prisma.$disconnect()
+}
