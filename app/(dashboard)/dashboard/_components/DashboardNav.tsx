@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Session } from "next-auth";
+import { UserRole } from "@prisma/client";
 import SignOutButton from "@/components/layout/SignOutButton";
 import MobileNav from "@/components/layout/MobileNav";
 
@@ -120,7 +121,7 @@ export default function DashboardNav({
               >
                 Paramètres
               </Link>
-              {session?.user?.role === "SUPER_ADMIN" && (
+              {session?.user?.role === UserRole.SUPER_ADMIN && (
                 <Link
                   href="/admin"
                   className="text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1"
@@ -153,7 +154,7 @@ export default function DashboardNav({
             <div className="hidden md:block">
               <SignOutButton />
             </div>
-            <MobileNav userName={userName} userEmail={userEmail} />
+            <MobileNav userName={userName} userEmail={userEmail} session={session} />
           </div>
         </div>
       </div>
