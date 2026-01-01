@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import { getServices } from "@/app/actions/services";
 import { getPackages } from "@/app/actions/packages";
 import ServicesList from "./_components/ServicesList";
@@ -66,7 +67,9 @@ export default async function ServicesPage({
         </div>
       </div>
 
-      <ServiceTabs />
+      <Suspense fallback={<div className="mb-6 h-10 w-full animate-pulse rounded-md bg-foreground/10" />}>
+        <ServiceTabs />
+      </Suspense>
 
       {renderTabContent(activeTab, servicesResult, packagesResult, services, packages)}
     </div>

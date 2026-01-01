@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
 import { ContactForm } from "./_components/ContactForm";
 
@@ -124,7 +125,9 @@ export default function ContactPage() {
               Envoyez-nous un message
             </h2>
 
-            <ContactForm />
+            <Suspense fallback={<div>Chargement...</div>}>
+              <ContactForm />
+            </Suspense>
           </div>
 
           {/* Informations de contact */}

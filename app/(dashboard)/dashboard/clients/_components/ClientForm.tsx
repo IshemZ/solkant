@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useEffect } from "react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import {
   Button,
   Input,
@@ -17,7 +18,7 @@ import {
   CardTitle,
 } from "@/components/ui";
 import { createClient, updateClient } from "@/app/actions/clients";
-import { createClientSchema, type CreateClientInput } from "@/lib/validations";
+import { createClientSchema, type CreateClientInput, type CreateClientResult } from "@/lib/validations";
 import type { Client } from "@prisma/client";
 
 interface ClientFormProps {
@@ -38,6 +39,7 @@ export default function ClientForm({
 }: ClientFormProps) {
   const router = useRouter();
   const isEdit = mode === "edit";
+  const { trackEvent } = useAnalytics();
 
   const {
     register,
@@ -67,7 +69,12 @@ export default function ClientForm({
    */
   useEffect(() => {
     // Only parse if we have a legacy address but no structured address
-    if (client?.address && !client?.rue && !client?.codePostal && !client?.ville) {
+    if (
+      client?.address &&
+      !client?.rue &&
+      !client?.codePostal &&
+      !client?.ville
+    ) {
       const address = client.address.trim();
 
       // Try to find postal code (5 digits)
@@ -93,7 +100,13 @@ export default function ClientForm({
         setValue("ville", city);
       }
     }
-  }, [client?.address, client?.rue, client?.codePostal, client?.ville, setValue]);
+  }, [
+    client?.address,
+    client?.rue,
+    client?.codePostal,
+    client?.ville,
+    setValue,
+  ]);
 
   async function onSubmit(data: CreateClientInput) {
     try {
@@ -114,11 +127,33 @@ export default function ClientForm({
         toast.success(
           isEdit ? "Client modifié avec succès" : "Client créé avec succès"
         );
+
+        // Track analytics event for client creation (not for edits)
+        if (!isEdit) {
+          trackEvent("create_client", {
+            page_category: "dashboard",
+          });
+
+          // Track first-time activation milestone
+          const clientData = result.data as CreateClientResult;
+          if (clientData.isFirstClient) {
+            trackEvent("create_first_client", {
+              page_category: "dashboard",
+            });
+          }
+        }
+
         router.push("/dashboard/clients");
         router.refresh();
       }
-    } catch {
+    } catch (error) {
       toast.error("Une erreur est survenue");
+
+      // Track dashboard error
+      trackEvent("dashboard_error", {
+        error_type: "client_creation_failed",
+        page_category: "dashboard",
+      });
     }
   }
 
@@ -147,6 +182,7 @@ export default function ClientForm({
               <Input
                 id="firstName"
                 {...register("firstName")}
+                autoComplete="given-name"
                 aria-invalid={!!errors.firstName}
                 aria-describedby={
                   errors.firstName ? "firstName-error" : undefined
@@ -163,6 +199,7 @@ export default function ClientForm({
               <Input
                 id="lastName"
                 {...register("lastName")}
+                autoComplete="family-name"
                 aria-invalid={!!errors.lastName}
                 aria-describedby={
                   errors.lastName ? "lastName-error" : undefined
@@ -183,6 +220,7 @@ export default function ClientForm({
                 id="email"
                 type="email"
                 {...register("email")}
+                autoComplete="email"
                 placeholder="exemple@email.com"
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : "email-hint"}
@@ -199,6 +237,7 @@ export default function ClientForm({
                 id="phone"
                 type="tel"
                 {...register("phone")}
+                autoComplete="tel"
                 placeholder="06 12 34 56 78"
                 aria-invalid={!!errors.phone}
                 aria-describedby={errors.phone ? "phone-error" : "phone-hint"}
@@ -217,6 +256,7 @@ export default function ClientForm({
               <Input
                 id="rue"
                 {...register("rue")}
+                autoComplete="street-address"
                 placeholder="123 Rue de Rivoli"
                 aria-invalid={!!errors.rue}
                 aria-describedby={errors.rue ? "rue-error" : undefined}
@@ -232,6 +272,7 @@ export default function ClientForm({
               <Input
                 id="complement"
                 {...register("complement")}
+                autoComplete="address-line2"
                 placeholder="Appartement 4B"
                 aria-invalid={!!errors.complement}
                 aria-describedby={
@@ -251,6 +292,7 @@ export default function ClientForm({
                 <Input
                   id="codePostal"
                   {...register("codePostal")}
+                  autoComplete="postal-code"
                   placeholder="75001"
                   maxLength={5}
                   pattern="\d{5}"
@@ -270,6 +312,7 @@ export default function ClientForm({
                 <Input
                   id="ville"
                   {...register("ville")}
+                  autoComplete="address-level2"
                   placeholder="Paris"
                   aria-invalid={!!errors.ville}
                   aria-describedby={errors.ville ? "ville-error" : undefined}

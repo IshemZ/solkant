@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { Suspense } from "react";
 import RegisterForm from "@/components/auth/RegisterForm";
 
 export const metadata: Metadata = {
@@ -17,7 +18,17 @@ export default function RegisterPage() {
           <p className="mt-2 text-sm text-muted-foreground">Créez votre compte</p>
         </div>
 
-        <RegisterForm />
+        <Suspense
+          fallback={
+            <div className="space-y-4">
+              <div className="h-10 w-full animate-pulse rounded-md bg-foreground/10" />
+              <div className="h-10 w-full animate-pulse rounded-md bg-foreground/10" />
+              <div className="h-10 w-full animate-pulse rounded-md bg-foreground/10" />
+            </div>
+          }
+        >
+          <RegisterForm />
+        </Suspense>
 
         <p className="text-center text-sm text-muted-foreground">
           Vous avez déjà un compte ?{" "}

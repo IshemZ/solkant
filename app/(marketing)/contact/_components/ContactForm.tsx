@@ -89,6 +89,7 @@ export function ContactForm() {
           name="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoComplete="name"
           className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground placeholder:text-foreground/40 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
           placeholder="Votre nom"
           required
@@ -112,6 +113,7 @@ export function ContactForm() {
           name="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
           className="w-full rounded-md border border-foreground/20 bg-background px-4 py-3 text-foreground placeholder:text-foreground/40 focus:border-foreground focus:outline-none focus:ring-1 focus:ring-foreground"
           placeholder="votre@email.com"
           required

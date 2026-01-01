@@ -160,3 +160,24 @@ export type CreateClientInput = z.infer<typeof createClientSchema>;
  * Type inféré pour la mise à jour d'un Client
  */
 export type UpdateClientInput = z.infer<typeof updateClientSchema>;
+
+/**
+ * Type for client creation result with analytics flag
+ */
+export interface CreateClientResult {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string | null;
+  phone: string | null;
+  address: string | null;
+  rue: string | null;
+  complement: string | null;
+  codePostal: string | null;
+  ville: string | null;
+  notes: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  businessId: string;
+  isFirstClient?: boolean;
+}

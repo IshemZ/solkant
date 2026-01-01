@@ -10,6 +10,7 @@ import { formatDate } from "@/lib/date-utils";
 import { deleteQuote } from "@/app/actions/quotes";
 import ConfirmDialog from "@/components/shared/ConfirmDialog";
 import QuotePreview from "./QuotePreview";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 interface QuoteViewProps {
   quote: SerializedQuoteWithFullRelations;
@@ -17,6 +18,7 @@ interface QuoteViewProps {
 
 export default function QuoteView({ quote }: QuoteViewProps) {
   const router = useRouter();
+  const { trackEvent } = useAnalytics();
   const [isGenerating, setIsGenerating] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -47,9 +49,21 @@ export default function QuoteView({ quote }: QuoteViewProps) {
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+
+      // Track successful PDF export
+      trackEvent("export_pdf", {
+        page_category: "dashboard",
+        quote_number: quote.quoteNumber,
+      });
     } catch (error) {
       console.error("Error generating PDF:", error);
       alert("Erreur lors de la génération du PDF");
+
+      // Track PDF generation error
+      trackEvent("dashboard_error", {
+        error_type: "pdf_generation_failed",
+        page_category: "dashboard",
+      });
     } finally {
       setIsGenerating(false);
     }

@@ -11,6 +11,7 @@ declare global {
       (command: "set", property: string, value: unknown): void;
       (command: "consent", action: string, params?: Record<string, unknown>): void;
     };
+    dataLayer: unknown[];
   }
 }
 

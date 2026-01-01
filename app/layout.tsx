@@ -3,10 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
+import { Suspense } from "react";
 import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import { SignUpTracker } from "@/components/analytics/SignUpTracker";
+import { DevAnalyticsHelper } from "@/components/analytics/DevAnalyticsHelper";
 import { CookieBanner } from "@/components/shared/CookieBanner";
 import { SessionProvider } from "@/components/providers/SessionProvider";
 import "./globals.css";
@@ -154,10 +156,13 @@ export default function RootLayout({
           <AnalyticsProvider>
             {children}
             <Toaster position="top-right" richColors closeButton />
-            <GoogleAnalytics />
+            <Suspense fallback={null}>
+              <GoogleAnalytics />
+            </Suspense>
             <PageViewTracker />
             <SignUpTracker />
             <CookieBanner />
+            {process.env.NODE_ENV === "development" && <DevAnalyticsHelper />}
           </AnalyticsProvider>
         </SessionProvider>
         <SpeedInsights />

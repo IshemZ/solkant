@@ -6,12 +6,13 @@ import {
   updateClientSchema,
   type CreateClientInput,
   type UpdateClientInput,
+  type CreateClientResult,
 } from "@/lib/validations";
 import { z } from "zod";
 import { sanitizeObject } from "@/lib/security";
 import { revalidatePath } from "next/cache";
 import { auditLog, AuditAction, AuditLevel } from "@/lib/audit-logger";
-import { successResult } from "@/lib/action-types";
+import { successResult, type ActionResult } from "@/lib/action-types";
 import { withAuth, withAuthAndValidation } from "@/lib/action-wrapper";
 import { serializeDecimalFields } from "@/lib/decimal-utils";
 
@@ -25,8 +26,14 @@ export const getClients = withAuth(async (_input: void, session) => {
 }, "getClients");
 
 export const createClient = withAuthAndValidation(
-  async (input: CreateClientInput, session) => {
+  async (input: CreateClientInput, session): Promise<ActionResult<CreateClientResult>> => {
     const sanitized = sanitizeObject(input);
+
+    // Check if this is the first client for analytics
+    const existingClientCount = await prisma.client.count({
+      where: { businessId: session.businessId },
+    });
+    const isFirstClient = existingClientCount === 0;
 
     const client = await prisma.client.create({
       data: {
@@ -46,11 +53,15 @@ export const createClient = withAuthAndValidation(
         firstName: client.firstName,
         lastName: client.lastName,
         email: client.email,
+        isFirstClient,
       },
     });
 
     revalidatePath("/dashboard/clients");
-    return successResult(serializeDecimalFields(client));
+    return successResult({
+      ...serializeDecimalFields(client),
+      isFirstClient,
+    } as CreateClientResult);
   },
   "createClient",
   createClientSchema

@@ -2,6 +2,8 @@ import { useState, useMemo } from "react";
 import type { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import { toast } from "sonner";
 import { createQuote, updateQuote } from "@/app/actions/quotes";
+import type { QuoteWithRelationsAndAnalytics } from "@/app/actions/quotes";
+import { useAnalytics } from "@/hooks/useAnalytics";
 import type { Client } from "@prisma/client";
 import type { DiscountType } from "@/components/shared/DiscountField";
 import type {
@@ -34,6 +36,7 @@ export function useQuoteForm({
   packages,
   router,
 }: UseQuoteFormProps) {
+  const { trackEvent } = useAnalytics();
 
   // Form state - use lazy initialization for edit mode
   const [selectedClientId, setSelectedClientId] = useState(() =>
@@ -251,6 +254,15 @@ export function useQuoteForm({
           ? "Erreur lors de la création du devis"
           : "Erreur lors de la modification du devis"
       );
+
+      // Track dashboard error for quote creation/update
+      if (mode === 'create') {
+        trackEvent("dashboard_error", {
+          error_type: "quote_creation_failed",
+          page_category: "dashboard",
+        });
+      }
+
       setIsLoading(false);
     } else {
       toast.success(
@@ -258,6 +270,37 @@ export function useQuoteForm({
           ? `Devis ${result.data.quoteNumber} créé avec succès`
           : `Devis ${result.data.quoteNumber} modifié avec succès`
       );
+
+      // Track analytics event for quote creation (not for edits)
+      if (mode === 'create') {
+        const numServices = items.length;
+        const totalAmount = total;
+
+        // Categorize total amount into buckets for better analytics
+        let totalAmountBucket: string;
+        if (totalAmount < 500) {
+          totalAmountBucket = '<500';
+        } else if (totalAmount >= 500 && totalAmount <= 1000) {
+          totalAmountBucket = '500-1000';
+        } else {
+          totalAmountBucket = '>1000';
+        }
+
+        trackEvent("create_quote", {
+          page_category: "dashboard",
+          num_services: numServices,
+          total_amount_bucket: totalAmountBucket,
+        });
+
+        // Track first-time activation milestone
+        const quoteData = result.data as QuoteWithRelationsAndAnalytics;
+        if (quoteData.isFirstQuote) {
+          trackEvent("create_first_quote", {
+            page_category: "dashboard",
+          });
+        }
+      }
+
       router.push(`/dashboard/devis/${result.data.id}`);
     }
   }

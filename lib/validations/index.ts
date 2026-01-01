@@ -52,6 +52,7 @@ export {
   updateClientSchema,
   type CreateClientInput,
   type UpdateClientInput,
+  type CreateClientResult,
 } from "./client";
 
 // Service

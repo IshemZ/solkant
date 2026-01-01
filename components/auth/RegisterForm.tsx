@@ -27,7 +27,10 @@ function RegisterFormContent() {
     if (!formStartTracked) {
       trackEvent("form_start_register", {
         first_field: fieldName,
-        referrer: typeof document !== "undefined" ? document.referrer || "direct" : "unknown",
+        referrer:
+          typeof document !== "undefined"
+            ? document.referrer || "direct"
+            : "unknown",
       });
       setFormStartTracked(true);
     }
@@ -142,6 +145,7 @@ function RegisterFormContent() {
             onChange={(e) => setName(e.target.value)}
             onFocus={() => trackFormStart("name")}
             required
+            autoComplete="name"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="Votre nom"
             disabled={isLoading}
@@ -162,6 +166,7 @@ function RegisterFormContent() {
             onChange={(e) => setEmail(e.target.value)}
             onFocus={() => trackFormStart("email")}
             required
+            autoComplete="email"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="vous@exemple.com"
             disabled={isLoading}
@@ -183,6 +188,7 @@ function RegisterFormContent() {
             onFocus={() => trackFormStart("password")}
             required
             minLength={8}
+            autoComplete="new-password"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="••••••••"
             disabled={isLoading}
@@ -203,6 +209,7 @@ function RegisterFormContent() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
             minLength={8}
+            autoComplete="new-password"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="••••••••"
             disabled={isLoading}

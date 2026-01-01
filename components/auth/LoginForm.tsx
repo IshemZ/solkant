@@ -40,7 +40,11 @@ function LoginFormContent({ initialError }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   // Afficher message de succès
-  const successMessage = getSuccessMessage(verified, resetParam, registeredParam);
+  const successMessage = getSuccessMessage(
+    verified,
+    resetParam,
+    registeredParam
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,6 +113,7 @@ function LoginFormContent({ initialError }: LoginFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            autoComplete="email"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="vous@exemple.com"
             disabled={isLoading}
@@ -128,6 +133,7 @@ function LoginFormContent({ initialError }: LoginFormProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            autoComplete="current-password"
             className="mt-1 block w-full rounded-md border border-foreground/20 bg-background px-3 py-2 text-foreground placeholder-foreground/50 focus:border-foreground/40 focus:outline-none focus:ring-1 focus:ring-foreground/40"
             placeholder="••••••••"
             disabled={isLoading}

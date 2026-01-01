@@ -36,6 +36,11 @@ type QuoteWithRelations = Quote & {
   items: (QuoteItem & { service: Service | null })[];
 };
 
+// Type pour le résultat de création de quote avec flag analytics
+export type QuoteWithRelationsAndAnalytics = QuoteWithRelations & {
+  isFirstQuote?: boolean;
+};
+
 export const getQuotes = withAuth(
   async (
     _input: void,
@@ -226,9 +231,15 @@ export const createQuote = withAuthAndValidation(
   async (
     input: CreateQuoteInput,
     session
-  ): Promise<ActionResult<QuoteWithRelations>> => {
+  ): Promise<ActionResult<QuoteWithRelationsAndAnalytics>> => {
     // Sanitize input
     const sanitized = sanitizeObject(input);
+
+    // Check if this is the first quote for analytics
+    const existingQuoteCount = await prisma.quote.count({
+      where: { businessId: session.businessId },
+    });
+    const isFirstQuote = existingQuoteCount === 0;
 
     // Use retry logic to handle race conditions
     const quote = await createQuoteWithRetry(sanitized, session.businessId);
@@ -245,11 +256,15 @@ export const createQuote = withAuthAndValidation(
         quoteNumber: quote.quoteNumber,
         clientId: quote.clientId,
         total: quote.total,
+        isFirstQuote,
       },
     });
 
     revalidatePath("/dashboard/devis");
-    return successResult(serializeDecimalFields(quote));
+    return successResult({
+      ...serializeDecimalFields(quote),
+      isFirstQuote,
+    } as QuoteWithRelationsAndAnalytics);
   },
   "createQuote",
   createQuoteSchema
