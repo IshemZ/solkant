@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { getPageCategory, getContentType } from "@/lib/analytics/utils";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 /**
  * Global Page View Tracker that enriches automatic page_view events
@@ -14,21 +15,22 @@ import { getPageCategory, getContentType } from "@/lib/analytics/utils";
 export function PageViewTracker() {
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { trackEvent } = useAnalytics();
 
   useEffect(() => {
-    if (!window.gtag) return;
-
     const pageCategory = getPageCategory(pathname);
     const contentType = getContentType(pathname);
 
     // Enrichir page_view automatique avec custom parameters
-    window.gtag("event", "page_view", {
+    trackEvent("page_view", {
       page_category: pageCategory,
       user_authenticated: !!session,
-      subscription_status: session?.user?.subscriptionStatus || null,
+      ...(session?.user?.subscriptionStatus && {
+        subscription_status: session.user.subscriptionStatus,
+      }),
       ...(contentType && { content_type: contentType }),
     });
-  }, [pathname, session]);
+  }, [pathname, session, trackEvent]);
 
   return null; // Composant invisible
 }

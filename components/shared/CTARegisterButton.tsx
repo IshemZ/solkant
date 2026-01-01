@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 type CTALocation =
   | "hero"
@@ -36,9 +37,11 @@ export function CTARegisterButton({
   variant = "button",
   children,
 }: CTARegisterButtonProps) {
+  const { trackEvent } = useAnalytics();
+
   const handleClick = () => {
     // Track CTA click event
-    globalThis.window?.gtag?.("event", "click_cta_register", {
+    trackEvent("click_cta_register", {
       cta_location: location,
       cta_text: text,
       page_path: globalThis.window?.location?.pathname,

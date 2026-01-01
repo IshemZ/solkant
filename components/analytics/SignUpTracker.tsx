@@ -2,6 +2,7 @@
 
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 /**
  * Tracks sign_up event for OAuth (Google) registrations
@@ -13,6 +14,7 @@ import { useEffect, useState } from "react";
  */
 export function SignUpTracker() {
   const { data: session, status } = useSession();
+  const { trackEvent } = useAnalytics();
   const [tracked, setTracked] = useState(false);
 
   useEffect(() => {
@@ -24,14 +26,13 @@ export function SignUpTracker() {
       !tracked &&
       status === "authenticated" &&
       session?.user?.businessId &&
-      typeof globalThis.window !== "undefined" &&
-      globalThis.window.gtag
+      typeof globalThis.window !== "undefined"
     ) {
       const pendingSignUp = sessionStorage.getItem("new_signup");
 
       if (pendingSignUp === "google") {
         // Track sign_up for OAuth
-        globalThis.window.gtag("event", "sign_up", {
+        trackEvent("sign_up", {
           method: "google",
           user_id: session.user.businessId,
         });
@@ -41,7 +42,7 @@ export function SignUpTracker() {
         setTracked(true);
       }
     }
-  }, [session, status, tracked]);
+  }, [session, status, tracked, trackEvent]);
 
   return null; // Composant invisible
 }
