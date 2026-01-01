@@ -1,281 +1,96 @@
-# Solkant - AI Coding Agent Instructions
+# Copilot Instructions - Solkant
 
-## Project Overview
+**Solkant** est un SaaS français de gestion de devis pour instituts de beauté. Next.js 16 App Router, NextAuth v4, Prisma ORM, PostgreSQL (Neon).
 
-**Solkant** is a French-language quote/estimate management SaaS for beauty salons and service businesses. Built with Next.js 16 (App Router), NextAuth v4, Prisma ORM, and PostgreSQL (Neon).
+## 🔴 Règles Critiques
 
-## Architecture
+### Multi-Tenant Security
 
-### Data Model Hierarchy
-
-```
-User (auth) → Business (1:1) → Clients, Services, Quotes (1:many)
-Quote → QuoteItems (line items referencing Services or Packages)
-Package → PackageItems (services with quantities)
-```
-
-Every authenticated user MUST have a Business record. The `businessId` is stored in JWT tokens and used for multi-tenant data isolation.
-
-### Authentication Pattern
-
-- **JWT Strategy**: Session stored in JWT (not database), configured in `lib/auth.ts`
-- **Providers**: Credentials (email/password with bcrypt) + Google OAuth
-- **Session Extension**: Custom `businessId`, `role`, `subscriptionStatus`, `isPro` added via JWT/session callbacks
-- **Google OAuth Flow**: Auto-creates User + Business on first login in `signIn` callback with retry logic (3 attempts, exponential backoff)
-- **Protected Routes**: Use `(dashboard)` route group with layout checking `getServerSession()`
-
-### Server Actions Pattern
-
-All CRUD operations use Next.js Server Actions in `app/actions/*.ts` wrapped with action wrappers from `lib/action-wrapper.ts`:
-
-1. **withAuth()**: For actions without input validation
-2. **withAuthAndValidation()**: For actions with Zod schema validation
-
-Both wrappers:
-
-- Validate session → extract `businessId` from JWT
-- Validate input with Zod schemas from `lib/validations/`
-- Query Prisma with `businessId` filter (security-critical for multi-tenancy)
-- Call `revalidatePath()` after mutations (e.g., `/dashboard/devis`)
-- Return `{ data, error }` object structure with Sentry logging
-
-**Example withAuthAndValidation**:
+Chaque utilisateur a un Business (1:1). **TOUJOURS filtrer par `businessId`** dans les queries Prisma :
 
 ```typescript
-export const createClient = withAuthAndValidation(
-  async (input: CreateClientInput, session) => {
-    const client = await prisma.client.create({
-      data: { ...input, businessId: session.businessId },
+// ✅ CORRECT
+const clients = await prisma.client.findMany({
+  where: { businessId: session.businessId },
+});
+// ❌ FUITE DE DONNÉES : findMany() sans businessId
+```
+
+### Server Actions (`app/actions/`)
+
+Utiliser les wrappers de [lib/action-wrapper.ts](lib/action-wrapper.ts) :
+
+```typescript
+import { successResult } from "@/lib/action-types";
+
+// Sans validation
+export const deleteResource = withAuth(
+  async (input: { id: string }, session) => {
+    await prisma.resource.delete({
+      where: { id: input.id, businessId: session.businessId },
     });
-    revalidatePath("/dashboard/clients");
-    return successResult(client);
+    revalidatePath("/dashboard/resources");
+    return successResult({ id: input.id });
   },
-  "createClient",
-  createClientSchema
+  "deleteResource"
+);
+
+// Avec validation Zod
+export const createResource = withAuthAndValidation(
+  handler,
+  "createResource",
+  createResourceSchema
 );
 ```
 
-**Example withAuth**:
+- Handlers retournent `successResult(data)` - jamais de return direct
+- Schémas Zod dans [lib/validations/](lib/validations/)
+
+### Imports
 
 ```typescript
-export const deleteClient = withAuth(async (input: { id: string }, session) => {
-  await prisma.client.delete({
-    where: { id: input.id, businessId: session.businessId },
-  });
-  revalidatePath("/dashboard/clients");
-  return successResult({ id: input.id });
-}, "deleteClient");
+import { prisma } from "@/lib/prisma"; // ✅ Jamais new PrismaClient()
+import { authOptions } from "@/lib/auth"; // ✅ Utiliser @/ pour paths absolus
 ```
 
-### Validation Architecture
+## 🟡 Conventions Next.js 16
 
-- **Centralized Exports**: All schemas exported from `lib/validations/index.ts`
-- **Zod v4**: Using `zod@4.1.13` - note `z.string().cuid()` for ID validation
-- **French Messages**: All validation errors in French (e.g., "Le nom est requis")
-- **Helper Functions**: Use `validateAction()`, `formatZodErrors()` from `lib/validations/helpers.ts`
+- **Route params** : `const { id } = await params;` (params est une Promise)
+- **Components** : Placer dans `_components/` si utilisés dans UNE feature ; `/components/` si partagés entre 2+ features
+- **Structure routes** : `app/(dashboard)/dashboard/[resource]/` avec `page.tsx`, `loading.tsx`, `nouveau/`, `[id]/`
 
-### PDF Generation
+## 📍 Locale Française
 
-- **Library**: `@react-pdf/renderer` for declarative PDF components
-- **Pattern**: Create React-PDF component (`components/QuotePDF.tsx`) → render via API route
-- **API Route**: `app/api/quotes/[id]/pdf/route.ts` uses `renderToStream()` for streaming response
-- **Styling**: Inline StyleSheet objects (similar to React Native) with French locale formatting
+```typescript
+date.toLocaleDateString(
+  "fr-FR"
+) // "01/01/2026"
+`${price.toFixed(2)} €`; // "99.99 €" (espace avant €)
+```
 
-## Development Workflows
-
-### Database Management
+## 🧪 Tests
 
 ```bash
-# Prisma commands (always with direct connection)
-npx prisma migrate dev      # Create & apply migration
-npx prisma generate          # Regenerate client after schema changes
-npx prisma studio            # GUI database explorer
-
-# Required env vars: DATABASE_URL (Neon pooled), DIRECT_URL (direct connection)
+npm test                    # Vitest watch mode
+npm run test:run            # Run once
+npm run test:multi-tenant   # Tests isolation multi-tenant (CRITIQUE)
+npm run test:e2e            # Playwright E2E
+npm run test:coverage       # Couverture >80%
 ```
 
-### Scripts
-
-- **Fix Missing Business**: `npx tsx scripts/fix-missing-business.ts` - repairs users without Business records (common after OAuth bugs)
-- **Sitemap**: Auto-generates via `next-sitemap` in `postbuild` script
-
-### Environment Setup
-
-Required `.env.local`:
-
-```
-DATABASE_URL=          # Neon pooled connection
-DIRECT_URL=            # Neon direct connection (migrations)
-NEXTAUTH_SECRET=       # JWT secret (generate with: openssl rand -base64 32)
-# NEXTAUTH_URL=        # Auto-détecté (optionnel, seulement si URL custom)
-GOOGLE_CLIENT_ID=      # OAuth (optional)
-GOOGLE_CLIENT_SECRET=  # OAuth (optional)
-```
-
-## Code Conventions
-
-### File Organization (App Router + Colocation)
-
-#### Route Structure
-
-- **Route Groups**: Use `(group)` folders for layout sharing without URL segments (e.g., `(auth)`, `(dashboard)`)
-- **Special Files**: `page.tsx`, `layout.tsx`, `loading.tsx`, `error.tsx`, `not-found.tsx`
-- **Private Folders**: Prefix with `_` for non-routable folders (e.g., `_components/`, `_lib/`)
-
-#### Component Colocation Strategy
-
-**Colocate components in `app/*/\_components/`** when:
-
-- ✅ Used in ONE SINGLE feature/route
-- ✅ Contains feature-specific business logic
-- ✅ Will never be reused elsewhere
-
-**Keep components in root `/components`** when:
-
-- ✅ Reused across 2+ different features
-- ✅ Part of the design system (UI primitives)
-- ✅ Global layout/navigation components
-- ✅ Cross-cutting concerns (PDF generation, exports)
-
-#### File Organization Pattern
-
-```
-app/(dashboard)/dashboard/
-  ├── page.tsx                    # Server Component with data fetching
-  ├── loading.tsx                 # Streaming UI fallback
-  ├── error.tsx                   # Error boundary
-  ├── _components/                # Dashboard-specific components
-  │   └── DashboardStats.tsx
-  ├── devis/
-  │   ├── page.tsx
-  │   ├── loading.tsx
-  │   ├── error.tsx
-  │   ├── _components/            # Quote-specific components ONLY
-  │   │   ├── QuotesList.tsx
-  │   │   ├── QuoteForm.tsx
-  │   │   └── QuoteFilters.tsx
-  │   ├── nouveau/
-  │   │   └── page.tsx
-  │   └── [id]/
-  │       ├── page.tsx
-  │       └── _components/
-  │           └── QuoteDetails.tsx
-
-components/                       # SHARED components only
-  ├── ui/                         # Design system (shadcn/ui)
-  ├── layout/                     # Global navigation
-  ├── shared/                     # Business components (2+ features)
-  └── pdf/                        # Cross-feature utilities
-
-lib/
-  ├── validations/                # One schema file per model + index
-  └── utils.ts                    # Shared utilities
-
-app/actions/                      # Server Actions (one file per resource)
-  ├── clients.ts
-  ├── quotes.ts
-  └── services.ts
-```
-
-#### Benefits of This Architecture
-
-1. **Proximity**: Components live next to their usage
-2. **Clarity**: Server/Client separation is more visible
-3. **Scalability**: New feature = new `_components/` folder
-4. **Performance**: Better tree-shaking and code splitting
-5. **Maintainability**: Changes have local impact, not global
-
-### TypeScript Patterns
-
-- **Prisma Types**: Use `import type { Quote, Client } from '@prisma/client'`
-- **Relations**: Define interface extending model: `interface QuoteWithRelations extends Quote { client: Client }`
-- **NextAuth Types**: Extended in `types/next-auth.d.ts` to add `businessId` to Session/User/JWT
-
-### French Locale
-
-- **UI Text**: All user-facing strings in French
-- **Status Enums**: Use English in code (`DRAFT`, `SENT`) but translate in UI
-- **Date Formatting**: `toLocaleDateString('fr-FR')` for consistency
-- **Currency**: Format as `{price.toFixed(2)} €` (space before €)
-
-### Quote Number Generation
-
-Auto-generated in format `DEVIS-{YEAR}-{SEQUENCE}` (e.g., `DEVIS-2024-001`). The `generateQuoteNumber()` function in `actions/quotes.ts` queries last quote for the year and increments.
-
-## Critical Gotchas
-
-1. **Business Creation**: Every User needs a Business. OAuth callback handles this, but credentials login doesn't - ensure Business exists after registration.
-
-2. **Multi-Tenancy Security**: ALWAYS filter Prisma queries by `businessId` from session. Missing this filter = data leak between tenants.
-
-3. **Prisma Singleton**: Import from `lib/prisma.ts`, NOT `new PrismaClient()` directly (prevents connection leaks in dev).
-
-4. **Route Params in Next.js 16**: `params` is a Promise in Next.js 16: `const { id } = await params`
-
-5. **PDF Streaming**: Use `renderToStream()` not `renderToBuffer()` for better performance with large PDFs.
-
-6. **Zod v4 Changes**: String validation methods changed (e.g., `.cuid()` vs `.uuid()`). See `lib/validations/` for patterns.
-
-7. **Action Wrappers**: Handlers MUST return `ActionResult<T>` using `successResult(data)` wrapper. The wrappers do NOT auto-convert - you must explicitly wrap your return value.
-
-## Common Tasks
-
-### Adding New Resource (App Router Pattern)
-
-1. **Database Schema**: Update `prisma/schema.prisma` with model + `businessId` relation
-
-   ```bash
-   npx prisma migrate dev --name add_resource
-   ```
-
-2. **Validation**: Create Zod schema in `lib/validations/resource.ts` + export from `index.ts`
-
-3. **Server Actions**: Create in `app/actions/resource.ts` with:
-
-   - Session validation + `businessId` extraction
-   - Input validation with Zod
-   - Prisma query with `businessId` filter
-   - `revalidatePath()` after mutations
-
-4. **Route Structure**: Build in `app/(dashboard)/dashboard/resource/`
-
-   ```
-   resource/
-   ├── page.tsx              # Server Component (list view)
-   ├── loading.tsx           # Suspense fallback
-   ├── error.tsx             # Error boundary
-   ├── _components/          # Feature-specific components
-   │   ├── ResourceList.tsx
-   │   ├── ResourceForm.tsx
-   │   └── ResourceFilters.tsx
-   ├── nouveau/
-   │   └── page.tsx          # Create form page
-   └── [id]/
-       └── page.tsx          # Detail/edit page
-   ```
-
-5. **Component Organization**:
-   - Place feature-specific components in `_components/`
-   - Only move to `/components` if reused across 2+ features
-   - Keep Server Components by default, add `'use client'` only when needed
-
-### Debugging Auth Issues
-
-- Check JWT token: Install browser extension to decode `next-auth.session-token` cookie
-- Verify `businessId` in session: Log `session.user.businessId` in Server Actions
-- Run fix script: `npx tsx scripts/fix-missing-business.ts` if Business missing
-
-### Testing in Development
+## 🗄️ Database
 
 ```bash
-npm run dev              # Start dev server on :3000
-npx prisma studio        # Inspect database
-npm run lint             # ESLint check
+npx prisma migrate dev      # Créer migration (dev)
+npx prisma generate         # Régénérer client après schema.prisma
+npx prisma studio           # GUI database
+# Prod : migrations auto sur Vercel - jamais db push/reset
 ```
 
-## External Integrations
+## 📁 Structure Clé
 
-- **Neon PostgreSQL**: Serverless Postgres with connection pooling
-- **NextAuth**: v4 (pre-v5) - callbacks API differs from v5
-- **Tailwind CSS v4**: Note different configuration format in `postcss.config.mjs`
-- **next-sitemap**: SEO sitemap generation post-build
+- [app/actions/](app/actions/) - Server actions CRUD
+- [lib/validations/](lib/validations/) - Schémas Zod par ressource
+- [lib/action-wrapper.ts](lib/action-wrapper.ts) - Wrappers auth + validation
+- [prisma/schema.prisma](prisma/schema.prisma) - Modèles avec relations Business
+- [CLAUDE-ADVANCED.md](CLAUDE-ADVANCED.md) - Guide complet ajout nouvelle ressource

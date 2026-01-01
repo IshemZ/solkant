@@ -1,4 +1,4 @@
 {
-  "buildCommand": "NODE_OPTIONS='--no-deprecation' npm run build",
+  "buildCommand": "NODE_OPTIONS='--no-deprecation' npm run build:with-migrate",
   "framework": "nextjs"
 }
