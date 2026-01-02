@@ -2,12 +2,9 @@
 
 import { GoogleAnalytics as NextGoogleAnalytics } from "@next/third-parties/google";
 import { useEffect } from "react";
-import { useSearchParams } from "next/navigation";
 
 export function GoogleAnalytics() {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const searchParams = useSearchParams();
-  const isDebugMode = searchParams.get("debug_mode") === "true";
 
   // Initialiser le consent mode AVANT le chargement de GA
   useEffect(() => {
@@ -44,12 +41,25 @@ export function GoogleAnalytics() {
       }
     }
 
-    // Activer le debug mode si présent dans l'URL
-    if (isDebugMode) {
-      gtag("set", { debug_mode: true });
-      console.log("[GA4] Debug mode activé");
+    // Activer le debug mode si présent dans l'URL (using window.location for reliable detection)
+    if (typeof globalThis.window !== "undefined") {
+      const params = new URLSearchParams(globalThis.window.location.search);
+      const debugMode = params.get("debug_mode") === "true";
+      if (debugMode) {
+        gtag("set", { debug_mode: true });
+        console.log("[GA4] Debug mode activé");
+      }
     }
-  }, [gaId, isDebugMode]);
+
+    // TEST #3: Disable automatic form_submit events to prevent conflicts
+    gtag("config", gaId, {
+      send_page_view: false, // Let PageViewTracker handle this
+      enhanced_measurement: {
+        forms: false, // Disable automatic form_submit events
+      },
+    });
+    console.log("[GA4 TEST #3] Automatic form tracking disabled");
+  }, [gaId]);
 
   if (!gaId) return null;
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useSearchParams } from "next/navigation";
 
 /**
  * Hook for tracking GA4 events with automatic user_id enrichment
@@ -12,8 +11,6 @@ import { useSearchParams } from "next/navigation";
  */
 export function useAnalytics() {
   const { data: session } = useSession();
-  const searchParams = useSearchParams();
-  const isDebugMode = searchParams.get("debug_mode") === "true";
 
   const trackEvent = (
     eventName: string,
@@ -24,17 +21,21 @@ export function useAnalytics() {
       return;
     }
 
+    // Check debug_mode directly from URL for reliable detection
+    const urlParams = new URLSearchParams(globalThis.window.location.search);
+    const debugModeActive = urlParams.get("debug_mode") === "true";
+
     // Auto-enrichir avec user_id et debug_mode si disponibles
     const enrichedParams = {
       ...params,
       ...(session?.user?.businessId && { user_id: session.user.businessId }),
-      ...(isDebugMode && { debug_mode: true }),
+      ...(debugModeActive && { debug_mode: true }),
     };
 
     globalThis.window.gtag("event", eventName, enrichedParams);
 
     // Log en console si debug mode
-    if (isDebugMode) {
+    if (debugModeActive) {
       console.log(`[GA4 Debug] Event: ${eventName}`, enrichedParams);
     }
   };

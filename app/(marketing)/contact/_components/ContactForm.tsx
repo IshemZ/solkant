@@ -32,10 +32,11 @@ export function ContactForm() {
 
       if (result.success) {
         // Track successful contact form submission
-        trackEvent("form_submit_contact", {
+        trackEvent("contact_form_submitted", {
           subject,
           name_length: name.length,
           message_length: message.length,
+          page_category: "marketing",
         });
 
         setSuccess(true);
