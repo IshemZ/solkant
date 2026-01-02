@@ -3,7 +3,7 @@
 import { useSession } from "next-auth/react";
 
 /**
- * Hook for tracking GA4 events with automatic user_id enrichment
+ * Hook for tracking GA4 events via GTM dataLayer
  *
  * @example
  * const { trackEvent } = useAnalytics();
@@ -16,8 +16,8 @@ export function useAnalytics() {
     eventName: string,
     params?: Record<string, string | number | boolean>
   ) => {
-    // Server-side or gtag not loaded
-    if (!globalThis.window?.gtag) {
+    // Server-side or dataLayer not available
+    if (!globalThis.window?.dataLayer) {
       return;
     }
 
@@ -32,11 +32,15 @@ export function useAnalytics() {
       ...(debugModeActive && { debug_mode: true }),
     };
 
-    globalThis.window.gtag("event", eventName, enrichedParams);
+    // Push to dataLayer (GTM pattern)
+    globalThis.window.dataLayer.push({
+      event: eventName,
+      ...enrichedParams,
+    });
 
     // Log en console si debug mode
     if (debugModeActive) {
-      console.log(`[GA4 Debug] Event: ${eventName}`, enrichedParams);
+      console.log(`[GTM Debug] Event: ${eventName}`, enrichedParams);
     }
   };
 

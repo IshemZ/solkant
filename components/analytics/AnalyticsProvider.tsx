@@ -8,35 +8,35 @@ interface AnalyticsProviderProps {
 }
 
 /**
- * Global Analytics Provider that configures User ID tracking
+ * Global Analytics Provider that configures User ID tracking via GTM
  * when user is authenticated
  *
  * Must be placed inside SessionProvider in app/layout.tsx
  */
 export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
   const { data: session, status } = useSession();
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   useEffect(() => {
-    if (!gaId || status !== "authenticated" || !session?.user?.businessId) {
+    if (status !== "authenticated" || !session?.user?.businessId) {
       return;
     }
 
-    // Attendre que gtag soit disponible (lazy-loaded dans GoogleAnalytics.tsx)
+    // Attendre que dataLayer soit disponible (chargé par GTM)
     const configureUserId = () => {
-      if (globalThis.window?.gtag && session.user.businessId) {
+      if (globalThis.window?.dataLayer && session.user.businessId) {
         const businessId = session.user.businessId;
 
-        // 1. Set user_id globally for all events
-        globalThis.window.gtag("set", { user_id: businessId });
-
-        // 2. Set user properties
-        globalThis.window.gtag("set", "user_properties", {
-          subscription_status: session.user.subscriptionStatus || null,
-          is_pro: session.user.isPro || false,
+        // Push user configuration to dataLayer
+        globalThis.window.dataLayer.push({
+          event: 'user_authenticated',
+          user_id: businessId,
+          user_properties: {
+            subscription_status: session.user.subscriptionStatus || null,
+            is_pro: session.user.isPro || false,
+          },
         });
 
-        console.log("[GA4] User ID configured:", businessId);
+        console.log("[GTM] User ID configured:", businessId);
         return true;
       }
       return false;
@@ -60,7 +60,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
       clearInterval(interval);
       clearTimeout(timeout);
     };
-  }, [session, status, gaId]);
+  }, [session, status]);
 
   return <>{children}</>;
 }

@@ -24,14 +24,18 @@ export function CookieBanner() {
   const [showPreferences, setShowPreferences] = useState(false);
 
   const enableGoogleAnalytics = useCallback(() => {
-    globalThis.window?.gtag?.("consent", "update", {
-      analytics_storage: "granted",
+    // Push consent update to dataLayer (GTM pattern)
+    globalThis.window?.dataLayer?.push({
+      event: 'consent_update',
+      consent_analytics: 'granted',
     });
   }, []);
 
   const disableGoogleAnalytics = useCallback(() => {
-    globalThis.window?.gtag?.("consent", "update", {
-      analytics_storage: "denied",
+    // Push consent update to dataLayer (GTM pattern)
+    globalThis.window?.dataLayer?.push({
+      event: 'consent_update',
+      consent_analytics: 'denied',
     });
   }, []);
 

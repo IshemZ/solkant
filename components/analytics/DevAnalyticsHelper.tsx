@@ -29,10 +29,11 @@ export function DevAnalyticsHelper() {
 
       localStorage.setItem("cookie-consent", JSON.stringify(devConsent));
 
-      // Activer GA4 immédiatement
-      if (globalThis.window?.gtag) {
-        globalThis.window.gtag("consent", "update", {
-          analytics_storage: "granted",
+      // Activer GA4 immédiatement via dataLayer
+      if (globalThis.window?.dataLayer) {
+        globalThis.window.dataLayer.push({
+          event: 'consent_update',
+          consent_analytics: 'granted',
         });
         console.log("🚀 [DEV] Analytics auto-activées pour le développement");
       }

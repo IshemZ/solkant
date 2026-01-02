@@ -3,8 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import { Toaster } from "sonner";
-import { Suspense } from "react";
-import { GoogleAnalytics } from "@/components/analytics/GoogleAnalytics";
 import { AnalyticsProvider } from "@/components/analytics/AnalyticsProvider";
 import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 import { SignUpTracker } from "@/components/analytics/SignUpTracker";
@@ -185,9 +183,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           <AnalyticsProvider>
             {children}
             <Toaster position="top-right" richColors closeButton />
-            <Suspense fallback={null}>
-              <GoogleAnalytics />
-            </Suspense>
+            {/* GTM handles GA4 loading - no need for separate GoogleAnalytics component */}
             <PageViewTracker />
             <SignUpTracker />
             <CookieBanner />

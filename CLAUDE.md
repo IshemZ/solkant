@@ -18,6 +18,8 @@ This file provides guidance to Claude Code when working with this repository.
 
 📚 **Documentation complète** : [CLAUDE-ADVANCED.md](CLAUDE-ADVANCED.md)
 📊 **Analytics GA4** : [docs/analytics/CLAUDE-ANALYTICS.md](docs/analytics/CLAUDE-ANALYTICS.md)
+⚙️ **Configuration GTM** : [docs/analytics/gtm-configuration-guide.md](docs/analytics/gtm-configuration-guide.md)
+✅ **Validation Analytics** : [docs/analytics/validation-guide.md](docs/analytics/validation-guide.md)
 
 ---
 
@@ -50,6 +52,46 @@ const clients = await prisma.client.findMany(); // Missing businessId filter
 - Google OAuth: Auto-creates User + Business with retry logic (3 attempts, exponential backoff)
 - Credentials: Requires manual Business creation post-registration
 - Recovery: `npx tsx scripts/fix-missing-business.ts` repairs orphaned users
+
+---
+
+## 🔴 CRITICAL: Analytics - GTM + GA4
+
+### Architecture
+
+Solkant utilise **Google Tag Manager (GTM)** pour charger GA4 et gérer tous les événements analytics.
+
+**Pattern obligatoire:**
+```typescript
+// ✅ CORRECT - via dataLayer
+import { useAnalytics } from '@/hooks/useAnalytics';
+
+const { trackEvent } = useAnalytics();
+trackEvent('event_name', { param: 'value' });
+
+// ❌ WRONG - gtag() direct
+window.gtag('event', 'event_name', { param: 'value' });
+```
+
+### Configuration Environnements
+
+**Development:**
+1. Créer container GTM dev dans https://tagmanager.google.com
+2. Configurer `.env.development` avec `NEXT_PUBLIC_GTM_ID="GTM-DEVXXXX"`
+3. Suivre [gtm-configuration-guide.md](docs/analytics/gtm-configuration-guide.md)
+
+**Production:**
+- GTM ID: `GTM-5KZL68FJ` (déjà configuré)
+- GA4 chargé VIA GTM (pas de NEXT_PUBLIC_GA_MEASUREMENT_ID)
+
+### Validation Obligatoire
+
+Avant TOUT commit d'événement analytics:
+1. Tester avec GTM Preview Mode (voir [validation-guide.md](docs/analytics/validation-guide.md))
+2. Vérifier dans GA4 DebugView que l'événement arrive
+3. Confirmer AUCUNE duplication (1 événement = 1 tracking, pas 2)
+
+**Documentation:** [CLAUDE-ANALYTICS.md](docs/analytics/CLAUDE-ANALYTICS.md)
 
 ---
 
