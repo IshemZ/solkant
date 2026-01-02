@@ -21,6 +21,7 @@ vi.mock("@/lib/prisma", () => ({
       findFirst: vi.fn(),
       create: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     user: {
       findUnique: vi.fn(),
@@ -310,6 +311,7 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock: aucun devis existant pour cette année
+      vi.mocked(prisma.quote.count).mockResolvedValue(0);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -389,6 +391,7 @@ describe("Quote Server Actions", () => {
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
 
       // Mock: dernier devis = DEVIS-2024-042
+      vi.mocked(prisma.quote.count).mockResolvedValue(42);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue({
         id: "quote_last",
         quoteNumber: "DEVIS-2024-042",
@@ -478,6 +481,7 @@ describe("Quote Server Actions", () => {
     it("should calculate subtotal from items", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.quote.count).mockResolvedValue(0);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -560,6 +564,7 @@ describe("Quote Server Actions", () => {
     it("should apply discount correctly", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.quote.count).mockResolvedValue(0);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {
@@ -628,6 +633,7 @@ describe("Quote Server Actions", () => {
     it("should handle multiple quantities", async () => {
       vi.mocked(getServerSession).mockResolvedValue(mockSession);
       vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
+      vi.mocked(prisma.quote.count).mockResolvedValue(0);
       vi.mocked(prisma.quote.findFirst).mockResolvedValue(null);
 
       const quoteInput = {

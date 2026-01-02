@@ -14,6 +14,7 @@ vi.mock("next-auth");
 // Mock Prisma avec des fonctions vi.fn()
 const mockFindFirst = vi.fn();
 const mockCreate = vi.fn();
+const mockCount = vi.fn();
 const mockUserFindUnique = vi.fn();
 
 vi.mock("@/lib/prisma", () => ({
@@ -21,6 +22,7 @@ vi.mock("@/lib/prisma", () => ({
     quote: {
       findFirst: mockFindFirst,
       create: mockCreate,
+      count: mockCount,
     },
     user: {
       findUnique: mockUserFindUnique,
@@ -89,6 +91,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
     vi.clearAllMocks();
     vi.mocked(getServerSession).mockResolvedValue(mockSession);
     mockUserFindUnique.mockResolvedValue(mockUser);
+    mockCount.mockResolvedValue(0);
   });
 
   describe("✅ Correction contrainte unique par Business", () => {

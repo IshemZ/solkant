@@ -26,6 +26,20 @@ vi.mock("next/navigation", () => ({
   }),
 }));
 
+vi.mock("next-auth/react", () => ({
+  useSession: () => ({
+    data: {
+      user: {
+        id: "user-1",
+        businessId: "business-1",
+        email: "test@example.com",
+        name: "Test User",
+      },
+    },
+    status: "authenticated",
+  }),
+}));
+
 vi.mock("@/app/actions/quotes", () => ({
   createQuote: vi.fn().mockResolvedValue({
     success: true,

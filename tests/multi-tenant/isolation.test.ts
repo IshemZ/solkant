@@ -33,6 +33,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     quote: {
       findMany: vi.fn(),
@@ -40,6 +41,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     service: {
       findMany: vi.fn(),
@@ -47,6 +49,7 @@ vi.mock("@/lib/prisma", () => ({
       findUnique: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
   },
 }));
@@ -106,6 +109,7 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
 
     it("🚨 MUST NOT allow creating client for another tenant", async () => {
       vi.mocked(getServerSession).mockResolvedValue(sessions.tenant1);
+      vi.mocked(prisma.client.count).mockResolvedValue(0);
       vi.mocked(prisma.client.create).mockResolvedValue({
         id: "client_123",
         firstName: "Jean",

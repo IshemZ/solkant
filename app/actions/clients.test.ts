@@ -24,6 +24,7 @@ vi.mock('@/lib/prisma', () => ({
       create: vi.fn(),
       update: vi.fn(),
       delete: vi.fn(),
+      count: vi.fn(),
     },
     user: {
       findUnique: vi.fn(),
@@ -146,6 +147,7 @@ describe('Client Actions', () => {
         businessId: 'business-test-123',
       });
 
+      vi.mocked(prisma.client.count).mockResolvedValue(0);
       vi.mocked(prisma.client.create).mockResolvedValue(createdClient);
 
       // ACT
@@ -156,6 +158,7 @@ describe('Client Actions', () => {
       if (result.success) {
         expect(result.data?.firstName).toBe('Marie');
         expect(result.data?.lastName).toBe('Dupont');
+        expect(result.data?.isFirstClient).toBe(true);
       }
 
       expect(prisma.client.create).toHaveBeenCalled();
@@ -198,6 +201,7 @@ describe('Client Actions', () => {
       };
 
       const created = createMockClient(input);
+      vi.mocked(prisma.client.count).mockResolvedValue(0);
       vi.mocked(prisma.client.create).mockResolvedValue(created);
 
       // ACT
