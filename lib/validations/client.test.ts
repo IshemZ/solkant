@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { createClientSchema, updateClientSchema } from "@/lib/validations";
+import { createClientSchema, updateClientSchema } from "./index";
 
 describe("Client Validation Schema", () => {
   describe("createClientSchema", () => {
