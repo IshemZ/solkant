@@ -1,0 +1,87 @@
+name: Check Migration Sync
+
+# OPTIONAL: Only runs if MONITORING_DB_URL secret is configured
+# This should be a READ-ONLY database user for security
+#
+# To enable:
+# 1. Create read-only database user (see docs/MIGRATION-PREVENTION-GUIDE.md)
+# 2. Add MONITORING_DB_URL to GitHub Secrets
+#
+# To disable: Simply don't add the secret - workflow will skip
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'prisma/schema.prisma'
+      - 'prisma/migrations/**'
+  workflow_dispatch:
+  schedule:
+    # Run every Monday at 9 AM UTC (only if secret configured)
+    - cron: '0 9 * * 1'
+
+jobs:
+  check-migration-sync:
+    name: Verify Production Migration Sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check if monitoring is enabled
+        id: check_secret
+        run: |
+          if [ -z "${{ secrets.MONITORING_DB_URL }}" ]; then
+            echo "enabled=false" >> $GITHUB_OUTPUT
+            echo "⚠️ MONITORING_DB_URL not configured - skipping migration check"
+            echo "To enable: Add MONITORING_DB_URL secret (read-only user recommended)"
+          else
+            echo "enabled=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup PostgreSQL client
+        if: steps.check_secret.outputs.enabled == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Check migration sync
+        if: steps.check_secret.outputs.enabled == 'true'
+        env:
+          DIRECT_URL: ${{ secrets.MONITORING_DB_URL }}
+        run: |
+          chmod +x scripts/check-migration-sync.sh
+          ./scripts/check-migration-sync.sh --verbose
+
+      - name: Comment on PR (if desync detected)
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Migration Desync Detected**\n\nThe production database is not synchronized with the migrations in this PR.\n\nPlease run:\n```bash\n./scripts/check-migration-sync.sh\n```\n\nThen apply missing migrations before merging.'
+            })
+
+      - name: Create issue (if scheduled check fails)
+        if: failure() && github.event_name == 'schedule'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: '🚨 Production Migration Desync Detected',
+              body: '**Automated weekly check detected migration desync**\n\nThe production database is missing migrations from the codebase.\n\nRun the following to diagnose:\n```bash\nexport DIRECT_URL="<your-production-url>"\n./scripts/check-migration-sync.sh --verbose\n```\n\nTo fix:\n```bash\n./scripts/apply-missing-migrations.sh --execute\n```\n\nTriggered by: Weekly scheduled check',
+              labels: ['bug', 'database', 'urgent']
+            })
