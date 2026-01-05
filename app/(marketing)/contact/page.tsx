@@ -255,7 +255,7 @@ export default function ContactPage() {
                     Combien coûte Solkant ?
                   </h4>
                   <p className="text-sm text-muted-foreground">
-                    À partir de 0€/mois (plan Gratuit) ou 19€/mois (plan Pro).{" "}
+                    À partir de 0€/mois (plan Gratuit) ou 19,99 €/mois (plan Pro).{" "}
                     <Link
                       href="/pricing"
                       className="text-foreground hover:underline"

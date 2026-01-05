@@ -755,7 +755,7 @@ export default function GestionInstitutBeauteGuidePage() {
                 </p>
                 <p className="text-foreground/70 text-sm mb-2">
                   <strong>Prix :</strong> Gratuit jusqu'à 10 devis/mois, puis
-                  19€/mois illimité
+                  19,99 €/mois illimité
                 </p>
                 <p className="text-foreground/70 text-sm mb-3">
                   <strong>Pourquoi Solkant ?</strong> Spécialisé instituts de

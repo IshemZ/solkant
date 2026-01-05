@@ -973,7 +973,7 @@ export default function Home() {
               <p className="text-foreground/80 mb-4">
                 &quot;Je recommande à toutes mes collègues ! Le plan gratuit est
                 parfait pour démarrer, et quand on passe au Pro, on ne regrette
-                pas les 19€/mois.&quot;
+                pas les 19,99 €/mois.&quot;
               </p>
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-foreground/10 font-semibold text-foreground">
@@ -1060,7 +1060,7 @@ export default function Home() {
                     name: "Combien coûte Solkant ?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Solkant propose un plan Gratuit (0€/mois, jusqu'à 10 devis/mois) et un plan Pro (19€/mois, devis illimités avec fonctionnalités avancées). Aucun engagement, vous pouvez changer de plan à tout moment.",
+                      text: "Solkant propose un plan Gratuit (0€/mois, jusqu'à 10 devis/mois) et un plan Pro (19,99 €/mois, devis illimités avec fonctionnalités avancées). Aucun engagement, vous pouvez changer de plan à tout moment.",
                     },
                   },
                   {
@@ -1166,7 +1166,7 @@ export default function Home() {
               </h3>
               <p className="text-muted-foreground">
                 Solkant propose un plan Gratuit (0€/mois, jusqu&apos;à 10
-                devis/mois) et un plan Pro (19€/mois, devis illimités avec
+                devis/mois) et un plan Pro (19,99 €/mois, devis illimités avec
                 fonctionnalités avancées). Aucun engagement, vous pouvez changer
                 de plan à tout moment.{" "}
                 <Link

@@ -103,7 +103,7 @@ export default function LogicielDevisInstitutPage() {
                 name: "Combien coûte un logiciel de devis pour institut ?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Les tarifs vont de 0€ (versions gratuites limitées) à 30€/mois. Solkant propose un plan gratuit jusqu'à 10 devis/mois et un plan Pro à 19€/mois en illimité. Le ROI est immédiat grâce au temps gagné.",
+                  text: "Les tarifs vont de 0€ (versions gratuites limitées) à 30€/mois. Solkant propose un plan gratuit jusqu'à 10 devis/mois et un plan Pro à 19,99 €/mois en illimité. Le ROI est immédiat grâce au temps gagné.",
                 },
               },
             ],
@@ -501,7 +501,7 @@ export default function LogicielDevisInstitutPage() {
               Les tarifs vont de 0€ (versions gratuites limitées) à 30-50€/mois
               pour des solutions complètes. Calculez votre ROI : si vous gagnez
               2h/semaine à 25€/h de valorisation, vous économisez 200€/mois.
-              Payer 19€/mois devient dérisoire face à ce gain.
+              Payer 19,99 €/mois devient dérisoire face à ce gain.
             </p>
 
             <h3 className="text-2xl font-semibold text-foreground mt-8 mb-4">
@@ -845,7 +845,7 @@ export default function LogicielDevisInstitutPage() {
                       : 2h20/semaine = <strong>10h/mois</strong>. Taux de
                       conversion devis → vente passé de 62% à{" "}
                       <strong>78%</strong> grâce à des PDF plus professionnels
-                      envoyés dans l'heure. ROI : 19€/mois vs 250€ de temps
+                      envoyés dans l'heure. ROI : 19,99 €/mois vs 250€ de temps
                       gagné (10h × 25€/h valorisation).
                     </p>
                   </div>
@@ -984,7 +984,7 @@ export default function LogicielDevisInstitutPage() {
                 <p className="text-foreground/80 leading-relaxed">
                   Les tarifs vont de 0€ (versions gratuites limitées comme le
                   plan Solkant gratuit jusqu'à 10 devis/mois) à 30€/mois pour
-                  des solutions complètes. Solkant Pro coûte 19€/mois en
+                  des solutions complètes. Solkant Pro coûte 19,99 €/mois en
                   illimité. Le ROI est immédiat grâce au temps gagné (2h/semaine
                   = 200€/mois valorisés).
                 </p>
@@ -1054,7 +1054,7 @@ export default function LogicielDevisInstitutPage() {
               des données concrètes.
             </p>
             <p className="text-foreground/80 leading-relaxed mb-4">
-              Le retour sur investissement est immédiat : pour 19€/mois, vous
+              Le retour sur investissement est immédiat : pour 19,99 €/mois, vous
               gagnez 8-10 heures par mois (valorisées à 200-250€) et améliorez
               votre taux de conversion grâce à des devis impeccables.
             </p>

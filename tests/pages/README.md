@@ -110,7 +110,7 @@ Comprehensive unit tests for the marketing homepage at `/app/page.tsx`.
 ### 16. French Content (4 tests)
 - All content in French
 - French quotation marks
-- French price format (19€/mois)
+- French price format (19,99 €/mois)
 - French apostrophes
 
 ### 17. Performance (3 tests)

@@ -765,12 +765,12 @@ describe("Homepage", () => {
     it("devrait utiliser le format de prix français", () => {
       render(<Home />);
 
-      // Format français: "19€/mois" ou "0€/mois" dans la FAQ
+      // Format français: "19,99 €/mois" ou "0€/mois" dans la FAQ
       // Rechercher dans tout le texte de la page
       const { container } = render(<Home />);
       const pageText = container.textContent || "";
 
-      expect(pageText).toMatch(/19€\/mois/);
+      expect(pageText).toMatch(/19,99 €\/mois/);
       expect(pageText).toMatch(/0€\/mois/);
     });
 

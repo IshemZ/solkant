@@ -342,7 +342,7 @@ export default function ArticlePage() {
             Testez Solkant gratuitement - 0€, 0 engagement
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            10 devis gratuits par mois, sans carte bancaire. Si ça vous convient, passez à 19€/mois. Sinon, restez en gratuit.
+            10 devis gratuits par mois, sans carte bancaire. Si ça vous convient, passez à 19,99 €/mois. Sinon, restez en gratuit.
           </p>
           <div className="mt-6">
             <Link href="/register" className="rounded-md bg-foreground px-6 py-3 font-semibold text-background hover:bg-foreground/90">

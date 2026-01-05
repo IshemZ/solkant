@@ -311,7 +311,7 @@ export default function MaterielInformatiqueArticle() {
             <p className="text-foreground/70 italic">
               &quot;Avant de m&apos;équiper, je passais mes soirées à faire mes
               devis sur Excel. J&apos;ai investi 800€ dans un ordinateur et
-              19€/mois pour Solkant. Résultat : j&apos;économise 8 heures par
+              19,99 €/mois pour Solkant. Résultat : j&apos;économise 8 heures par
               semaine que j&apos;utilise pour développer mon Instagram. Mon CA a
               augmenté de 15% en 6 mois. Le meilleur investissement de ma
               carrière !&quot;
@@ -1151,7 +1151,7 @@ export default function MaterielInformatiqueArticle() {
                   <ul className="space-y-1 text-sm text-foreground/70">
                     <li>✅ Pensé 100% pour les instituts de beauté</li>
                     <li>✅ Simple ET complet</li>
-                    <li>✅ Prix juste : 19€/mois</li>
+                    <li>✅ Prix juste : 19,99 €/mois</li>
                     <li>✅ Sans engagement</li>
                     <li>✅ Opérationnel en 30 minutes</li>
                     <li>✅ Support en français</li>
@@ -1379,10 +1379,10 @@ export default function MaterielInformatiqueArticle() {
               <div className="bg-white rounded-lg p-6 shadow-sm">
                 <h4 className="font-semibold text-foreground mb-3 flex items-center gap-2">
                   <span className="text-2xl">✅</span> 4. Prix transparent :
-                  19€/mois, sans engagement
+                  19,99 €/mois, sans engagement
                 </h4>
                 <ul className="space-y-2 text-foreground/70 mb-4">
-                  <li>💰 19€/mois - prix fixe et transparent</li>
+                  <li>💰 19,99 €/mois - prix fixe et transparent</li>
                   <li>✅ Pas de frais cachés</li>
                   <li>✅ Pas de commission sur vos ventes</li>
                   <li>✅ Pas de limite de devis ou de clientes</li>
@@ -1398,7 +1398,7 @@ export default function MaterielInformatiqueArticle() {
                     <li>• Vous économisez : <strong>8h/mois minimum</strong></li>
                     <li>• Votre taux horaire moyen : <strong>50€/h</strong></li>
                     <li>• Valeur du temps gagné : <strong>400€/mois</strong></li>
-                    <li>• Coût Solkant : <strong>19€/mois</strong></li>
+                    <li>• Coût Solkant : <strong>19,99 €/mois</strong></li>
                   </ul>
                   <p className="font-bold text-green-700 mt-3 text-lg text-center">
                     ➡️ ROI = +381€/mois de valeur créée !
@@ -1545,7 +1545,7 @@ export default function MaterielInformatiqueArticle() {
                     50-80€
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 text-center font-semibold bg-green-50">
-                    19€
+                    19,99 €
                   </td>
                 </tr>
                 <tr className="bg-foreground/5">
@@ -1790,7 +1790,7 @@ export default function MaterielInformatiqueArticle() {
                     Solkant
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-semibold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3">
                     ❌ Indispensable
@@ -1856,7 +1856,7 @@ export default function MaterielInformatiqueArticle() {
                     Coût mensuel
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-bold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3"></td>
                 </tr>
@@ -1887,9 +1887,9 @@ export default function MaterielInformatiqueArticle() {
               </li>
             </ul>
             <p className="text-foreground/80 font-semibold mt-4">
-              <strong>ROI :</strong> Avec 19€/mois pour Solkant, si vous gagnez
+              <strong>ROI :</strong> Avec 19,99 €/mois pour Solkant, si vous gagnez
               ne serait-ce que 30 minutes par semaine, c&apos;est déjà
-              rentabilisé (votre temps vaut bien plus que 19€ !).
+              rentabilisé (votre temps vaut bien plus que 19,99 € !).
             </p>
           </div>
 
@@ -1944,7 +1944,7 @@ export default function MaterielInformatiqueArticle() {
                     Solkant
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-semibold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3">
                     Gain de temps maximal
@@ -2010,7 +2010,7 @@ export default function MaterielInformatiqueArticle() {
                     Coût mensuel
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-bold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3"></td>
                 </tr>
@@ -2103,7 +2103,7 @@ export default function MaterielInformatiqueArticle() {
                     Solkant
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-semibold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3">
                     Même prix, même efficacité
@@ -2183,7 +2183,7 @@ export default function MaterielInformatiqueArticle() {
                     Coût mensuel
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 font-bold">
-                    19€/mois
+                    19,99 €/mois
                   </td>
                   <td className="border border-foreground/20 px-4 py-3"></td>
                 </tr>
@@ -2203,7 +2203,7 @@ export default function MaterielInformatiqueArticle() {
             </ul>
             <p className="text-foreground/80 font-semibold mt-3">
               <strong>Important :</strong> Même avec le budget premium, Solkant
-              reste à 19€/mois. Le logiciel n&apos;est pas plus cher parce que
+              reste à 19,99 €/mois. Le logiciel n&apos;est pas plus cher parce que
               votre MacBook coûte plus cher !
             </p>
           </div>
@@ -2251,13 +2251,13 @@ export default function MaterielInformatiqueArticle() {
                     Coût mensuel
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 text-center">
-                    19€
+                    19,99 €
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 text-center font-semibold bg-green-50">
-                    19€
+                    19,99 €
                   </td>
                   <td className="border border-foreground/20 px-4 py-3 text-center">
-                    19€
+                    19,99 €
                   </td>
                 </tr>
                 <tr>
@@ -2330,7 +2330,7 @@ export default function MaterielInformatiqueArticle() {
                 </h5>
                 <ul className="space-y-2 text-sm text-foreground/70">
                   <li>Matériel : 1000€ (une fois)</li>
-                  <li>Solkant : 19€ × 12 mois = 228€/an</li>
+                  <li>Solkant : 19,99 € × 12 mois = 228€/an</li>
                   <li>
                     <strong className="text-foreground">
                       Total 1ère année : 1228€

@@ -68,13 +68,13 @@ export default function PricingPage() {
               {
                 "@type": "Offer",
                 name: "Plan Pro",
-                price: "19",
+                price: "19.99",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
                 url: "https://solkant.com/pricing",
                 priceSpecification: {
                   "@type": "UnitPriceSpecification",
-                  price: "19",
+                  price: "19.99",
                   priceCurrency: "EUR",
                   unitText: "MONTH",
                 },
@@ -295,7 +295,7 @@ export default function PricingPage() {
                 Pour les instituts qui veulent optimiser leur gestion
               </p>
               <p className="mt-6">
-                <span className="text-4xl font-bold text-foreground">19 €</span>
+                <span className="text-4xl font-bold text-foreground">19,99 €</span>
                 <span className="text-muted-foreground">/mois</span>
               </p>
 
@@ -584,7 +584,7 @@ export default function PricingPage() {
                     name: "Comment fonctionne la facturation du plan Pro ?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Le plan Pro à 19€/mois est facturé mensuellement. Vous recevez une facture par email chaque mois. Vous pouvez annuler à tout moment sans frais supplémentaires. Aucune période d'engagement minimum n'est requise.",
+                      text: "Le plan Pro à 19,99 €/mois est facturé mensuellement. Vous recevez une facture par email chaque mois. Vous pouvez annuler à tout moment sans frais supplémentaires. Aucune période d'engagement minimum n'est requise.",
                     },
                   },
                   {
@@ -592,7 +592,7 @@ export default function PricingPage() {
                     name: "Y a-t-il des frais cachés ou des coûts supplémentaires ?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Non, aucun. Le prix affiché (0€ pour Gratuit, 19€ pour Pro) est le prix total. Il n'y a pas de frais d'installation, de configuration, ni de coûts supplémentaires par utilisateur ou par devis.",
+                      text: "Non, aucun. Le prix affiché (0€ pour Gratuit, 19,99 € pour Pro) est le prix total. Il n'y a pas de frais d'installation, de configuration, ni de coûts supplémentaires par utilisateur ou par devis.",
                     },
                   },
                   {
@@ -608,7 +608,7 @@ export default function PricingPage() {
                     name: "Proposez-vous des réductions pour les abonnements annuels ?",
                     acceptedAnswer: {
                       "@type": "Answer",
-                      text: "Actuellement, nous proposons uniquement des abonnements mensuels à 19€/mois. Nous prévoyons de proposer des tarifs annuels avec réduction dans le futur. Inscrivez-vous à notre newsletter pour être informé.",
+                      text: "Actuellement, nous proposons uniquement des abonnements mensuels à 19,99 €/mois. Nous prévoyons de proposer des tarifs annuels avec réduction dans le futur. Inscrivez-vous à notre newsletter pour être informé.",
                     },
                   },
                   {
@@ -665,7 +665,7 @@ export default function PricingPage() {
                 Comment fonctionne la facturation du plan Pro ?
               </h3>
               <p className="text-foreground/70">
-                Le plan Pro à 19€/mois est facturé mensuellement. Vous recevez
+                Le plan Pro à 19,99 €/mois est facturé mensuellement. Vous recevez
                 une facture par email chaque mois. Vous pouvez annuler à tout
                 moment sans frais supplémentaires. Aucune période
                 d&apos;engagement minimum n&apos;est requise.
@@ -678,7 +678,7 @@ export default function PricingPage() {
                 Y a-t-il des frais cachés ou des coûts supplémentaires ?
               </h3>
               <p className="text-foreground/70">
-                Non, aucun. Le prix affiché (0€ pour Gratuit, 19€ pour Pro) est
+                Non, aucun. Le prix affiché (0€ pour Gratuit, 19,99 € pour Pro) est
                 le prix total. Il n&apos;y a pas de frais d&apos;installation,
                 de configuration, ni de coûts supplémentaires par utilisateur ou
                 par devis.
@@ -705,7 +705,7 @@ export default function PricingPage() {
               </h3>
               <p className="text-foreground/70">
                 Actuellement, nous proposons uniquement des abonnements mensuels
-                à 19€/mois. Nous prévoyons de proposer des tarifs annuels avec
+                à 19,99 €/mois. Nous prévoyons de proposer des tarifs annuels avec
                 réduction dans le futur. Inscrivez-vous à notre newsletter pour
                 être informé.
               </p>

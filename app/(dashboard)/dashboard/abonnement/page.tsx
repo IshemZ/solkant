@@ -188,7 +188,7 @@ export default async function AbonnementPage() {
             <div className="mb-4">
               <h3 className="text-xl font-bold text-foreground">Pro</h3>
               <div className="mt-2">
-                <span className="text-3xl font-bold text-foreground">19 €</span>
+                <span className="text-3xl font-bold text-foreground">19,99 €</span>
                 <span className="text-muted-foreground">/mois</span>
               </div>
             </div>
