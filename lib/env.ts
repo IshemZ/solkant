@@ -96,6 +96,14 @@ const envSchema = z.object({
       "Active les fonctionnalités de paiement Stripe (optionnel, défaut: false)"
     ),
 
+  NEXT_PUBLIC_ENABLE_PAYMENTS: z
+    .string()
+    .optional()
+    .transform((val) => val === "true")
+    .describe(
+      "Active les paiements côté client (publique, doit matcher ENABLE_PAYMENTS)"
+    ),
+
   STRIPE_SECRET_KEY: z
     .string()
     .regex(
@@ -342,7 +350,11 @@ export const features = {
 
   /** Stripe payments activés */
   get stripePayments(): boolean {
-    if (typeof globalThis.window !== "undefined") return false; // Côté client
+    // Côté client : utiliser NEXT_PUBLIC_ENABLE_PAYMENTS
+    if (typeof globalThis.window !== "undefined") {
+      return process.env.NEXT_PUBLIC_ENABLE_PAYMENTS === "true";
+    }
+    // Côté serveur : vérifier toutes les variables
     const env = getEnv();
     return !!(
       env.ENABLE_PAYMENTS &&
