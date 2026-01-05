@@ -26,6 +26,7 @@ This file provides guidance to Claude Code when working with this repository.
 ## 🔴 CRITICAL: Multi-Tenant Security
 
 ### Data Model
+
 ```
 User (auth) → Business (1:1) → Clients, Services, Quotes (1:many)
 ```
@@ -41,7 +42,7 @@ Missing this filter = data leak between tenants.
 ```typescript
 // ✅ CORRECT
 const clients = await prisma.client.findMany({
-  where: { businessId: session.businessId }
+  where: { businessId: session.businessId },
 });
 
 // ❌ WRONG - DATA LEAK!
@@ -49,6 +50,7 @@ const clients = await prisma.client.findMany(); // Missing businessId filter
 ```
 
 **Auto-Business Creation:**
+
 - Google OAuth: Auto-creates User + Business with retry logic (3 attempts, exponential backoff)
 - Credentials: Requires manual Business creation post-registration
 - Recovery: `npx tsx scripts/fix-missing-business.ts` repairs orphaned users
@@ -62,31 +64,35 @@ const clients = await prisma.client.findMany(); // Missing businessId filter
 Solkant utilise **Google Tag Manager (GTM)** pour charger GA4 et gérer tous les événements analytics.
 
 **Pattern obligatoire:**
+
 ```typescript
 // ✅ CORRECT - via dataLayer
-import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAnalytics } from "@/hooks/useAnalytics";
 
 const { trackEvent } = useAnalytics();
-trackEvent('event_name', { param: 'value' });
+trackEvent("event_name", { param: "value" });
 
 // ❌ WRONG - gtag() direct
-window.gtag('event', 'event_name', { param: 'value' });
+window.gtag("event", "event_name", { param: "value" });
 ```
 
 ### Configuration Environnements
 
 **Development:**
+
 1. Créer container GTM dev dans https://tagmanager.google.com
 2. Configurer `.env.development` avec `NEXT_PUBLIC_GTM_ID="GTM-DEVXXXX"`
 3. Suivre [gtm-configuration-guide.md](docs/analytics/gtm-configuration-guide.md)
 
 **Production:**
-- GTM ID: `GTM-5KZL68FJ` (déjà configuré)
+
+- GTM ID: `GTM-5DCB78MC` (déjà configuré)
 - GA4 chargé VIA GTM (pas de NEXT_PUBLIC_GA_MEASUREMENT_ID)
 
 ### Validation Obligatoire
 
 Avant TOUT commit d'événement analytics:
+
 1. Tester avec GTM Preview Mode (voir [validation-guide.md](docs/analytics/validation-guide.md))
 2. Vérifier dans GA4 DebugView que l'événement arrive
 3. Confirmer AUCUNE duplication (1 événement = 1 tracking, pas 2)
@@ -102,15 +108,16 @@ All CRUD operations use Server Actions in `app/actions/` with action wrappers fr
 ### Use withAuth() or withAuthAndValidation()
 
 **Simple actions (no input validation):**
+
 ```typescript
 import { successResult } from "@/lib/action-types";
 
 export const deleteResource = withAuth(
   async (input: { id: string }, session) => {
     await prisma.resource.delete({
-      where: { id: input.id, businessId: session.businessId }
+      where: { id: input.id, businessId: session.businessId },
     });
-    revalidatePath('/dashboard/resources');
+    revalidatePath("/dashboard/resources");
     return successResult({ id: input.id });
   },
   "deleteResource"
@@ -118,23 +125,25 @@ export const deleteResource = withAuth(
 ```
 
 **Actions with validation:**
+
 ```typescript
 import { successResult } from "@/lib/action-types";
 
 export const createResource = withAuthAndValidation(
   async (input: CreateResourceInput, session) => {
     const resource = await prisma.resource.create({
-      data: { ...input, businessId: session.businessId }
+      data: { ...input, businessId: session.businessId },
     });
-    revalidatePath('/dashboard/resources');
+    revalidatePath("/dashboard/resources");
     return successResult(resource);
   },
   "createResource",
-  createResourceSchema  // Zod schema from lib/validations/
+  createResourceSchema // Zod schema from lib/validations/
 );
 ```
 
 **Benefits:**
+
 - ✅ Automatic session validation + `businessId` extraction
 - ✅ Consistent Zod validation with fieldErrors
 - ✅ Centralized error handling + Sentry logging
@@ -155,6 +164,7 @@ export const createResource = withAuthAndValidation(
 ## 🟡 Critical Gotchas
 
 1. **Route Params in Next.js 16**: `params` is a Promise
+
    ```typescript
    // ✅ CORRECT
    const { id } = await params;
