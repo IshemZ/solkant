@@ -13,6 +13,7 @@ Advanced technical reference for Claude Code. For critical rules, see [CLAUDE.md
 5. [External Integrations](#external-integrations)
 6. [Testing](#testing)
 7. [Quote Number Generation](#quote-number-generation)
+8. [Système d'Annonces (Nouveautés)](#système-dannonces-nouveautés)
 
 ---
 
@@ -784,3 +785,44 @@ async function generateQuoteNumber(businessId: string): Promise<string> {
 - Sequence resets each year
 - Zero-padded to 3 digits (001, 002, etc.)
 - Scoped per business (multi-tenant safe)
+
+---
+
+## Système d'Annonces (Nouveautés)
+
+### Configuration
+
+Les annonces sont définies dans `lib/announcements.ts` comme un array TypeScript.
+
+**Ajouter une nouvelle annonce :**
+
+1. Éditer `lib/announcements.ts`
+2. Ajouter un objet au début de l'array `announcements`
+3. Format :
+   ```typescript
+   {
+     id: "unique-slug-yyyy-mm",
+     publishedAt: new Date("YYYY-MM-DD"),
+     title: "Titre court et clair",
+     description: "1-2 phrases max, orientées bénéfice utilisateur",
+     actionLabel: "Verbe d'action", // optionnel
+     actionUrl: "/dashboard/path#anchor", // optionnel
+     badge: "new" | "feature" | "improvement" // optionnel
+   }
+   ```
+4. Commit et déployer
+
+### Logique du Badge
+
+- Badge visible si `max(annonces.publishedAt) > user.lastSeenAnnouncementsAt`
+- Disparaît 300ms après ouverture du panel
+- Affiche le nombre d'annonces non vues (max 10)
+
+### Tests
+
+Tests couvrent :
+- Helpers (`lib/__tests__/announcements.test.ts`)
+- Server Action (`app/actions/announcements.test.ts`)
+- Composant UI (`app/(dashboard)/dashboard/_components/__tests__/AnnouncementsPanel.test.tsx`)
+
+Run: `npm run test:run -- announcements`
