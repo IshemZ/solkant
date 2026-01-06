@@ -7,13 +7,12 @@
 
 export interface Announcement {
   id: string;
+  publishedAt: Date;
   title: string;
   description: string;
-  date: Date;
-}
-
-export interface VisibleAnnouncement extends Announcement {
-  isNew: boolean;
+  actionLabel?: string;
+  actionUrl?: string;
+  badge?: "new" | "feature" | "improvement";
 }
 
 /**
@@ -22,25 +21,31 @@ export interface VisibleAnnouncement extends Announcement {
  */
 export const announcements: Announcement[] = [
   {
-    id: 'forfaits-2025-01',
-    title: 'Nouveaux forfaits disponibles',
-    description:
-      'Créez des forfaits personnalisés pour vos clients réguliers. Parfait pour les abonnements mensuels ou les packages de prestations.',
-    date: new Date('2025-01-06T10:00:00Z'),
+    id: "forfaits-packs-2025-01",
+    publishedAt: new Date("2025-01-06"),
+    title: "Forfaits : packs + réduction automatique",
+    description: "Combine plusieurs services, choisis des quantités et applique une réduction automatiquement.",
+    actionLabel: "Créer un forfait",
+    actionUrl: "/dashboard/services#forfaits",
+    badge: "new",
   },
   {
-    id: 'payment-schedule-2025-01',
-    title: 'Paiements en plusieurs fois',
-    description:
-      'Proposez des paiements échelonnés à vos clients. Configurez le nombre d\'acomptes et les montants dans vos devis.',
-    date: new Date('2025-01-05T09:00:00Z'),
+    id: "payment-installments-2025-01",
+    publishedAt: new Date("2025-01-05"),
+    title: "Option paiement en 4 fois",
+    description: "Active l'affichage du paiement en 4x sur les devis (si proposé).",
+    actionLabel: "Activer",
+    actionUrl: "/dashboard/parametres#payment-installments",
+    badge: "feature",
   },
   {
-    id: 'pdf-prefix-2025-01',
-    title: 'Personnalisation des PDF',
-    description:
-      'Ajoutez un préfixe personnalisé à vos numéros de devis (ex: DEV-001). Configurez-le dans les paramètres de votre entreprise.',
-    date: new Date('2025-01-04T09:15:00Z'),
+    id: "pdf-prefix-2025-01",
+    publishedAt: new Date("2025-01-04"),
+    title: "Personnalise le nom de tes PDF",
+    description: "Définis un préfixe pour retrouver tes devis plus vite (ex : 'Laser Diode - …').",
+    actionLabel: "Choisir un préfixe",
+    actionUrl: "/dashboard/parametres#pdf-prefix",
+    badge: "feature",
   },
 ];
 
@@ -56,7 +61,7 @@ export function hasUnseenAnnouncements(lastSeenAt: Date | null): boolean {
   const newestAnnouncement = announcements[0];
   if (!newestAnnouncement) return false;
 
-  return newestAnnouncement.date > lastSeenAt;
+  return newestAnnouncement.publishedAt > lastSeenAt;
 }
 
 /**
@@ -68,7 +73,7 @@ export function hasUnseenAnnouncements(lastSeenAt: Date | null): boolean {
 export function getUnseenCount(lastSeenAt: Date | null): number {
   if (!lastSeenAt) return announcements.length;
 
-  return announcements.filter((announcement) => announcement.date > lastSeenAt)
+  return announcements.filter((announcement) => announcement.publishedAt > lastSeenAt)
     .length;
 }
 
@@ -80,9 +85,9 @@ export function getUnseenCount(lastSeenAt: Date | null): number {
  */
 export function getVisibleAnnouncements(
   lastSeenAt: Date | null
-): VisibleAnnouncement[] {
+): (Announcement & { isNew: boolean })[] {
   return announcements.map((announcement) => ({
     ...announcement,
-    isNew: !lastSeenAt || announcement.date > lastSeenAt,
+    isNew: !lastSeenAt || announcement.publishedAt > lastSeenAt,
   }));
 }

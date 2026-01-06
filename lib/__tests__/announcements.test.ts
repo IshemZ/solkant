@@ -13,17 +13,17 @@ describe('announcements', () => {
     });
 
     it('should have French titles', () => {
-      expect(announcements[0].title).toBe('Nouveaux forfaits disponibles');
-      expect(announcements[1].title).toBe('Paiements en plusieurs fois');
-      expect(announcements[2].title).toBe('Personnalisation des PDF');
+      expect(announcements[0].title).toBe('Forfaits : packs + réduction automatique');
+      expect(announcements[1].title).toBe('Option paiement en 4 fois');
+      expect(announcements[2].title).toBe('Personnalise le nom de tes PDF');
     });
 
     it('should have dates in descending order', () => {
-      expect(announcements[0].date.getTime()).toBeGreaterThan(
-        announcements[1].date.getTime()
+      expect(announcements[0].publishedAt.getTime()).toBeGreaterThan(
+        announcements[1].publishedAt.getTime()
       );
-      expect(announcements[1].date.getTime()).toBeGreaterThan(
-        announcements[2].date.getTime()
+      expect(announcements[1].publishedAt.getTime()).toBeGreaterThan(
+        announcements[2].publishedAt.getTime()
       );
     });
 
@@ -50,7 +50,7 @@ describe('announcements', () => {
     });
 
     it('should return false when lastSeenAt equals newest announcement', () => {
-      const newestDate = announcements[0].date;
+      const newestDate = announcements[0].publishedAt;
       expect(hasUnseenAnnouncements(newestDate)).toBe(false);
     });
   });
@@ -107,8 +107,8 @@ describe('announcements', () => {
     it('should return announcements in date descending order', () => {
       const visible = getVisibleAnnouncements(null);
       for (let i = 0; i < visible.length - 1; i++) {
-        expect(visible[i].date.getTime()).toBeGreaterThanOrEqual(
-          visible[i + 1].date.getTime()
+        expect(visible[i].publishedAt.getTime()).toBeGreaterThanOrEqual(
+          visible[i + 1].publishedAt.getTime()
         );
       }
     });
@@ -119,7 +119,7 @@ describe('announcements', () => {
         expect(v.id).toBe(announcements[i].id);
         expect(v.title).toBe(announcements[i].title);
         expect(v.description).toBe(announcements[i].description);
-        expect(v.date).toBe(announcements[i].date);
+        expect(v.publishedAt).toBe(announcements[i].publishedAt);
       });
     });
   });
