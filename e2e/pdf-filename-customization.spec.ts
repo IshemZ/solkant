@@ -10,7 +10,7 @@ import { loginUser } from "./helpers";
 test.describe("PDF Filename Customization", () => {
   const TEST_USER = {
     email: process.env.TEST_USER_EMAIL || "test@devisio.fr",
-    password: process.env.TEST_USER_PASSWORD || "TestPassword123!",
+    password: process.env.TEST_USER_PASSWORD || "TestPassword123!", // NOSONAR - test fallback only
   };
 
   test.skip(

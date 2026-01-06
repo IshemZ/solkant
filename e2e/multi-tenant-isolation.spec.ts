@@ -10,12 +10,12 @@ test.describe("🔒 Isolation Multi-Tenant E2E (CRITICAL)", () => {
   // Ces tests nécessitent 2 comptes de test pré-existants
   const TENANT1 = {
     email: process.env.TENANT1_EMAIL || "tenant1@devisio.fr",
-    password: process.env.TENANT1_PASSWORD || "TestPassword123!",
+    password: process.env.TENANT1_PASSWORD || "TestPassword123!", // NOSONAR - test fallback only
   };
 
   const TENANT2 = {
     email: process.env.TENANT2_EMAIL || "tenant2@devisio.fr",
-    password: process.env.TENANT2_PASSWORD || "TestPassword123!",
+    password: process.env.TENANT2_PASSWORD || "TestPassword123!", // NOSONAR - test fallback only
   };
 
   test.skip(

@@ -12,7 +12,7 @@ test.describe("Flow Complet - Création de Devis", () => {
   // Utiliser un compte de test pré-existant ou skip si non disponible
   const TEST_USER = {
     email: process.env.TEST_USER_EMAIL || "test@devisio.fr",
-    password: process.env.TEST_USER_PASSWORD || "TestPassword123!",
+    password: process.env.TEST_USER_PASSWORD || "TestPassword123!", // NOSONAR - test fallback only
   };
 
   test.skip(

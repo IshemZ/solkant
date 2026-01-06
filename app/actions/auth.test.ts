@@ -63,7 +63,9 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(true);
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
+      if ("error" in result) {
+        expect(result.error).toBeUndefined();
+      }
 
       // Vérifier que l'utilisateur a été recherché
       expect(prisma.user.findUnique).toHaveBeenCalledWith({
@@ -102,7 +104,9 @@ describe("Password Reset Server Actions", () => {
       // ✅ SÉCURITÉ: Retourner succès même si user n'existe pas
       // (protection contre l'énumération d'emails)
       expect(result.success).toBe(true);
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
+      if ("error" in result) {
+        expect(result.error).toBeUndefined();
+      }
 
       // Aucun token ne doit être créé
       expect(prisma.passwordResetToken.create).not.toHaveBeenCalled();
@@ -222,7 +226,11 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      if ("error" in result) { expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer."); }
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Une erreur est survenue. Veuillez réessayer."
+        );
+      }
       expect(Sentry.captureException).toHaveBeenCalled();
     });
   });
@@ -238,10 +246,11 @@ describe("Password Reset Server Actions", () => {
         createdAt: new Date(),
       };
 
+      // Test mock - not a real password
       const mockUser = {
         id: "user_123",
         email: "test@example.com",
-        password: "old_hashed_password",
+        password: "old_hashed_password", // NOSONAR
       };
 
       vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
@@ -258,12 +267,14 @@ describe("Password Reset Server Actions", () => {
       const result = await resetPasswordWithOTP({
         email: "test@example.com",
         code: "123456",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(result.success).toBe(true);
-      if ("error" in result) { expect(result.error).toBeUndefined(); }
+      if ("error" in result) {
+        expect(result.error).toBeUndefined();
+      }
 
       // Vérifier que le token a été recherché correctement
       expect(prisma.passwordResetToken.findFirst).toHaveBeenCalledWith({
@@ -290,8 +301,8 @@ describe("Password Reset Server Actions", () => {
       const result = await resetPasswordWithOTP({
         email: "test@example.com",
         code: "999999",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(result.success).toBe(false);
@@ -309,8 +320,8 @@ describe("Password Reset Server Actions", () => {
       const result = await resetPasswordWithOTP({
         email: "test@example.com",
         code: "123456",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(result.success).toBe(false);
@@ -327,8 +338,8 @@ describe("Password Reset Server Actions", () => {
       const result = await resetPasswordWithOTP({
         email: "test@example.com",
         code: "123456",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(result.success).toBe(false);
@@ -345,8 +356,8 @@ describe("Password Reset Server Actions", () => {
       await resetPasswordWithOTP({
         email: "  TEST@EXAMPLE.COM  ",
         code: "123456",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(prisma.passwordResetToken.findFirst).toHaveBeenCalledWith({
@@ -382,12 +393,14 @@ describe("Password Reset Server Actions", () => {
       const result = await resetPasswordWithOTP({
         email: "test@example.com",
         code: "123456",
-        newPassword: "NewPassword123!",
-        confirmPassword: "NewPassword123!",
+        newPassword: "NewPassword123!", // NOSONAR
+        confirmPassword: "NewPassword123!", // NOSONAR
       });
 
       expect(result.success).toBe(false);
-      if ("error" in result) { expect(result.error).toBe("Utilisateur introuvable."); }
+      if ("error" in result) {
+        expect(result.error).toBe("Utilisateur introuvable.");
+      }
     });
 
     it("should hash password with bcrypt before saving", async () => {
@@ -400,10 +413,11 @@ describe("Password Reset Server Actions", () => {
         createdAt: new Date(),
       };
 
+      // Test mock - not a real password
       const mockUser = {
         id: "user_123",
         email: "test@example.com",
-        password: "old_hashed_password",
+        password: "old_hashed_password", // NOSONAR
       };
 
       vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
@@ -443,10 +457,11 @@ describe("Password Reset Server Actions", () => {
         createdAt: new Date(),
       };
 
+      // Test mock - not a real password
       const mockUser = {
         id: "user_123",
         email: "test@example.com",
-        password: "old_hashed_password",
+        password: "old_hashed_password", // NOSONAR
       };
 
       vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
@@ -484,7 +499,11 @@ describe("Password Reset Server Actions", () => {
       });
 
       expect(result.success).toBe(false);
-      if ("error" in result) { expect(result.error).toBe("Une erreur est survenue. Veuillez réessayer."); }
+      if ("error" in result) {
+        expect(result.error).toBe(
+          "Une erreur est survenue. Veuillez réessayer."
+        );
+      }
       expect(Sentry.captureException).toHaveBeenCalled();
     });
   });
