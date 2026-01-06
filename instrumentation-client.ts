@@ -46,13 +46,14 @@ if (dsn) {
               blockAllMedia: true,
             })
           );
-        } catch {
-          // ne jamais casser le client
+        } catch (error) {
+          // ne jamais casser le client - intentionally silent
+          console.warn("Sentry replay integration failed:", error instanceof Error ? error.message : error);
         }
       }, 2000);
     }
-  } catch (e) {
-    console.warn("Sentry client init failed", e);
+  } catch (error) {
+    console.warn("Sentry client init failed:", error instanceof Error ? error.message : error);
   }
 }
 

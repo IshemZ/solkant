@@ -40,7 +40,7 @@ if (dsn) {
         },
       },
     });
-  } catch (e) {
-    console.warn("Sentry server init failed", e);
+  } catch (error) {
+    console.warn("Sentry server init failed:", error instanceof Error ? error.message : error);
   }
 }
