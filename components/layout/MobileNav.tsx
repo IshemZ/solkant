@@ -2,11 +2,18 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Session } from "next-auth";
 import { UserRole } from "@prisma/client";
 import * as Dialog from "@radix-ui/react-dialog";
 import SignOutButton from "./SignOutButton";
+import {
+  hasUnseenAnnouncements,
+  getUnseenCount,
+  getVisibleAnnouncements,
+} from "@/lib/announcements";
+import { markAnnouncementsAsSeen } from "@/app/actions/announcements";
+import AnnouncementsPanel from "@/app/(dashboard)/dashboard/_components/AnnouncementsPanel";
 
 interface MobileNavProps {
   userName?: string | null;
@@ -26,9 +33,28 @@ function getLinkClassName(isPrimary: boolean, isActive: boolean): string {
 
 export default function MobileNav({ userName, userEmail, session }: MobileNavProps) {
   const [open, setOpen] = useState(false);
+  const [announcementsPanelOpen, setAnnouncementsPanelOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  const navLinks = [
+  const lastSeenAt = session?.user?.lastSeenAnnouncementsAt ?? null;
+  const visibleAnnouncements = getVisibleAnnouncements(lastSeenAt);
+  const hasUnseen = hasUnseenAnnouncements(lastSeenAt);
+  const unseenCount = getUnseenCount(lastSeenAt);
+
+  const handleAnnouncementsOpened = async () => {
+    setOpen(false);
+    setAnnouncementsPanelOpen(true);
+    await markAnnouncementsAsSeen({});
+    router.refresh();
+  };
+
+  const navLinks: Array<{
+    href: string;
+    label: string;
+    primary?: boolean;
+    onClick?: () => void;
+  }> = [
     { href: "/dashboard", label: "Tableau de bord" },
     { href: "/dashboard/devis/nouveau", label: "Nouveau devis", primary: true },
     { href: "/dashboard/devis", label: "Mes devis" },
@@ -36,6 +62,11 @@ export default function MobileNav({ userName, userEmail, session }: MobileNavPro
     { href: "/dashboard/services", label: "Services" },
     { href: "/dashboard/abonnement", label: "Abonnement" },
     { href: "/dashboard/parametres", label: "Paramètres" },
+    {
+      href: "#announcements",
+      label: "Nouveautés",
+      onClick: handleAnnouncementsOpened,
+    },
   ];
 
   return (
@@ -107,11 +138,19 @@ export default function MobileNav({ userName, userEmail, session }: MobileNavPro
             <nav className="flex-1 space-y-2">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
+                const isAnnouncements = link.href === "#announcements";
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                      if (link.onClick) {
+                        e.preventDefault();
+                        link.onClick();
+                      } else {
+                        setOpen(false);
+                      }
+                    }}
                     className={getLinkClassName(!!link.primary, isActive)}
                   >
                     {link.primary && (
@@ -129,7 +168,27 @@ export default function MobileNav({ userName, userEmail, session }: MobileNavPro
                         />
                       </svg>
                     )}
-                    {link.label}
+                    {isAnnouncements && (
+                      <svg
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M13 10V3L4 14h7v7l9-11h-7z"
+                        />
+                      </svg>
+                    )}
+                    <span className="flex-1">{link.label}</span>
+                    {isAnnouncements && hasUnseen && unseenCount > 0 && (
+                      <span className="inline-flex items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white min-w-[1.25rem]">
+                        {unseenCount}
+                      </span>
+                    )}
                   </Link>
                 );
               })}
@@ -164,6 +223,12 @@ export default function MobileNav({ userName, userEmail, session }: MobileNavPro
           </div>
         </Dialog.Content>
       </Dialog.Portal>
+      <AnnouncementsPanel
+        isOpen={announcementsPanelOpen}
+        onClose={() => setAnnouncementsPanelOpen(false)}
+        announcements={visibleAnnouncements}
+        onOpened={() => {}}
+      />
     </Dialog.Root>
   );
 }

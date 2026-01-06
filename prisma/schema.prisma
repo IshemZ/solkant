@@ -23,11 +23,12 @@ model User {
   image             String?
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
-  tokenExpiry       DateTime?
-  verificationToken String?   @unique
-  accounts          Account[]
-  business          Business?
-  sessions          Session[]
+  tokenExpiry              DateTime?
+  verificationToken        String?   @unique
+  lastSeenAnnouncementsAt  DateTime?
+  accounts                 Account[]
+  business                 Business?
+  sessions                 Session[]
 
   @@map("users")
 }
