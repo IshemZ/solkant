@@ -20,7 +20,7 @@ import {
 import { safeParsePrice } from "@/lib/number-utils";
 
 interface UseQuoteFormProps {
-  mode: 'create' | 'edit';
+  mode: "create" | "edit";
   initialQuote?: QuoteWithItems;
   clients: Client[];
   services: SerializedService[];
@@ -40,11 +40,11 @@ export function useQuoteForm({
 
   // Form state - use lazy initialization for edit mode
   const [selectedClientId, setSelectedClientId] = useState(() =>
-    mode === 'edit' && initialQuote ? initialQuote.clientId || "" : ""
+    mode === "edit" && initialQuote ? initialQuote.clientId || "" : ""
   );
 
   const [items, setItems] = useState<QuoteItemInput[]>(() =>
-    mode === 'edit' && initialQuote
+    mode === "edit" && initialQuote
       ? initialQuote.items.map((item) => ({
           id: crypto.randomUUID(), // Generate unique ID for React keys
           serviceId: item.serviceId || undefined,
@@ -60,15 +60,17 @@ export function useQuoteForm({
   );
 
   const [discount, setDiscount] = useState(() =>
-    mode === 'edit' && initialQuote ? Number(initialQuote.discount) : 0
+    mode === "edit" && initialQuote ? Number(initialQuote.discount) : 0
   );
 
   const [discountType, setDiscountType] = useState<DiscountType>(() =>
-    mode === 'edit' && initialQuote ? initialQuote.discountType as DiscountType : "FIXED"
+    mode === "edit" && initialQuote
+      ? (initialQuote.discountType as DiscountType)
+      : "FIXED"
   );
 
   const [notes, setNotes] = useState(() =>
-    mode === 'edit' && initialQuote ? initialQuote.notes || "" : ""
+    mode === "edit" && initialQuote ? initialQuote.notes || "" : ""
   );
 
   const [validUntil, setValidUntil] = useState("");
@@ -162,7 +164,9 @@ export function useQuoteForm({
 
     // Use shared utilities for package calculations
     const basePrice = safeParsePrice(calculatePackageBasePrice(pkg));
-    const packageDiscount = safeParsePrice(calculatePackageDiscount(pkg, basePrice));
+    const packageDiscount = safeParsePrice(
+      calculatePackageDiscount(pkg, basePrice)
+    );
     const servicesDescription = createPackageServicesDescription(pkg);
     const quantity = 1;
 
@@ -202,7 +206,8 @@ export function useQuoteForm({
 
     // Recalculate total for this item
     if (field === "price" || field === "quantity") {
-      newItems[index].total = Number(newItems[index].price) * Number(newItems[index].quantity);
+      newItems[index].total =
+        Number(newItems[index].price) * Number(newItems[index].quantity);
     }
 
     setItems(newItems);
@@ -213,95 +218,105 @@ export function useQuoteForm({
     setItems(items.filter((_, i) => i !== index));
   }
 
+  // Validation helper
+  function validateForm(): string | null {
+    if (!selectedClientId) return "Veuillez sélectionner un client";
+    if (items.length === 0) return "Veuillez ajouter au moins un article";
+    return null;
+  }
+
+  // Build quote payload - strip UI-only id field from items
+  function buildQuotePayload() {
+    return {
+      clientId: selectedClientId,
+      items: items.map(({ id: _id, ...item }) => item),
+      discount,
+      discountType,
+      notes: notes || undefined,
+      ...(mode === "create" && validUntil
+        ? { validUntil: new Date(validUntil) }
+        : {}),
+    };
+  }
+
+  // Categorize total amount into buckets for analytics
+  function getTotalAmountBucket(totalAmount: number): string {
+    if (totalAmount < 500) return "<500";
+    if (totalAmount <= 1000) return "500-1000";
+    return ">1000";
+  }
+
+  // Track analytics for successful quote creation
+  function trackQuoteCreationAnalytics(
+    resultData: QuoteWithRelationsAndAnalytics
+  ) {
+    trackEvent("create_quote", {
+      page_category: "dashboard",
+      num_services: items.length,
+      total_amount_bucket: getTotalAmountBucket(total),
+    });
+
+    if (resultData.isFirstQuote) {
+      trackEvent("create_first_quote", { page_category: "dashboard" });
+    }
+  }
+
+  // Handle submission error
+  function handleSubmitError(errorMessage: string) {
+    setError(errorMessage);
+    const errorToast =
+      mode === "create"
+        ? "Erreur lors de la création du devis"
+        : "Erreur lors de la modification du devis";
+    toast.error(errorToast);
+
+    if (mode === "create") {
+      trackEvent("dashboard_error", {
+        error_type: "quote_creation_failed",
+        page_category: "dashboard",
+      });
+    }
+    setIsLoading(false);
+  }
+
+  // Handle submission success
+  function handleSubmitSuccess(resultData: QuoteWithRelationsAndAnalytics) {
+    const successToast =
+      mode === "create"
+        ? `Devis ${resultData.quoteNumber} créé avec succès`
+        : `Devis ${resultData.quoteNumber} modifié avec succès`;
+    toast.success(successToast);
+
+    if (mode === "create") {
+      trackQuoteCreationAnalytics(resultData);
+    }
+
+    router.push(`/dashboard/devis/${resultData.id}`);
+  }
+
   // Form submission
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    // Validation
-    if (!selectedClientId) {
-      setError("Veuillez sélectionner un client");
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
       setIsLoading(false);
       return;
     }
 
-    if (items.length === 0) {
-      setError("Veuillez ajouter au moins un article");
-      setIsLoading(false);
-      return;
-    }
-
-    // Build payload - strip UI-only id field from items
-    const quoteData = {
-      clientId: selectedClientId,
-      items: items.map(({ id: _id, ...item }) => item),
-      discount,
-      discountType,
-      notes: notes || undefined,
-      ...(mode === 'create' && validUntil ? { validUntil: new Date(validUntil) } : {}),
-    };
-
-    // Call appropriate action
-    const result = mode === 'create'
-      ? await createQuote(quoteData)
-      : await updateQuote({ ...quoteData, id: initialQuote!.id });
+    const quotePayload = buildQuotePayload();
+    const result =
+      mode === "create"
+        ? await createQuote(quotePayload)
+        : await updateQuote({ ...quotePayload, id: initialQuote!.id });
 
     if (!result.success) {
-      setError(result.error);
-      toast.error(
-        mode === 'create'
-          ? "Erreur lors de la création du devis"
-          : "Erreur lors de la modification du devis"
-      );
-
-      // Track dashboard error for quote creation/update
-      if (mode === 'create') {
-        trackEvent("dashboard_error", {
-          error_type: "quote_creation_failed",
-          page_category: "dashboard",
-        });
-      }
-
-      setIsLoading(false);
+      handleSubmitError(result.error);
     } else {
-      toast.success(
-        mode === 'create'
-          ? `Devis ${result.data.quoteNumber} créé avec succès`
-          : `Devis ${result.data.quoteNumber} modifié avec succès`
-      );
-
-      // Track analytics event for quote creation (not for edits)
-      if (mode === 'create') {
-        const numServices = items.length;
-        const totalAmount = total;
-
-        // Categorize total amount into buckets for better analytics
-        let totalAmountBucket: string;
-        if (totalAmount < 500) {
-          totalAmountBucket = '<500';
-        } else if (totalAmount >= 500 && totalAmount <= 1000) {
-          totalAmountBucket = '500-1000';
-        } else {
-          totalAmountBucket = '>1000';
-        }
-
-        trackEvent("create_quote", {
-          page_category: "dashboard",
-          num_services: numServices,
-          total_amount_bucket: totalAmountBucket,
-        });
-
-        // Track first-time activation milestone
-        const quoteData = result.data as QuoteWithRelationsAndAnalytics;
-        if (quoteData.isFirstQuote) {
-          trackEvent("create_first_quote", {
-            page_category: "dashboard",
-          });
-        }
-      }
-
-      router.push(`/dashboard/devis/${result.data.id}`);
+      handleSubmitSuccess(result.data as QuoteWithRelationsAndAnalytics);
     }
   }
 
