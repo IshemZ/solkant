@@ -26,7 +26,7 @@ async function main() {
     {
       userName: "Marie Dupont",
       userEmail: "marie@example.com",
-      userPassword: "TestPassword123!",
+      userPassword: "TestPassword123!", // NOSONAR
       businessName: "Salon Beauté Marie",
       businessCity: "Paris",
       clients: [
@@ -59,7 +59,7 @@ async function main() {
     {
       userName: "Jean Moreau",
       userEmail: "jean@example.com",
-      userPassword: "TestPassword456!",
+      userPassword: "TestPassword456!", // NOSONAR
       businessName: "Coiffure Prestige",
       businessCity: "Lyon",
       clients: [
@@ -84,7 +84,7 @@ async function main() {
     {
       userName: "Caroline Lefebvre",
       userEmail: "caroline@example.com",
-      userPassword: "TestPassword789!",
+      userPassword: "TestPassword789!", // NOSONAR
       businessName: "Institut Wellness",
       businessCity: "Marseille",
       clients: [

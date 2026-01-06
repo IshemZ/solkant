@@ -32,7 +32,7 @@ import { z } from "zod";
  * Pattern: withAuth (pas de validation complexe)
  */
 export const getClients = withAuth(
-  async (input: {}, session) => {
+  async (_input: void, session) => {
     const clients = await prisma.client.findMany({
       where: { businessId: session.businessId },
       orderBy: { createdAt: "desc" },
@@ -227,7 +227,7 @@ export const getClientById = withAuthAndValidation(
  * Pattern: withAuth (ou withAuthUnverified - identique maintenant)
  */
 export const getUserPreferences = withAuth(
-  async (input: {}, session) => {
+  async (_input: void, session) => {
     const { userId } = session;
 
     // Récupérer préférences depuis la base

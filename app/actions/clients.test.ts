@@ -47,7 +47,7 @@ import { revalidatePath } from "next/cache";
 
 // Import des mocks
 import prisma from "@/lib/prisma";
-import { createMockClient } from "@/tests/helpers/test-data";
+import { createMockClient } from "@/lib/__tests__/helpers/test-data";
 
 describe("Client Actions", () => {
   const mockSession = {

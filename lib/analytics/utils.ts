@@ -42,17 +42,12 @@ export function parseSignUpErrorType(errorMessage: string): string {
 /**
  * Sanitize error message for GA4 tracking (remove sensitive data)
  */
-export function sanitizeErrorMessage(
-  message: string,
-  maxLength = 100
-): string {
+export function sanitizeErrorMessage(message: string, maxLength = 100): string {
   // Supprimer infos sensibles potentielles
+  // Utiliser des regex atomiques avec limites pour éviter le ReDoS
   const sanitized = message
-    .replace(
-      /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-      "[email]"
-    ) // Masquer emails
-    .replace(/\b\d{13,19}\b/g, "[number]") // Masquer longs nombres (potentiels tokens)
+    .replaceAll(/[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{1,64}/g, "[email]") // Masquer emails avec limites strictes
+    .replaceAll(/\b\d{13,19}\b/g, "[number]") // Masquer longs nombres (potentiels tokens)
     .substring(0, maxLength);
 
   return sanitized;

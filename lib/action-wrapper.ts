@@ -166,35 +166,8 @@ export function withAuthUnverified<TInput, TOutput>(
   actionName: string,
   errorMessage?: string
 ) {
-  return async (input: TInput): Promise<ActionResult<TOutput>> => {
-    // Validate session (identical to withAuth now that email verification is removed)
-    const validatedSession = await validateSessionWithEmail();
-    if ("error" in validatedSession) {
-      return errorResult(validatedSession.error);
-    }
-
-    try {
-      return await handler(input, validatedSession);
-    } catch (error) {
-      // BusinessError: preserve user-facing message
-      if (error instanceof BusinessError) {
-        return errorResult(error.message, error.code);
-      }
-
-      // Technical errors: log to Sentry and return generic message
-      const Sentry = await import("@sentry/nextjs");
-      Sentry.captureException(error, {
-        tags: { action: actionName, businessId: validatedSession.businessId },
-        extra: { input },
-      });
-
-      if (process.env.NODE_ENV === "development") {
-        console.error(`Error in ${actionName}:`, error);
-      }
-
-      return errorResult(errorMessage || `Erreur lors de ${actionName}`);
-    }
-  };
+  // Delegate to withAuth - no longer any difference since email verification was removed
+  return withAuth(handler, actionName, errorMessage);
 }
 
 /**

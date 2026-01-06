@@ -6,6 +6,42 @@
 import { test, expect, type Page } from "@playwright/test";
 import { loginUser } from "./helpers";
 
+/**
+ * Helper: Create a test quote and return its ID
+ * @deprecated Not currently used - kept for future test scenarios
+ */
+async function _createTestQuote(
+  page: Page,
+  _clientName: { firstName: string; lastName: string }
+): Promise<string> {
+  // Navigate to quotes
+  await page.goto("/dashboard/devis");
+
+  // Click "Nouveau devis"
+  await page.click('a[href*="/devis/nouveau"]');
+  await page.waitForURL(/\/devis\/nouveau/);
+
+  // Select a client (assumes client exists or create one)
+  // For simplicity, we'll select the first client in the dropdown
+  const clientSelect = page.locator('select[name="clientId"]');
+  await clientSelect.selectOption({ index: 1 });
+
+  // Fill basic quote info
+  await page.fill('input[name="title"]', "Test Quote");
+  await page.fill('textarea[name="notes"]', "Test notes");
+
+  // Submit form
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect to quote detail page
+  await page.waitForURL(/\/devis\/[a-z0-9]+/);
+
+  // Extract quote ID from URL
+  const url = page.url();
+  const match = /\/devis\/([a-z0-9]+)/.exec(url);
+  return match ? match[1] : "";
+}
+
 // NOTE: Ces tests nécessitent un environnement de test avec base de données
 test.describe("PDF Filename Customization", () => {
   const TEST_USER = {
@@ -38,42 +74,6 @@ test.describe("PDF Filename Customization", () => {
 
     // Wait for success message or page reload
     await page.waitForTimeout(1000);
-  }
-
-  /**
-   * Helper: Create a test quote and return its ID
-   * @deprecated Not currently used - kept for future test scenarios
-   */
-  async function _createTestQuote(
-    page: Page,
-    _clientName: { firstName: string; lastName: string }
-  ): Promise<string> {
-    // Navigate to quotes
-    await page.goto("/dashboard/devis");
-
-    // Click "Nouveau devis"
-    await page.click('a[href*="/devis/nouveau"]');
-    await page.waitForURL(/\/devis\/nouveau/);
-
-    // Select a client (assumes client exists or create one)
-    // For simplicity, we'll select the first client in the dropdown
-    const clientSelect = page.locator('select[name="clientId"]');
-    await clientSelect.selectOption({ index: 1 });
-
-    // Fill basic quote info
-    await page.fill('input[name="title"]', "Test Quote");
-    await page.fill('textarea[name="notes"]', "Test notes");
-
-    // Submit form
-    await page.click('button[type="submit"]');
-
-    // Wait for redirect to quote detail page
-    await page.waitForURL(/\/devis\/[a-z0-9]+/);
-
-    // Extract quote ID from URL
-    const url = page.url();
-    const match = /\/devis\/([a-z0-9]+)/.exec(url);
-    return match ? match[1] : "";
   }
 
   /**
@@ -120,7 +120,9 @@ test.describe("PDF Filename Customization", () => {
     expect(value.length).toBeLessThanOrEqual(25);
   });
 
-  test("Scenario 2: Validation - Accepts exactly 25 characters", async ({ page }) => {
+  test("Scenario 2: Validation - Accepts exactly 25 characters", async ({
+    page,
+  }) => {
     await page.goto("/dashboard/parametres");
 
     const input = page.locator('input[name="pdfFileNamePrefix"]');
@@ -138,7 +140,9 @@ test.describe("PDF Filename Customization", () => {
     expect(savedValue).toBe(exactly25);
   });
 
-  test("Scenario 3: Validation - Accepts empty/null value", async ({ page }) => {
+  test("Scenario 3: Validation - Accepts empty/null value", async ({
+    page,
+  }) => {
     await page.goto("/dashboard/parametres");
 
     const input = page.locator('input[name="pdfFileNamePrefix"]');
@@ -156,7 +160,9 @@ test.describe("PDF Filename Customization", () => {
     expect(savedValue).toBe("");
   });
 
-  test("Scenario 4: PDF Generation - Full happy path with prefix", async ({ page }) => {
+  test("Scenario 4: PDF Generation - Full happy path with prefix", async ({
+    page,
+  }) => {
     // Set a custom prefix
     await setPdfFileNamePrefix(page, "Devis Laser Diode");
 
@@ -179,10 +185,14 @@ test.describe("PDF Filename Customization", () => {
 
     // Filename should match pattern: "Devis Laser Diode - LastName FirstName.pdf"
     // Or fallback to "DEVIS-YYYY-NNN.pdf" if no client
-    expect(filename).toMatch(/^(Devis Laser Diode - .+\.pdf|DEVIS-\d{4}-\d{3}\.pdf)$/);
+    expect(filename).toMatch(
+      /^(Devis Laser Diode - .+\.pdf|DEVIS-\d{4}-\d{3}\.pdf)$/
+    );
   });
 
-  test("Scenario 5: PDF Generation - No prefix (fallback)", async ({ page }) => {
+  test("Scenario 5: PDF Generation - No prefix (fallback)", async ({
+    page,
+  }) => {
     // Clear the prefix
     await setPdfFileNamePrefix(page, null);
 
@@ -206,7 +216,9 @@ test.describe("PDF Filename Customization", () => {
     expect(filename).toMatch(/^DEVIS-\d{4}-\d{3}\.pdf$/);
   });
 
-  test("Scenario 6: PDF Generation - Special characters (accents)", async ({ page }) => {
+  test("Scenario 6: PDF Generation - Special characters (accents)", async ({
+    page,
+  }) => {
     // Set prefix with French accented characters
     const prefixWithAccents = "Devis Éclat & Beauté";
     await setPdfFileNamePrefix(page, prefixWithAccents);
@@ -232,7 +244,9 @@ test.describe("PDF Filename Customization", () => {
     expect(filename.endsWith(".pdf")).toBe(true);
   });
 
-  test("Scenario 7: Persistence - Value survives page refresh", async ({ page }) => {
+  test("Scenario 7: Persistence - Value survives page refresh", async ({
+    page,
+  }) => {
     const testPrefix = "Test Persistence";
 
     // Set prefix
@@ -250,7 +264,9 @@ test.describe("PDF Filename Customization", () => {
     expect(savedValue).toBe(testPrefix);
   });
 
-  test("Scenario 8: Regression - Other business settings still save", async ({ page }) => {
+  test("Scenario 8: Regression - Other business settings still save", async ({
+    page,
+  }) => {
     await page.goto("/dashboard/parametres");
 
     // Update business name

@@ -21,7 +21,7 @@ import { revalidatePath } from 'next/cache';
 
 // Import des mocks et helpers
 import { prismaMock } from '@/lib/__mocks__/prisma';
-import { mockSession, mockOtherSession, createMockClient } from '@/tests/helpers/test-data';
+import { mockSession, mockOtherSession, createMockClient } from '@/lib/__tests__/helpers/test-data';
 
 // Mock du module Prisma pour utiliser prismaMock
 vi.mock('@/lib/prisma', () => ({

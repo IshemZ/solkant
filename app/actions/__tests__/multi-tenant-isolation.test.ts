@@ -14,7 +14,7 @@ import { getServerSession } from "next-auth";
 import {
   createMultiTenantSessions,
   assertBusinessIdIsolation,
-} from "../helpers/session-mock";
+} from "@/lib/__tests__/helpers/session-mock";
 import { Decimal } from "@prisma/client/runtime/library";
 
 // Mock dependencies

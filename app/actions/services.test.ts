@@ -37,7 +37,7 @@ import { revalidatePath } from "next/cache";
 
 // Import des mocks
 import prisma from "@/lib/prisma";
-import { createMockService } from "@/tests/helpers/test-data";
+import { createMockService } from "@/lib/__tests__/helpers/test-data";
 import { Decimal } from "@prisma/client/runtime/library";
 
 describe("Service Actions", () => {

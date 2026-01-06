@@ -10,8 +10,8 @@
  * 4. Affiche un résumé des migrations à appliquer
  */
 
-const { execSync } = require("child_process");
-const readline = require("readline");
+import { execSync } from "node:child_process";
+import readline from "node:readline";
 
 // Couleurs pour la console
 const colors = {
@@ -22,6 +22,12 @@ const colors = {
   blue: "\x1b[34m",
   magenta: "\x1b[35m",
   cyan: "\x1b[36m",
+};
+
+// Environnement sécurisé avec PATH fixe (répertoires non modifiables uniquement)
+const secureEnv = {
+  ...process.env,
+  PATH: "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
 };
 
 function log(message, color = "reset") {
@@ -93,6 +99,7 @@ function getMigrationStatus() {
     const status = execSync("npx prisma migrate status", {
       encoding: "utf-8",
       stdio: "pipe",
+      env: secureEnv,
     });
     console.log(status);
     return status;
@@ -129,6 +136,7 @@ function runMigrations({ skipConfirmation = false }) {
     execSync("npx prisma migrate deploy", {
       encoding: "utf-8",
       stdio: "inherit",
+      env: secureEnv,
     });
 
     success("Migrations appliquées avec succès !");
@@ -138,6 +146,7 @@ function runMigrations({ skipConfirmation = false }) {
     execSync("npx prisma migrate status", {
       encoding: "utf-8",
       stdio: "inherit",
+      env: secureEnv,
     });
 
     return true;
@@ -229,11 +238,9 @@ process.on("unhandledRejection", (err) => {
   error(`Promesse rejetée: ${err.message}`);
 });
 
-// Exécuter le script
-if (require.main === module) {
-  main().catch((err) => {
-    error(`Erreur fatale: ${err.message}`);
-  });
-}
+// Exécuter le script (ESM: le script s'exécute toujours directement)
+main().catch((err) => {
+  error(`Erreur fatale: ${err.message}`);
+});
 
-module.exports = { main };
+export { main };

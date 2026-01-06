@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useForm, useFieldArray, Controller } from "react-hook-form";
+import { useForm, useFieldArray, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -71,7 +71,6 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     register,
     handleSubmit,
     control,
-    watch,
     formState: { errors, isSubmitting },
     setError,
   } = form;
@@ -98,10 +97,10 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     loadServices();
   }, []);
 
-  // Watch form values for price calculation
-  const watchedItems = watch("items");
-  const watchedDiscountType = watch("discountType");
-  const watchedDiscountValue = watch("discountValue");
+  // Watch form values for price calculation using useWatch for better performance
+  const watchedItems = useWatch({ control, name: "items" });
+  const watchedDiscountType = useWatch({ control, name: "discountType" });
+  const watchedDiscountValue = useWatch({ control, name: "discountValue" });
 
   // Calculate prices
   function calculateBasePrice(): number {
@@ -126,7 +125,10 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
     try {
       const result =
         isEdit && initialData
-          ? await updatePackage({ id: initialData.id, ...data } as CreatePackageInput & { id: string })
+          ? await updatePackage({
+              id: initialData.id,
+              ...data,
+            } as CreatePackageInput & { id: string })
           : await createPackage(data as CreatePackageInput);
 
       if (!result.success) {
@@ -143,9 +145,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
         }
       } else {
         toast.success(
-          isEdit
-            ? "Forfait modifié avec succès"
-            : "Forfait créé avec succès"
+          isEdit ? "Forfait modifié avec succès" : "Forfait créé avec succès"
         );
         router.push("/dashboard/services?tab=packages");
         router.refresh();
@@ -207,9 +207,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
               rows={3}
               aria-invalid={!!errors.description}
               aria-describedby={
-                errors.description
-                  ? "description-error"
-                  : "description-hint"
+                errors.description ? "description-error" : "description-hint"
               }
             />
           </FormField>
@@ -268,7 +266,8 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                   (s) => s.id === watchedItems?.[index]?.serviceId
                 );
                 const itemTotal = service
-                  ? Number(service.price) * (watchedItems?.[index]?.quantity || 1)
+                  ? Number(service.price) *
+                    (watchedItems?.[index]?.quantity || 1)
                   : 0;
 
                 return (
@@ -326,9 +325,7 @@ export default function PackageForm({ initialData, mode }: PackageFormProps) {
                             {...register(`items.${index}.quantity`, {
                               valueAsNumber: true,
                             })}
-                            aria-invalid={
-                              !!errors.items?.[index]?.quantity
-                            }
+                            aria-invalid={!!errors.items?.[index]?.quantity}
                           />
                         </FormField>
                       </div>

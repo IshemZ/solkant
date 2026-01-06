@@ -10,9 +10,9 @@ function Table({ className, ...props }: Readonly<React.ComponentProps<"table">>)
       data-slot="table-container"
       className="relative w-full overflow-x-auto"
     >
-      {/* NOSONAR: typescript:S5256 - This is a primitive component; headers are provided via children */}
       <table
         data-slot="table"
+        role="table"
         className={cn("w-full caption-bottom text-sm", className)}
         {...props}
       />

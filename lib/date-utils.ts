@@ -3,11 +3,14 @@
  * Évite les problèmes d'hydratation en normalisant les dates entre serveur et client
  */
 
+/** Type pour les valeurs de date acceptées */
+type DateInput = Date | string | null | undefined;
+
 /**
  * Formate une date de manière cohérente entre serveur et client
  * Utilise UTC pour éviter les problèmes de timezone lors de l'hydratation
  */
-export function formatDate(date: Date | string | null | undefined): string {
+export function formatDate(date: DateInput): string {
   // Gérer les valeurs nulles/undefined
   if (!date) {
     return "—";
@@ -31,7 +34,7 @@ export function formatDate(date: Date | string | null | undefined): string {
 /**
  * Formate une date avec l'heure de manière cohérente
  */
-export function formatDateTime(date: Date | string | null | undefined): string {
+export function formatDateTime(date: DateInput): string {
   // Gérer les valeurs nulles/undefined
   if (!date) {
     return "—";
@@ -54,7 +57,7 @@ export function formatDateTime(date: Date | string | null | undefined): string {
 /**
  * Formate une date au format ISO (YYYY-MM-DD) pour les inputs
  */
-export function formatDateISO(date: Date | string | null | undefined): string {
+export function formatDateISO(date: DateInput): string {
   // Gérer les valeurs nulles/undefined
   if (!date) {
     return "";

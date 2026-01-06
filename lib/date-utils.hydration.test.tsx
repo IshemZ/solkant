@@ -96,7 +96,8 @@ describe("Hydration Safety", () => {
 
     it("ne devrait PAS utiliser Math.random() dans le rendu", () => {
       // ❌ Mauvais : différent à chaque rendu
-      const badRender = () => `Random: ${Math.random()}`;
+      // Test démontrant l'anti-pattern - usage intentionnel
+      const badRender = () => `Random: ${Math.random()}`; // NOSONAR - intentional demo of anti-pattern
 
       const result1 = badRender();
       const result2 = badRender();
@@ -199,7 +200,9 @@ describe("Hydration Safety", () => {
         <div className="rounded-lg border border-foreground/10 bg-background p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">{label}</p>
+              <p className="text-sm font-medium text-muted-foreground">
+                {label}
+              </p>
               <p className="mt-2 text-3xl font-bold text-foreground">{value}</p>
             </div>
           </div>
