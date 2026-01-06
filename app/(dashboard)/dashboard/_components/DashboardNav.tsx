@@ -1,11 +1,19 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Session } from "next-auth";
 import { UserRole } from "@prisma/client";
 import SignOutButton from "@/components/layout/SignOutButton";
 import MobileNav from "@/components/layout/MobileNav";
+import {
+  hasUnseenAnnouncements,
+  getUnseenCount,
+  getVisibleAnnouncements,
+} from "@/lib/announcements";
+import { markAnnouncementsAsSeen } from "@/app/actions/announcements";
+import AnnouncementsPanel from "./AnnouncementsPanel";
 
 interface DashboardNavProps {
   userName?: string | null;
@@ -19,6 +27,19 @@ export default function DashboardNav({
   session,
 }: DashboardNavProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [announcementsPanelOpen, setAnnouncementsPanelOpen] = useState(false);
+
+  const lastSeenAt = session?.user?.lastSeenAnnouncementsAt ?? null;
+  const visibleAnnouncements = getVisibleAnnouncements(lastSeenAt);
+  const hasUnseen = hasUnseenAnnouncements(lastSeenAt);
+  const unseenCount = getUnseenCount(lastSeenAt);
+
+  const handleAnnouncementsOpened = async () => {
+    setAnnouncementsPanelOpen(true);
+    await markAnnouncementsAsSeen({});
+    router.refresh();
+  };
 
   return (
     <header className="border-b border-foreground/10 bg-background">
@@ -121,6 +142,32 @@ export default function DashboardNav({
               >
                 Paramètres
               </Link>
+              <button
+                onClick={handleAnnouncementsOpened}
+                className="relative text-sm font-medium text-muted-foreground transition-colors hover:text-foreground flex items-center gap-1.5"
+                aria-label="Nouveautes de la plateforme"
+              >
+                <svg
+                  className="h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  />
+                </svg>
+                Nouveautés
+                {hasUnseen && unseenCount > 0 && (
+                  <span className="inline-flex items-center justify-center rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white min-w-[1.25rem]">
+                    {unseenCount}
+                  </span>
+                )}
+              </button>
               {session?.user?.role === UserRole.SUPER_ADMIN && (
                 <Link
                   href="/admin"
@@ -158,6 +205,12 @@ export default function DashboardNav({
           </div>
         </div>
       </div>
+      <AnnouncementsPanel
+        isOpen={announcementsPanelOpen}
+        onClose={() => setAnnouncementsPanelOpen(false)}
+        announcements={visibleAnnouncements}
+        onOpened={() => {}}
+      />
     </header>
   );
 }

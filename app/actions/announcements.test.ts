@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { markAnnouncementsAsSeen } from "./announcements";
 import prisma from "@/lib/prisma";
+import * as authHelpers from "@/lib/auth-helpers";
 
 // Mock dependencies
 vi.mock("@/lib/prisma", () => ({
@@ -11,31 +12,12 @@ vi.mock("@/lib/prisma", () => ({
   },
 }));
 
-vi.mock("@/lib/action-wrapper", () => ({
-  withAuth: (handler: any, actionName: string) => {
-    return async (input: any, mockSession?: any) => {
-      if (!mockSession) {
-        return {
-          success: false,
-          error: "Unauthorized",
-        };
-      }
-      if (!mockSession.user?.emailVerified) {
-        return {
-          success: false,
-          error: "Email not verified",
-        };
-      }
-      try {
-        return await handler(input, mockSession);
-      } catch (error) {
-        return {
-          success: false,
-          error: `Erreur lors de ${actionName}`,
-        };
-      }
-    };
-  },
+vi.mock("@/lib/auth-helpers");
+
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+  captureMessage: vi.fn(),
+  setContext: vi.fn(),
 }));
 
 describe("markAnnouncementsAsSeen", () => {
@@ -45,20 +27,20 @@ describe("markAnnouncementsAsSeen", () => {
 
   it("should update lastSeenAnnouncementsAt to current time", async () => {
     const mockSession = {
-      user: {
-        id: "user-123",
-        emailVerified: new Date(),
-      },
+      userId: "user-123",
+      userEmail: "test@example.com",
       businessId: "business-123",
     };
 
     const now = new Date();
+    vi.mocked(authHelpers.validateSessionWithEmail).mockResolvedValue(
+      mockSession
+    );
     vi.mocked(prisma.user.update).mockResolvedValue({
-      id: "user-123",
       lastSeenAnnouncementsAt: now,
     } as any);
 
-    const result = await markAnnouncementsAsSeen({}, mockSession);
+    const result = await markAnnouncementsAsSeen({});
 
     expect(result.success).toBe(true);
     if (result.success) {
@@ -73,51 +55,52 @@ describe("markAnnouncementsAsSeen", () => {
   });
 
   it("should require authentication", async () => {
+    vi.mocked(authHelpers.validateSessionWithEmail).mockResolvedValue({
+      error: "Non autorisé",
+    });
+
     const result = await markAnnouncementsAsSeen({});
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBe("Unauthorized");
+      expect(result.error).toBe("Non autorisé");
     }
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
   it("should require verified email", async () => {
-    const mockSession = {
-      user: {
-        id: "user-123",
-        emailVerified: null,
-      },
-      businessId: "business-123",
-    };
+    vi.mocked(authHelpers.validateSessionWithEmail).mockResolvedValue({
+      error: "Email non vérifié",
+    });
 
-    const result = await markAnnouncementsAsSeen({}, mockSession);
+    const result = await markAnnouncementsAsSeen({});
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBe("Email not verified");
+      expect(result.error).toBe("Email non vérifié");
     }
     expect(prisma.user.update).not.toHaveBeenCalled();
   });
 
   it("should handle database errors gracefully", async () => {
     const mockSession = {
-      user: {
-        id: "user-123",
-        emailVerified: new Date(),
-      },
+      userId: "user-123",
+      userEmail: "test@example.com",
       businessId: "business-123",
     };
 
+    vi.mocked(authHelpers.validateSessionWithEmail).mockResolvedValue(
+      mockSession
+    );
     vi.mocked(prisma.user.update).mockRejectedValue(
       new Error("Database connection failed")
     );
 
-    const result = await markAnnouncementsAsSeen({}, mockSession);
+    const result = await markAnnouncementsAsSeen({});
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toBeDefined();
+      expect(result.error).toBe("Erreur lors de markAnnouncementsAsSeen");
     }
   });
 });

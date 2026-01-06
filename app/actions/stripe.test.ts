@@ -71,6 +71,7 @@ describe("Stripe Server Actions", () => {
     country: null,
     tva: null,
     updatedAt: new Date(),
+    lastSeenAnnouncementsAt: null,
   };
 
   const mockBusiness = {

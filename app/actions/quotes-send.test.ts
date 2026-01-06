@@ -72,6 +72,7 @@ describe("sendQuote - Envoi d'emails", () => {
     tokenExpiry: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    lastSeenAnnouncementsAt: null,
   };
 
   const mockSession = {

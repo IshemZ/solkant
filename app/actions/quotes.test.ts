@@ -55,6 +55,7 @@ describe("Quote Server Actions", () => {
     tokenExpiry: null,
     createdAt: new Date(),
     updatedAt: new Date(),
+    lastSeenAnnouncementsAt: null,
   };
 
   beforeEach(() => {

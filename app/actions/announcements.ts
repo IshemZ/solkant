@@ -11,7 +11,7 @@ export const markAnnouncementsAsSeen = withAuth(
   async (_input: Record<string, never>, session) => {
     const updatedUser = await prisma.user.update({
       where: {
-        id: session.user.id,
+        id: session.userId,
       },
       data: {
         lastSeenAnnouncementsAt: new Date(),
@@ -21,7 +21,9 @@ export const markAnnouncementsAsSeen = withAuth(
       },
     });
 
-    return successResult(updatedUser);
+    return successResult({
+      lastSeenAnnouncementsAt: updatedUser.lastSeenAnnouncementsAt,
+    });
   },
   "markAnnouncementsAsSeen"
 );

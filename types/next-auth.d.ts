@@ -17,6 +17,7 @@ declare module 'next-auth' {
       subscriptionStatus?: string | null
       isPro?: boolean | null
       impersonatingBusinessId?: string | null  // For Phase 3
+      lastSeenAnnouncementsAt?: Date | null
     }
   }
 
