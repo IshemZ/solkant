@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useAnalytics } from "@/hooks/useAnalytics";
 
 /**
@@ -15,7 +15,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 export function SignUpTracker() {
   const { data: session, status } = useSession();
   const { trackEvent } = useAnalytics();
-  const [tracked, setTracked] = useState(false);
+  const trackedRef = useRef(false);
 
   useEffect(() => {
     // Wait for session to load
@@ -23,10 +23,10 @@ export function SignUpTracker() {
 
     // Check if there's a pending OAuth sign_up to track
     if (
-      !tracked &&
+      !trackedRef.current &&
       status === "authenticated" &&
       session?.user?.businessId &&
-      typeof globalThis.window !== "undefined"
+      globalThis.window !== undefined
     ) {
       const pendingSignUp = sessionStorage.getItem("new_signup");
 
@@ -39,10 +39,10 @@ export function SignUpTracker() {
 
         // Clear flag and mark as tracked
         sessionStorage.removeItem("new_signup");
-        setTracked(true);
+        trackedRef.current = true;
       }
     }
-  }, [session, status, tracked, trackEvent]);
+  }, [session, status, trackEvent]);
 
   return null; // Composant invisible
 }
