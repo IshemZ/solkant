@@ -55,6 +55,7 @@ describe("Quote Number Generation - Bug Fix & Multi-Tenant", () => {
     name: "Test User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),

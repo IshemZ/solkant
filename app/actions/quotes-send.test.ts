@@ -67,6 +67,7 @@ describe("sendQuote - Envoi d'emails", () => {
     name: "Test User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),

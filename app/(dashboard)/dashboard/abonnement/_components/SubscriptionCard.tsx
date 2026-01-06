@@ -47,7 +47,9 @@ export default function SubscriptionCard({ type }: SubscriptionCardProps) {
         }
       }
     } catch (error) {
-      console.error("Erreur:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur inconnue";
+      console.error("Erreur:", errorMessage);
       toast.error("Une erreur est survenue");
     } finally {
       setLoading(false);

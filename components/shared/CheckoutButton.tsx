@@ -10,7 +10,7 @@ import { features } from "@/lib/env";
 
 export function CheckoutButton() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const [loading, setLoading] = useState(false);
   const paymentsEnabled = features.stripePayments;
 
@@ -34,7 +34,7 @@ export function CheckoutButton() {
         }
 
         if (result.data.url) {
-          window.location.href = result.data.url;
+          globalThis.location.href = result.data.url;
         }
       } catch (error) {
         console.error("Erreur:", error);

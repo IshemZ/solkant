@@ -50,6 +50,7 @@ describe("Quote Server Actions", () => {
     name: "Test User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),

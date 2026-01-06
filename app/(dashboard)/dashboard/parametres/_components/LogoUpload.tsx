@@ -75,7 +75,9 @@ export default function LogoUpload({
 
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Error uploading logo:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur inconnue";
+      console.error("Error uploading logo:", errorMessage);
       toast.error("Erreur lors de l'upload");
       setIsUploading(false);
     }

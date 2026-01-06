@@ -18,7 +18,11 @@ import {
   CardTitle,
 } from "@/components/ui";
 import { createClient, updateClient } from "@/app/actions/clients";
-import { createClientSchema, type CreateClientInput, type CreateClientResult } from "@/lib/validations";
+import {
+  createClientSchema,
+  type CreateClientInput,
+  type CreateClientResult,
+} from "@/lib/validations";
 import type { Client } from "@prisma/client";
 
 interface ClientFormProps {
@@ -147,11 +151,14 @@ export default function ClientForm({
         router.refresh();
       }
     } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur inconnue";
       toast.error("Une erreur est survenue");
 
       // Track dashboard error
       trackEvent("dashboard_error", {
         error_type: "client_creation_failed",
+        error_message: errorMessage,
         page_category: "dashboard",
       });
     }

@@ -68,6 +68,7 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
     name: "Tenant 1 User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),
@@ -92,6 +93,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.client.findMany),
         "business_tenant1"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.client.findMany).mock.calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant1");
     });
 
     it("🚨 MUST filter clients by businessId (Tenant 2)", async () => {
@@ -105,6 +110,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.client.findMany),
         "business_tenant2"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.client.findMany).mock.calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant2");
     });
 
     it("🚨 MUST NOT allow creating client for another tenant", async () => {
@@ -118,6 +127,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         phone: "0123456789",
         address: null,
         notes: null,
+        rue: null,
+        complement: null,
+        codePostal: null,
+        ville: null,
         businessId: "business_tenant1",
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -148,6 +161,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.quote.findMany),
         "business_tenant1"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.quote.findMany).mock.calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant1");
     });
 
     it("🚨 MUST filter quotes by businessId (Tenant 2)", async () => {
@@ -160,6 +177,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.quote.findMany),
         "business_tenant2"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.quote.findMany).mock.calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant2");
     });
 
     it("🚨 MUST NOT allow creating quote for another tenant", async () => {
@@ -174,6 +195,10 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.quote.findMany),
         "business_tenant1"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.quote.findMany).mock.calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant1");
     });
   });
 
@@ -188,6 +213,11 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.service.findMany),
         "business_tenant1"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.service.findMany).mock
+        .calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant1");
     });
 
     it("🚨 MUST filter services by businessId (Tenant 2)", async () => {
@@ -200,6 +230,11 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.service.findMany),
         "business_tenant2"
       );
+
+      // Assertion explicite : vérifie que findMany a été appelé avec le bon businessId
+      const findManyCall = vi.mocked(prisma.service.findMany).mock
+        .calls[0]?.[0];
+      expect(findManyCall?.where?.businessId).toBe("business_tenant2");
     });
 
     it("🚨 MUST NOT allow creating service for another tenant", async () => {
@@ -274,6 +309,11 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         "business_tenant1"
       );
 
+      // Assertion explicite pour tenant 1
+      const findManyCall1 = vi.mocked(prisma.client.findMany).mock
+        .calls[0]?.[0];
+      expect(findManyCall1?.where?.businessId).toBe("business_tenant1");
+
       vi.clearAllMocks();
 
       // Deuxième requête avec tenant 2 (simulation de changement de session)
@@ -285,6 +325,11 @@ describe("🔒 MULTI-TENANT ISOLATION TESTS (CRITICAL)", () => {
         vi.mocked(prisma.client.findMany),
         "business_tenant2"
       );
+
+      // Assertion explicite pour tenant 2
+      const findManyCall2 = vi.mocked(prisma.client.findMany).mock
+        .calls[0]?.[0];
+      expect(findManyCall2?.where?.businessId).toBe("business_tenant2");
     });
   });
 });

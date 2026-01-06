@@ -23,8 +23,8 @@ if (dsn) {
         },
       },
     });
-  } catch (e) {
-    // Edge-safe logging
-    console.warn("Sentry edge init failed");
+  } catch (error) {
+    // Edge-safe logging - intentionally catching to prevent app crash if Sentry fails
+    console.warn("Sentry edge init failed:", error instanceof Error ? error.message : error);
   }
 }

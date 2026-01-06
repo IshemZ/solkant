@@ -62,6 +62,7 @@ describe("Stripe Server Actions", () => {
     name: "Test User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),
@@ -130,7 +131,9 @@ describe("Stripe Server Actions", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.url).toBe("https://checkout.stripe.com/session/test");
+        expect(result.data.url).toBe(
+          "https://checkout.stripe.com/session/test"
+        );
       }
 
       // Verify customer creation
@@ -188,7 +191,9 @@ describe("Stripe Server Actions", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.url).toBe("https://checkout.stripe.com/session/test");
+        expect(result.data.url).toBe(
+          "https://checkout.stripe.com/session/test"
+        );
       }
 
       // Should NOT create new customer
@@ -244,9 +249,7 @@ describe("Stripe Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
-        expect(result.error).toBe(
-          "Erreur lors de createCheckoutSession"
-        );
+        expect(result.error).toBe("Erreur lors de createCheckoutSession");
       }
     });
 
@@ -270,9 +273,7 @@ describe("Stripe Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
-        expect(result.error).toBe(
-          "Erreur lors de createCheckoutSession"
-        );
+        expect(result.error).toBe("Erreur lors de createCheckoutSession");
       }
     });
 
@@ -364,9 +365,7 @@ describe("Stripe Server Actions", () => {
       expect(result.success).toBe(false);
       if (!result.success) {
         // withAuth() retourne un message générique pour les erreurs techniques
-        expect(result.error).toBe(
-          "Erreur lors de createCheckoutSession"
-        );
+        expect(result.error).toBe("Erreur lors de createCheckoutSession");
       }
     });
   });

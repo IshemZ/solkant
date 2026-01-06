@@ -56,12 +56,15 @@ export default function QuoteView({ quote }: QuoteViewProps) {
         quote_number: quote.quoteNumber,
       });
     } catch (error) {
-      console.error("Error generating PDF:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur inconnue";
+      console.error("Error generating PDF:", errorMessage);
       alert("Erreur lors de la génération du PDF");
 
       // Track PDF generation error
       trackEvent("dashboard_error", {
         error_type: "pdf_generation_failed",
+        error_message: errorMessage,
         page_category: "dashboard",
       });
     } finally {
@@ -93,7 +96,9 @@ export default function QuoteView({ quote }: QuoteViewProps) {
 
       alert(`✅ ${data.message}`);
     } catch (error) {
-      console.error("Error sending email:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Erreur inconnue";
+      console.error("Error sending email:", errorMessage);
       alert("Erreur lors de l'envoi de l'email");
     } finally {
       setIsSending(false);

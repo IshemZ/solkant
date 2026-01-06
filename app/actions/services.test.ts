@@ -4,15 +4,15 @@
  * Exemple de structure de colocation pour les tests
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { getServerSession } from 'next-auth';
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { getServerSession } from "next-auth";
 
 // IMPORTANT: Mocks doivent être déclarés AVANT les imports qui en dépendent
-vi.mock('next-auth', () => ({
+vi.mock("next-auth", () => ({
   getServerSession: vi.fn(),
 }));
 
-vi.mock('@/lib/prisma', () => ({
+vi.mock("@/lib/prisma", () => ({
   default: {
     service: {
       findMany: vi.fn(),
@@ -27,36 +27,37 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-vi.mock('next/cache', () => ({
+vi.mock("next/cache", () => ({
   revalidatePath: vi.fn(),
 }));
 
 // Import des actions
-import { getServices, createService, deleteService } from './services';
-import { revalidatePath } from 'next/cache';
+import { getServices, createService, deleteService } from "./services";
+import { revalidatePath } from "next/cache";
 
 // Import des mocks
-import prisma from '@/lib/prisma';
-import { createMockService } from '@/tests/helpers/test-data';
-import { Decimal } from '@prisma/client/runtime/library';
+import prisma from "@/lib/prisma";
+import { createMockService } from "@/tests/helpers/test-data";
+import { Decimal } from "@prisma/client/runtime/library";
 
-describe('Service Actions', () => {
+describe("Service Actions", () => {
   const mockSession = {
     user: {
-      id: 'user-test-123',
-      businessId: 'biz-123',
-      email: 'test@solkant.com',
-      name: 'Test User',
+      id: "user-test-123",
+      businessId: "biz-123",
+      email: "test@solkant.com",
+      name: "Test User",
     },
   };
 
   const mockUser = {
-    id: 'user-test-123',
-    email: 'test@solkant.com',
-    emailVerified: new Date('2025-01-01'),
-    name: 'Test User',
+    id: "user-test-123",
+    email: "test@solkant.com",
+    emailVerified: new Date("2025-01-01"),
+    name: "Test User",
     password: null,
     image: null,
+    role: "USER" as const,
     verificationToken: null,
     tokenExpiry: null,
     createdAt: new Date(),
@@ -69,12 +70,12 @@ describe('Service Actions', () => {
     vi.mocked(prisma.user.findUnique).mockResolvedValue(mockUser);
   });
 
-  describe('getServices', () => {
-    it('should return active services for business', async () => {
+  describe("getServices", () => {
+    it("should return active services for business", async () => {
       // ARRANGE
       const mockServices = [
-        createMockService({ businessId: 'biz-123', isActive: true }),
-        createMockService({ businessId: 'biz-123', isActive: true }),
+        createMockService({ businessId: "biz-123", isActive: true }),
+        createMockService({ businessId: "biz-123", isActive: true }),
       ];
 
       vi.mocked(prisma.service.findMany).mockResolvedValue(mockServices);
@@ -90,14 +91,14 @@ describe('Service Actions', () => {
 
       expect(prisma.service.findMany).toHaveBeenCalledWith({
         where: {
-          businessId: 'biz-123',
+          businessId: "biz-123",
           isActive: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
       });
     });
 
-    it('should NOT return services from another business', async () => {
+    it("should NOT return services from another business", async () => {
       // ARRANGE
       vi.mocked(prisma.service.findMany).mockResolvedValue([]);
 
@@ -112,21 +113,21 @@ describe('Service Actions', () => {
     });
   });
 
-  describe('createService', () => {
-    it('should create service with businessId', async () => {
+  describe("createService", () => {
+    it("should create service with businessId", async () => {
       // ARRANGE
       const input = {
-        name: 'Coupe Cheveux',
-        description: 'Coupe classique',
+        name: "Coupe Cheveux",
+        description: "Coupe classique",
         price: 45,
         duration: 30,
-        category: 'Coiffure',
+        category: "Coiffure",
       };
 
       const created = createMockService({
         ...input,
         price: new Decimal(input.price),
-        businessId: 'biz-123',
+        businessId: "biz-123",
       });
 
       vi.mocked(prisma.service.create).mockResolvedValue(created);
@@ -139,23 +140,25 @@ describe('Service Actions', () => {
       expect(prisma.service.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            businessId: 'biz-123',
+            businessId: "biz-123",
           }),
         })
       );
 
-      expect(revalidatePath).toHaveBeenCalledWith('/dashboard/services');
+      expect(revalidatePath).toHaveBeenCalledWith("/dashboard/services");
     });
 
-    it('should reject negative price', async () => {
+    it("should reject negative price", async () => {
       // ARRANGE
       const invalidInput = {
-        name: 'Test',
+        name: "Test",
         price: -10, // Prix invalide
       };
 
       // ACT
-      const result = await createService(invalidInput as { name: string; price: number });
+      const result = await createService(
+        invalidInput as { name: string; price: number }
+      );
 
       // ASSERT
       expect(result.success).toBe(false);
@@ -165,19 +168,19 @@ describe('Service Actions', () => {
     });
   });
 
-  describe('deleteService (Soft Delete)', () => {
-    it('should soft delete service', async () => {
+  describe("deleteService (Soft Delete)", () => {
+    it("should soft delete service", async () => {
       // ARRANGE
-      const serviceId = 'service-123';
+      const serviceId = "service-123";
 
       const service = createMockService({
         id: serviceId,
-        businessId: 'biz-123',
+        businessId: "biz-123",
       });
 
       const deletedService = createMockService({
         id: serviceId,
-        businessId: 'biz-123',
+        businessId: "biz-123",
         deletedAt: new Date(),
       });
 
@@ -193,14 +196,14 @@ describe('Service Actions', () => {
       expect(prisma.service.findFirst).toHaveBeenCalledWith({
         where: {
           id: serviceId,
-          businessId: 'biz-123',
+          businessId: "biz-123",
         },
         select: expect.any(Object),
       });
       expect(prisma.service.update).toHaveBeenCalledWith({
         where: {
           id: serviceId,
-          businessId: 'biz-123',
+          businessId: "biz-123",
         },
         data: {
           isActive: false,
@@ -210,8 +213,8 @@ describe('Service Actions', () => {
     });
   });
 
-  describe('Multi-Tenant Isolation', () => {
-    it('should filter by businessId on all queries', async () => {
+  describe("Multi-Tenant Isolation", () => {
+    it("should filter by businessId on all queries", async () => {
       // ARRANGE
       vi.mocked(prisma.service.findMany).mockResolvedValue([]);
 
@@ -222,7 +225,7 @@ describe('Service Actions', () => {
       expect(prisma.service.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
-            businessId: 'biz-123',
+            businessId: "biz-123",
           }),
         })
       );
