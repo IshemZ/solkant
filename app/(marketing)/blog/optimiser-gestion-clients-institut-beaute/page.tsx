@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "5 astuces pour optimiser la gestion de vos clients",
     description:
       "Organisez votre fichier clients efficacement et fidélisez votre clientèle avec ces 5 astuces éprouvées.",
-    url: "https://solkant.com/blog/optimiser-gestion-clients-institut-beaute",
+    url: "https://www.solkant.com/blog/optimiser-gestion-clients-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-gestion-clients.png",
+        url: "https://www.solkant.com/images/og/article-gestion-clients.png",
         width: 1200,
         height: 630,
         alt: "5 astuces pour optimiser la gestion de vos clients institut",
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     title: "5 astuces pour optimiser la gestion de vos clients",
     description:
       "Organisez votre fichier clients et fidélisez votre clientèle.",
-    images: ["https://solkant.com/images/og/article-gestion-clients.png"],
+    images: ["https://www.solkant.com/images/og/article-gestion-clients.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/optimiser-gestion-clients-institut-beaute",
+      "https://www.solkant.com/blog/optimiser-gestion-clients-institut-beaute",
   },
 };
 
@@ -110,27 +110,27 @@ export default function Article3Page() {
               "5 astuces pour optimiser la gestion de vos clients – Institut de beauté",
             description:
               "Découvrez comment mieux organiser votre fichier clients, suivre l'historique des prestations et fidéliser votre clientèle.",
-            image: "https://solkant.com/images/og/article-gestion-clients.png",
+            image: "https://www.solkant.com/images/og/article-gestion-clients.png",
             datePublished: "2024-11-25T09:00:00Z",
             dateModified: "2024-11-25T09:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/optimiser-gestion-clients-institut-beaute",
+                "https://www.solkant.com/blog/optimiser-gestion-clients-institut-beaute",
             },
           }),
         }}

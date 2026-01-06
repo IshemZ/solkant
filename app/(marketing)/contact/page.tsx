@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     title: "Contact Solkant – Nous sommes là pour vous aider",
     description:
       "Questions, demandes d'information, support technique. Contactez l'équipe Solkant facilement.",
-    url: "https://solkant.com/contact",
+    url: "https://www.solkant.com/contact",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/contact.png",
+        url: "https://www.solkant.com/images/og/contact.png",
         width: 1200,
         height: 630,
         alt: "Contact Solkant - Nous répondons à toutes vos questions",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     title: "Contact Solkant – Nous sommes là pour vous",
     description:
       "Contactez notre équipe. Nous répondons rapidement à vos questions.",
-    images: ["https://solkant.com/images/og/contact.png"],
+    images: ["https://www.solkant.com/images/og/contact.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/contact",
+    canonical: "https://www.solkant.com/contact",
   },
 };
 

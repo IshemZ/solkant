@@ -5,11 +5,11 @@
 
 export const siteConfig = {
   name: "Solkant",
-  url: "https://solkant.com",
+  url: "https://www.solkant.com",
   description:
     "Logiciel SaaS de création de devis pour instituts de beauté, salons d'esthétique et spas. Gestion clients, catalogue de services et génération de PDF professionnels.",
   locale: "fr_FR",
-  ogImage: "https://solkant.com/images/og/home.png",
+  ogImage: "https://www.solkant.com/images/og/home.png",
   twitterHandle: "@solkant", // À configurer quand disponible
   email: "contact@solkant.com",
   keywords: [

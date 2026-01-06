@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     title: "Fonctionnalités Solkant – Outil complet pour votre institut",
     description:
       "Gestion de devis, clients, services, PDF élégants. Tout ce dont vous avez besoin pour professionnaliser votre institut de beauté.",
-    url: "https://solkant.com/fonctionnalites",
+    url: "https://www.solkant.com/fonctionnalites",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/features.png",
+        url: "https://www.solkant.com/images/og/features.png",
         width: 1200,
         height: 630,
         alt: "Fonctionnalités Solkant - Gestion complète de devis pour instituts",
@@ -29,10 +29,10 @@ export const metadata: Metadata = {
     title: "Fonctionnalités Solkant – Outil complet pour institut",
     description:
       "Gestion de devis, clients, services, PDF élégants pour votre institut.",
-    images: ["https://solkant.com/images/og/features.png"],
+    images: ["https://www.solkant.com/images/og/features.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/fonctionnalites",
+    canonical: "https://www.solkant.com/fonctionnalites",
   },
 };
 

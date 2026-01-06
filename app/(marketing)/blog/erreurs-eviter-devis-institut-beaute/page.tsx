@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "10 erreurs à éviter dans vos devis beauté",
     description:
       "Les pièges qui vous font perdre des clients et comment les éviter pour maximiser vos conversions.",
-    url: "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
+    url: "https://www.solkant.com/blog/erreurs-eviter-devis-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-erreurs-devis.png",
+        url: "https://www.solkant.com/images/og/article-erreurs-devis.png",
         width: 1200,
         height: 630,
         alt: "Les erreurs à éviter dans vos devis beauté",
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     title: "10 erreurs fatales à éviter dans vos devis beauté",
     description:
       "Les pièges qui font fuir vos clients et comment les corriger.",
-    images: ["https://solkant.com/images/og/article-erreurs-devis.png"],
+    images: ["https://www.solkant.com/images/og/article-erreurs-devis.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
+    canonical: "https://www.solkant.com/blog/erreurs-eviter-devis-institut-beaute",
   },
 };
 
@@ -109,27 +109,27 @@ export default function Article2Page() {
               "Devis beauté : les 10 erreurs fatales à éviter absolument",
             description:
               "Découvrez les erreurs les plus courantes dans les devis d'instituts de beauté et comment les éviter pour augmenter votre taux de conversion.",
-            image: "https://solkant.com/images/og/article-erreurs-devis.png",
+            image: "https://www.solkant.com/images/og/article-erreurs-devis.png",
             datePublished: "2024-12-06T10:00:00Z",
             dateModified: "2024-12-06T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/erreurs-eviter-devis-institut-beaute",
+                "https://www.solkant.com/blog/erreurs-eviter-devis-institut-beaute",
             },
           }),
         }}

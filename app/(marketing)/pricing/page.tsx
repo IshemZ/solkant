@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     title: "Tarifs Solkant – Logiciel de devis pour instituts",
     description:
       "Plans tarifaires transparents pour votre institut de beauté. Commencez gratuitement, sans carte bancaire.",
-    url: "https://solkant.com/pricing",
+    url: "https://www.solkant.com/pricing",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/pricing.png",
+        url: "https://www.solkant.com/images/og/pricing.png",
         width: 1200,
         height: 630,
         alt: "Tarifs Solkant - Plans adaptés aux instituts de beauté",
@@ -29,10 +29,10 @@ export const metadata: Metadata = {
     title: "Tarifs Solkant – Plans pour instituts de beauté",
     description:
       "Plans tarifaires transparents pour votre institut. Commencez gratuitement.",
-    images: ["https://solkant.com/images/og/pricing.png"],
+    images: ["https://www.solkant.com/images/og/pricing.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/pricing",
+    canonical: "https://www.solkant.com/pricing",
   },
 };
 
@@ -49,7 +49,7 @@ export default function PricingPage() {
             name: "Solkant - Logiciel de devis pour instituts de beauté",
             description:
               "Logiciel SaaS de création de devis pour instituts de beauté, salons d'esthétique et spas. Gestion clients, catalogue de services et génération de PDF professionnels.",
-            image: "https://solkant.com/images/og/pricing.png",
+            image: "https://www.solkant.com/images/og/pricing.png",
             brand: {
               "@type": "Brand",
               name: "Solkant",
@@ -61,7 +61,7 @@ export default function PricingPage() {
                 price: "0",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
-                url: "https://solkant.com/pricing",
+                url: "https://www.solkant.com/pricing",
                 description:
                   "Plan gratuit pour découvrir Solkant : jusqu'à 10 devis/mois, gestion clients illimitée, catalogue de services, génération PDF.",
               },
@@ -71,7 +71,7 @@ export default function PricingPage() {
                 price: "19.99",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
-                url: "https://solkant.com/pricing",
+                url: "https://www.solkant.com/pricing",
                 priceSpecification: {
                   "@type": "UnitPriceSpecification",
                   price: "19.99",

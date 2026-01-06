@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "Fixer tarifs prestations institut de beauté",
     description:
       "Méthodes, calculs, erreurs à éviter et astuces pour fixer les tarifs de prestations en institut de beauté.",
-    url: "https://solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
+    url: "https://www.solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-tarifs.png",
+        url: "https://www.solkant.com/images/og/article-tarifs.png",
         width: 1200,
         height: 630,
         alt: "Fixer tarifs prestations institut de beauté",
@@ -31,11 +31,11 @@ export const metadata: Metadata = {
     title: "Fixer tarifs prestations institut de beauté",
     description:
       "Méthodes, calculs, erreurs à éviter et astuces pour fixer les tarifs de prestations en institut de beauté.",
-    images: ["https://solkant.com/images/og/article-tarifs.png"],
+    images: ["https://www.solkant.com/images/og/article-tarifs.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
+      "https://www.solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
   },
 };
 
@@ -109,27 +109,27 @@ export default function ArticleFixerTarifsPage() {
               "Comment fixer vos tarifs de prestations en institut de beauté ? pourquoi ?",
             description:
               "Méthodes et conseils pour fixer les tarifs de prestations en institut de beauté : calculs, erreurs à éviter, astuces pour rentabilité et satisfaction client.",
-            image: "https://solkant.com/images/og/article-tarifs.png",
+            image: "https://www.solkant.com/images/og/article-tarifs.png",
             datePublished: "2025-12-18T09:00:00Z",
             dateModified: "2025-12-23T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
+                "https://www.solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
             },
           }),
         }}
@@ -147,19 +147,19 @@ export default function ArticleFixerTarifsPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Accueil",
-                item: "https://solkant.com",
+                item: "https://www.solkant.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Blog",
-                item: "https://solkant.com/blog",
+                item: "https://www.solkant.com/blog",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: "Fixer tarifs prestations institut de beauté",
-                item: "https://solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
+                item: "https://www.solkant.com/blog/fixer-tarifs-prestations-institut-beaute",
               },
             ],
           }),

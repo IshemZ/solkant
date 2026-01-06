@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Digitaliser votre institut de beauté : le guide complet 2025",
     description:
       "Les 7 raisons essentielles de passer au numérique et comment réussir votre transformation digitale.",
-    url: "https://solkant.com/blog/digitaliser-gestion-institut-beaute",
+    url: "https://www.solkant.com/blog/digitaliser-gestion-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-digitalisation.png",
+        url: "https://www.solkant.com/images/og/article-digitalisation.png",
         width: 1200,
         height: 630,
         alt: "Digitaliser la gestion de votre institut de beauté",
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     title: "Pourquoi digitaliser votre institut de beauté en 2025",
     description:
       "7 raisons essentielles de passer au numérique. Guide complet.",
-    images: ["https://solkant.com/images/og/article-digitalisation.png"],
+    images: ["https://www.solkant.com/images/og/article-digitalisation.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/digitaliser-gestion-institut-beaute",
+    canonical: "https://www.solkant.com/blog/digitaliser-gestion-institut-beaute",
   },
 };
 
@@ -109,27 +109,27 @@ export default function Article3Page() {
               "Pourquoi digitaliser la gestion de votre institut de beauté en 2025 ?",
             description:
               "Découvrez comment la transformation digitale peut révolutionner votre institut de beauté : gain de temps, image professionnelle, organisation optimisée.",
-            image: "https://solkant.com/images/og/article-digitalisation.png",
+            image: "https://www.solkant.com/images/og/article-digitalisation.png",
             datePublished: "2024-12-06T14:00:00Z",
             dateModified: "2024-12-06T14:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/digitaliser-gestion-institut-beaute",
+                "https://www.solkant.com/blog/digitaliser-gestion-institut-beaute",
             },
           }),
         }}

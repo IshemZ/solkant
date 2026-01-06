@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Comment faire un devis professionnel pour institut de beauté",
     description:
       "Tout ce qu'il faut savoir pour créer des devis conformes et professionnels qui rassurent vos clients.",
-    url: "https://solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
+    url: "https://www.solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-devis.png",
+        url: "https://www.solkant.com/images/og/article-devis.png",
         width: 1200,
         height: 630,
         alt: "Comment faire un devis professionnel pour votre institut de beauté",
@@ -32,11 +32,11 @@ export const metadata: Metadata = {
     title: "Comment faire un devis professionnel pour institut de beauté",
     description:
       "Guide complet 2025 : mentions obligatoires, calculs, présentation.",
-    images: ["https://solkant.com/images/og/article-devis.png"],
+    images: ["https://www.solkant.com/images/og/article-devis.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
+      "https://www.solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
   },
 };
 
@@ -110,27 +110,27 @@ export default function Article1Page() {
               "Comment faire un devis professionnel pour votre institut de beauté – Guide 2025",
             description:
               "Guide complet pour créer des devis professionnels pour institut de beauté : mentions obligatoires, calculs, présentation, outils.",
-            image: "https://solkant.com/images/og/article-devis.png",
+            image: "https://www.solkant.com/images/og/article-devis.png",
             datePublished: "2024-12-01T09:00:00Z",
             dateModified: "2024-12-01T09:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
+                "https://www.solkant.com/blog/comment-faire-devis-professionnel-institut-beaute",
             },
           }),
         }}

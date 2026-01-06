@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     title: "Organiser le planning institut de beauté",
     description:
       "Méthodes, outils et conseils pour optimiser la gestion du planning et des rendez-vous en institut de beauté.",
-    url: "https://solkant.com/blog/organiser-planning-institut-beaute",
+    url: "https://www.solkant.com/blog/organiser-planning-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-planning.png",
+        url: "https://www.solkant.com/images/og/article-planning.png",
         width: 1200,
         height: 630,
         alt: "Organiser planning institut de beauté",
@@ -31,10 +31,10 @@ export const metadata: Metadata = {
     title: "Organiser le planning institut de beauté",
     description:
       "Méthodes, outils et conseils pour optimiser la gestion du planning et des rendez-vous en institut de beauté.",
-    images: ["https://solkant.com/images/og/article-planning.png"],
+    images: ["https://www.solkant.com/images/og/article-planning.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/organiser-planning-institut-beaute",
+    canonical: "https://www.solkant.com/blog/organiser-planning-institut-beaute",
   },
 };
 
@@ -108,27 +108,27 @@ export default function ArticlePlanningInstitutPage() {
               "Comment organiser efficacement le planning de votre institut de beauté",
             description:
               "Conseils et méthodes pour organiser le planning de votre institut de beauté, optimiser la gestion des rendez-vous et de l’équipe. Outils, astuces et erreurs à éviter.",
-            image: "https://solkant.com/images/og/article-planning.png",
+            image: "https://www.solkant.com/images/og/article-planning.png",
             datePublished: "2025-12-08T09:00:00Z",
             dateModified: "2025-12-23T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/organiser-planning-institut-beaute",
+                "https://www.solkant.com/blog/organiser-planning-institut-beaute",
             },
           }),
         }}
@@ -146,19 +146,19 @@ export default function ArticlePlanningInstitutPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Accueil",
-                item: "https://solkant.com",
+                item: "https://www.solkant.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Blog",
-                item: "https://solkant.com/blog",
+                item: "https://www.solkant.com/blog",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: "Organiser le planning institut de beauté",
-                item: "https://solkant.com/blog/organiser-planning-institut-beaute",
+                item: "https://www.solkant.com/blog/organiser-planning-institut-beaute",
               },
             ],
           }),

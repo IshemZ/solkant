@@ -10,13 +10,13 @@ export const metadata: Metadata = {
     title: "À propos de Solkant – Notre mission",
     description:
       "Un outil pensé pour simplifier la vie des gérantes d'instituts de beauté et professionnaliser leur activité.",
-    url: "https://solkant.com/a-propos",
+    url: "https://www.solkant.com/a-propos",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/about.png",
+        url: "https://www.solkant.com/images/og/about.png",
         width: 1200,
         height: 630,
         alt: "À propos de Solkant - Notre mission pour les instituts de beauté",
@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     title: "À propos de Solkant – Notre mission",
     description:
       "Un outil pensé pour simplifier la gestion des instituts de beauté.",
-    images: ["https://solkant.com/images/og/about.png"],
+    images: ["https://www.solkant.com/images/og/about.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/a-propos",
+    canonical: "https://www.solkant.com/a-propos",
   },
 };
 

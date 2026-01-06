@@ -18,13 +18,13 @@ export const metadata: Metadata = {
     title: "Logiciel de Devis Institut Beauté - Guide Complet 2025",
     description:
       "Guide ultime pour choisir le logiciel de devis idéal pour votre institut de beauté. Fonctionnalités, comparatifs, cas d'usage.",
-    url: "https://solkant.com/logiciel-devis-institut-beaute",
+    url: "https://www.solkant.com/logiciel-devis-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
     images: [
       {
-        url: "https://solkant.com/images/og/pillar-logiciel-devis.png",
+        url: "https://www.solkant.com/images/og/pillar-logiciel-devis.png",
         width: 1200,
         height: 630,
         alt: "Guide complet logiciel de devis pour institut de beauté",
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
       "Tout savoir pour choisir le bon logiciel de devis pour votre institut.",
   },
   alternates: {
-    canonical: "https://solkant.com/logiciel-devis-institut-beaute",
+    canonical: "https://www.solkant.com/logiciel-devis-institut-beaute",
   },
 };
 
@@ -56,7 +56,7 @@ export default function LogicielDevisInstitutPage() {
               "Logiciel de Devis pour Institut de Beauté - Guide Complet 2025",
             description:
               "Guide complet pour choisir et utiliser un logiciel de devis adapté aux instituts de beauté, salons d'esthétique et spas.",
-            image: "https://solkant.com/images/og/pillar-logiciel-devis.png",
+            image: "https://www.solkant.com/images/og/pillar-logiciel-devis.png",
             datePublished: "2025-01-15T09:00:00Z",
             dateModified: "2025-01-15T09:00:00Z",
             author: {
@@ -68,7 +68,7 @@ export default function LogicielDevisInstitutPage() {
               name: "Solkant",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/logo.png",
+                url: "https://www.solkant.com/logo.png",
               },
             },
           }),

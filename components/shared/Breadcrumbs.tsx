@@ -24,7 +24,7 @@ export function Breadcrumbs({ items, className = "" }: BreadcrumbsProps) {
       "@type": "ListItem",
       position: index + 1,
       name: item.label,
-      item: `https://solkant.com${item.href}`,
+      item: `https://www.solkant.com${item.href}`,
     })),
   };
 

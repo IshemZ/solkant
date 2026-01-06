@@ -30,7 +30,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://solkant.com"),
+  metadataBase: new URL("https://www.solkant.com"),
   title: {
     default: "Solkant – Logiciel de devis pour instituts de beauté",
     template: "%s | Solkant",
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://solkant.com",
+    url: "https://www.solkant.com",
     siteName: "Solkant",
     title: "Solkant – Logiciel de devis pour instituts de beauté",
     description:
@@ -148,8 +148,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
-              logo: "https://solkant.com/logo.png",
+              url: "https://www.solkant.com",
+              logo: "https://www.solkant.com/logo.png",
               description:
                 "Logiciel SaaS de création de devis pour instituts de beauté, salons d'esthétique et spas. Gestion clients, catalogue de services et génération de PDF professionnels.",
               foundingDate: "2024",
@@ -162,7 +162,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
                 contactType: "customer service",
                 email: "contact@solkant.com",
                 availableLanguage: ["French"],
-                url: "https://solkant.com/contact",
+                url: "https://www.solkant.com/contact",
               },
               sameAs: [
                 // Ajouter ici vos réseaux sociaux quand disponibles

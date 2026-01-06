@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     title: "Solkant – Logiciel de devis pour instituts de beauté",
     description:
       "Simplifiez la création de devis pour votre institut avec Solkant. Interface simple, PDF élégants, gain de temps garanti.",
-    url: "https://solkant.com",
+    url: "https://www.solkant.com",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/home.png",
+        url: "https://www.solkant.com/images/og/home.png",
         width: 1200,
         height: 630,
         alt: "Solkant - Créez des devis élégants pour votre institut de beauté",
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
       "Créez des devis professionnels pour votre institut en quelques clics.",
   },
   alternates: {
-    canonical: "https://solkant.com",
+    canonical: "https://www.solkant.com",
   },
 };
 
@@ -56,7 +56,7 @@ export default function Home() {
             operatingSystem: "Web",
             description:
               "Logiciel de création de devis pour instituts de beauté et salons. Gestion clients, services et génération de PDF professionnels.",
-            url: "https://solkant.com",
+            url: "https://www.solkant.com",
             audience: {
               "@type": "Audience",
               audienceType: "instituts de beauté, salons, spas",

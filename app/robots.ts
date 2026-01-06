@@ -30,17 +30,11 @@ export default function robots(): MetadataRoute.Robots {
       },
       // Bloquer les scrapers agressifs
       {
-        userAgent: [
-          "AhrefsBot",
-          "SemrushBot",
-          "DotBot",
-          "MJ12bot",
-          "BLEXBot",
-        ],
+        userAgent: ["AhrefsBot", "SemrushBot", "DotBot", "MJ12bot", "BLEXBot"],
         crawlDelay: 10, // Ralentir ces bots pour économiser de la bande passante
         disallow: ["/dashboard/*", "/api/*"],
       },
     ],
-    sitemap: "https://solkant.com/sitemap.xml",
+    sitemap: "https://www.solkant.com/sitemap.xml",
   };
 }

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Ouvrir un institut de beauté : démarches administratives",
     description:
       "Étapes, documents, conseils et erreurs à éviter pour ouvrir un institut de beauté en toute sérénité.",
-    url: "https://solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
+    url: "https://www.solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-ouvrir-institut.png",
+        url: "https://www.solkant.com/images/og/article-ouvrir-institut.png",
         width: 1200,
         height: 630,
         alt: "Ouvrir institut de beauté démarches administratives",
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     title: "Ouvrir un institut de beauté : démarches administratives",
     description:
       "Étapes, documents, conseils et erreurs à éviter pour ouvrir un institut de beauté en toute sérénité.",
-    images: ["https://solkant.com/images/og/article-ouvrir-institut.png"],
+    images: ["https://www.solkant.com/images/og/article-ouvrir-institut.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
+      "https://www.solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
   },
 };
 
@@ -108,27 +108,27 @@ export default function ArticleOuvrirInstitutPage() {
               "Ouvrir un institut de beauté : toutes les démarches administratives",
             description:
               "Toutes les démarches administratives pour ouvrir un institut de beauté : étapes, documents, conseils et erreurs à éviter. Guide complet pour réussir votre projet.",
-            image: "https://solkant.com/images/og/article-ouvrir-institut.png",
+            image: "https://www.solkant.com/images/og/article-ouvrir-institut.png",
             datePublished: "2025-12-15T09:00:00Z",
             dateModified: "2025-12-23T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
+                "https://www.solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
             },
           }),
         }}
@@ -146,19 +146,19 @@ export default function ArticleOuvrirInstitutPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Accueil",
-                item: "https://solkant.com",
+                item: "https://www.solkant.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Blog",
-                item: "https://solkant.com/blog",
+                item: "https://www.solkant.com/blog",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: "Ouvrir institut de beauté démarches administratives",
-                item: "https://solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
+                item: "https://www.solkant.com/blog/ouvrir-institut-beaute-demarches-administratives",
               },
             ],
           }),

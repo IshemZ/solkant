@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     title: "Gestion Institut de Beauté : Le Guide Complet 2025",
     description:
       "Maîtrisez tous les aspects de la gestion de votre institut : clients, devis, planning, finances. Guide pratique par Solkant.",
-    url: "https://solkant.com/gestion-institut-beaute-guide",
+    url: "https://www.solkant.com/gestion-institut-beaute-guide",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
     images: [
       {
-        url: "https://solkant.com/images/og/pillar-gestion-institut.png",
+        url: "https://www.solkant.com/images/og/pillar-gestion-institut.png",
         width: 1200,
         height: 630,
         alt: "Guide complet gestion institut de beauté 2025",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
       "Optimisez la gestion de votre institut avec ce guide complet : clients, finances, planning, outils.",
   },
   alternates: {
-    canonical: "https://solkant.com/gestion-institut-beaute-guide",
+    canonical: "https://www.solkant.com/gestion-institut-beaute-guide",
   },
 };
 
@@ -54,7 +54,7 @@ export default function GestionInstitutBeauteGuidePage() {
             headline: "Gestion Institut de Beauté : Le Guide Complet 2025",
             description:
               "Guide pratique pour gérer efficacement votre institut de beauté : organisation, outils digitaux, stratégies de fidélisation.",
-            image: "https://solkant.com/images/og/pillar-gestion-institut.png",
+            image: "https://www.solkant.com/images/og/pillar-gestion-institut.png",
             datePublished: "2025-01-15T10:00:00Z",
             dateModified: "2025-01-15T10:00:00Z",
             author: {
@@ -66,7 +66,7 @@ export default function GestionInstitutBeauteGuidePage() {
               name: "Solkant",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/logo.png",
+                url: "https://www.solkant.com/logo.png",
               },
             },
           }),

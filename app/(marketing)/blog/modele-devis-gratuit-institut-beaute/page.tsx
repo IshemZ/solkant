@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Modèle de devis gratuit institut de beauté",
     description:
       "Modèle Word à télécharger + conseils pour rédiger des devis professionnels et efficaces pour votre institut.",
-    url: "https://solkant.com/blog/modele-devis-gratuit-institut-beaute",
+    url: "https://www.solkant.com/blog/modele-devis-gratuit-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-modele-devis.png",
+        url: "https://www.solkant.com/images/og/article-modele-devis.png",
         width: 1200,
         height: 630,
         alt: "Modèle de devis gratuit institut de beauté",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     title: "Modèle de devis gratuit institut de beauté",
     description:
       "Modèle Word à télécharger + conseils pour rédiger des devis professionnels et efficaces pour votre institut.",
-    images: ["https://solkant.com/images/og/article-modele-devis.png"],
+    images: ["https://www.solkant.com/images/og/article-modele-devis.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/modele-devis-gratuit-institut-beaute",
+    canonical: "https://www.solkant.com/blog/modele-devis-gratuit-institut-beaute",
   },
 };
 
@@ -106,27 +106,27 @@ export default function ArticleModeleDevisPage() {
                 "Modèle de devis gratuit pour institut de beauté (Word + conseils)",
               description:
                 "Téléchargez un modèle de devis Word gratuit pour institut de beauté, avec conseils pour rédiger des devis professionnels et convaincre vos clientes.",
-              image: "https://solkant.com/images/og/article-modele-devis.png",
+              image: "https://www.solkant.com/images/og/article-modele-devis.png",
               datePublished: "2025-12-01T09:00:00Z",
               dateModified: "2025-12-23T10:00:00Z",
               author: {
                 "@type": "Organization",
                 name: "Solkant",
-                url: "https://solkant.com",
+                url: "https://www.solkant.com",
               },
               publisher: {
                 "@type": "Organization",
                 name: "Solkant",
-                url: "https://solkant.com",
+                url: "https://www.solkant.com",
                 logo: {
                   "@type": "ImageObject",
-                  url: "https://solkant.com/images/og/home.png",
+                  url: "https://www.solkant.com/images/og/home.png",
                 },
               },
               mainEntityOfPage: {
                 "@type": "WebPage",
                 "@id":
-                  "https://solkant.com/blog/modele-devis-gratuit-institut-beaute",
+                  "https://www.solkant.com/blog/modele-devis-gratuit-institut-beaute",
               },
             }),
           }}
@@ -144,19 +144,19 @@ export default function ArticleModeleDevisPage() {
                   "@type": "ListItem",
                   position: 1,
                   name: "Accueil",
-                  item: "https://solkant.com",
+                  item: "https://www.solkant.com",
                 },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: "Blog",
-                  item: "https://solkant.com/blog",
+                  item: "https://www.solkant.com/blog",
                 },
                 {
                   "@type": "ListItem",
                   position: 3,
                   name: "Modèle de devis gratuit institut de beauté",
-                  item: "https://solkant.com/blog/modele-devis-gratuit-institut-beaute",
+                  item: "https://www.solkant.com/blog/modele-devis-gratuit-institut-beaute",
                 },
               ],
             }),

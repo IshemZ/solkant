@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Comptabilité institut de beauté débutants",
     description:
       "Obligations, astuces, erreurs à éviter et outils pour gérer la comptabilité d’un institut de beauté.",
-    url: "https://solkant.com/blog/comptabilite-institut-beaute-debutants",
+    url: "https://www.solkant.com/blog/comptabilite-institut-beaute-debutants",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-comptabilite.png",
+        url: "https://www.solkant.com/images/og/article-comptabilite.png",
         width: 1200,
         height: 630,
         alt: "Comptabilité institut de beauté débutants",
@@ -30,11 +30,11 @@ export const metadata: Metadata = {
     title: "Comptabilité institut de beauté débutants",
     description:
       "Obligations, astuces, erreurs à éviter et outils pour gérer la comptabilité d’un institut de beauté.",
-    images: ["https://solkant.com/images/og/article-comptabilite.png"],
+    images: ["https://www.solkant.com/images/og/article-comptabilite.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/comptabilite-institut-beaute-debutants",
+      "https://www.solkant.com/blog/comptabilite-institut-beaute-debutants",
   },
 };
 
@@ -108,27 +108,27 @@ export default function ArticleComptabiliteInstitutPage() {
               "Comptabilité d'institut de beauté : guide simplifié pour débutants",
             description:
               "Guide simplifié pour comprendre la comptabilité d’un institut de beauté : obligations, astuces, erreurs à éviter et outils pour débutants.",
-            image: "https://solkant.com/images/og/article-comptabilite.png",
+            image: "https://www.solkant.com/images/og/article-comptabilite.png",
             datePublished: "2025-12-12T09:00:00Z",
             dateModified: "2025-12-23T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/comptabilite-institut-beaute-debutants",
+                "https://www.solkant.com/blog/comptabilite-institut-beaute-debutants",
             },
           }),
         }}
@@ -146,19 +146,19 @@ export default function ArticleComptabiliteInstitutPage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Accueil",
-                item: "https://solkant.com",
+                item: "https://www.solkant.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Blog",
-                item: "https://solkant.com/blog",
+                item: "https://www.solkant.com/blog",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: "Comptabilité institut de beauté débutants",
-                item: "https://solkant.com/blog/comptabilite-institut-beaute-debutants",
+                item: "https://www.solkant.com/blog/comptabilite-institut-beaute-debutants",
               },
             ],
           }),

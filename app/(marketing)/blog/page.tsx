@@ -12,13 +12,13 @@ export const metadata: Metadata = {
     title: "Blog Solkant – Conseils pour instituts de beauté",
     description:
       "Guides et astuces pour améliorer la gestion quotidienne de votre institut de beauté.",
-    url: "https://solkant.com/blog",
+    url: "https://www.solkant.com/blog",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
     images: [
       {
-        url: "https://solkant.com/images/og/blog.png",
+        url: "https://www.solkant.com/images/og/blog.png",
         width: 1200,
         height: 630,
         alt: "Blog Solkant - Guides et conseils pour gérer votre institut",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     title: "Blog Solkant – Guides pour instituts de beauté",
     description:
       "Conseils d'experts pour optimiser la gestion de votre institut.",
-    images: ["https://solkant.com/images/og/blog.png"],
+    images: ["https://www.solkant.com/images/og/blog.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog",
+    canonical: "https://www.solkant.com/blog",
   },
 };
 

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Devis vs Facture : obligations légales institut de beauté",
     description:
       "Différences, mentions obligatoires, conseils et erreurs à éviter pour instituts de beauté.",
-    url: "https://solkant.com/blog/devis-vs-facture-obligations-legales",
+    url: "https://www.solkant.com/blog/devis-vs-facture-obligations-legales",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-devis-facture.png",
+        url: "https://www.solkant.com/images/og/article-devis-facture.png",
         width: 1200,
         height: 630,
         alt: "Devis vs Facture institut de beauté",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     title: "Devis vs Facture : obligations légales institut de beauté",
     description:
       "Différences, mentions obligatoires, conseils et erreurs à éviter pour instituts de beauté.",
-    images: ["https://solkant.com/images/og/article-devis-facture.png"],
+    images: ["https://www.solkant.com/images/og/article-devis-facture.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/devis-vs-facture-obligations-legales",
+    canonical: "https://www.solkant.com/blog/devis-vs-facture-obligations-legales",
   },
 };
 
@@ -107,27 +107,27 @@ export default function ArticleDevisFacturePage() {
               "Devis vs Facture : différences et obligations légales pour instituts",
             description:
               "Comprenez les différences entre devis et facture, et les obligations légales à respecter dans votre institut de beauté. Guide complet pour éviter les erreurs et rester conforme.",
-            image: "https://solkant.com/images/og/article-devis-facture.png",
+            image: "https://www.solkant.com/images/og/article-devis-facture.png",
             datePublished: "2025-12-05T09:00:00Z",
             dateModified: "2025-12-23T10:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/devis-vs-facture-obligations-legales",
+                "https://www.solkant.com/blog/devis-vs-facture-obligations-legales",
             },
           }),
         }}
@@ -145,19 +145,19 @@ export default function ArticleDevisFacturePage() {
                 "@type": "ListItem",
                 position: 1,
                 name: "Accueil",
-                item: "https://solkant.com",
+                item: "https://www.solkant.com",
               },
               {
                 "@type": "ListItem",
                 position: 2,
                 name: "Blog",
-                item: "https://solkant.com/blog",
+                item: "https://www.solkant.com/blog",
               },
               {
                 "@type": "ListItem",
                 position: 3,
                 name: "Devis vs Facture : obligations légales",
-                item: "https://solkant.com/blog/devis-vs-facture-obligations-legales",
+                item: "https://www.solkant.com/blog/devis-vs-facture-obligations-legales",
               },
             ],
           }),

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Devis en ligne vs papier : le meilleur choix pour votre institut",
     description:
       "Comparatif complet entre devis papier et numérique : avantages, coûts, efficacité.",
-    url: "https://solkant.com/blog/devis-en-ligne-vs-papier-institut-beaute",
+    url: "https://www.solkant.com/blog/devis-en-ligne-vs-papier-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/blog.png",
+        url: "https://www.solkant.com/images/og/blog.png",
         width: 1200,
         height: 630,
         alt: "Devis en ligne vs papier institut beauté",
@@ -31,11 +31,11 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Devis en ligne vs papier : quel choix pour votre institut ?",
     description: "Comparatif complet pour faire le bon choix en 2025.",
-    images: ["https://solkant.com/images/og/blog.png"],
+    images: ["https://www.solkant.com/images/og/blog.png"],
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/devis-en-ligne-vs-papier-institut-beaute",
+      "https://www.solkant.com/blog/devis-en-ligne-vs-papier-institut-beaute",
   },
 };
 
@@ -101,17 +101,17 @@ export default function ArticlePage() {
               "Devis en ligne vs devis papier : quel choix pour votre institut de beauté ?",
             description:
               "Comparatif complet entre devis papier et numérique pour instituts de beauté.",
-            image: "https://solkant.com/images/og/blog.png",
+            image: "https://www.solkant.com/images/og/blog.png",
             datePublished: "2025-01-10T09:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
           }),
         }}

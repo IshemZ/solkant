@@ -37,7 +37,7 @@ export const blogArticles: BlogArticle[] = [
     publishedTime: "2024-12-01T09:00:00Z",
     modifiedTime: "2024-12-01T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/article-devis.png",
+      url: "https://www.solkant.com/images/og/article-devis.png",
       alt: "Comment faire un devis professionnel pour votre institut de beauté",
     },
     keywords: [
@@ -62,7 +62,7 @@ export const blogArticles: BlogArticle[] = [
     publishedTime: "2024-12-06T10:00:00Z",
     modifiedTime: "2024-12-06T10:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/article-erreurs-devis.png",
+      url: "https://www.solkant.com/images/og/article-erreurs-devis.png",
       alt: "Les erreurs à éviter dans vos devis beauté",
     },
     keywords: [
@@ -88,7 +88,7 @@ export const blogArticles: BlogArticle[] = [
     publishedTime: "2024-12-06T14:00:00Z",
     modifiedTime: "2024-12-06T14:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/article-digitalisation.png",
+      url: "https://www.solkant.com/images/og/article-digitalisation.png",
       alt: "Digitaliser la gestion de votre institut de beauté",
     },
     keywords: [
@@ -113,7 +113,7 @@ export const blogArticles: BlogArticle[] = [
     publishedTime: "2024-11-28T09:00:00Z",
     modifiedTime: "2024-11-28T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/article-choisir-logiciel.png",
+      url: "https://www.solkant.com/images/og/article-choisir-logiciel.png",
       alt: "Comment choisir le bon logiciel de devis pour votre institut",
     },
     keywords: [
@@ -138,7 +138,7 @@ export const blogArticles: BlogArticle[] = [
     publishedTime: "2024-11-25T09:00:00Z",
     modifiedTime: "2024-11-25T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/article-gestion-clients.png",
+      url: "https://www.solkant.com/images/og/article-gestion-clients.png",
       alt: "5 astuces pour optimiser la gestion de vos clients",
     },
     keywords: [
@@ -163,7 +163,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-10T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Devis en ligne vs papier institut beauté",
     },
     keywords: [
@@ -187,7 +187,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-12T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Coût logiciel devis institut beauté",
     },
     keywords: [
@@ -211,7 +211,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-14T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Modèle devis gratuit institut beauté",
     },
     keywords: [
@@ -234,7 +234,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-15T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Fidéliser clientes institut beauté",
     },
     keywords: [
@@ -258,7 +258,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-17T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Envoyer devis par email bonnes pratiques",
     },
     keywords: [
@@ -281,7 +281,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-19T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Différence devis facture institut beauté",
     },
     keywords: [
@@ -304,7 +304,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-21T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Organiser planning institut beauté",
     },
     keywords: [
@@ -327,7 +327,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-23T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Comptabilité institut beauté",
     },
     keywords: [
@@ -350,7 +350,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-25T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Ouvrir institut beauté démarches",
     },
     keywords: [
@@ -373,7 +373,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-27T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Fixer tarifs institut beauté",
     },
     keywords: [
@@ -396,7 +396,7 @@ export const blogArticles: BlogArticle[] = [
     },
     publishedTime: "2025-01-28T09:00:00Z",
     image: {
-      url: "https://solkant.com/images/og/blog.png",
+      url: "https://www.solkant.com/images/og/blog.png",
       alt: "Matériel informatique pour institut de beauté",
     },
     keywords: [

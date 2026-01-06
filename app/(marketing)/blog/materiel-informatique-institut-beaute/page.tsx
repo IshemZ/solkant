@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Matériel informatique pour institut de beauté : Guide complet 2025",
     description:
       "Ordinateur, tablette, logiciel de gestion : tout le matériel essentiel pour digitaliser votre institut. Guide avec budget détaillé.",
-    url: "https://solkant.com/blog/materiel-informatique-institut-beaute",
+    url: "https://www.solkant.com/blog/materiel-informatique-institut-beaute",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/blog.png",
+        url: "https://www.solkant.com/images/og/blog.png",
         width: 1200,
         height: 630,
         alt: "Matériel informatique pour institut de beauté",
@@ -32,10 +32,10 @@ export const metadata: Metadata = {
     title: "Matériel informatique pour institut de beauté : Guide 2025",
     description:
       "Guide complet avec budget détaillé pour équiper votre institut.",
-    images: ["https://solkant.com/images/og/blog.png"],
+    images: ["https://www.solkant.com/images/og/blog.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/materiel-informatique-institut-beaute",
+    canonical: "https://www.solkant.com/blog/materiel-informatique-institut-beaute",
   },
 };
 
@@ -109,27 +109,27 @@ export default function MaterielInformatiqueArticle() {
               "Matériel informatique pour institut de beauté : Guide complet 2025",
             description:
               "Ordinateur, tablette, logiciel de gestion : découvrez tout le matériel informatique essentiel pour digitaliser votre institut de beauté. Guide complet avec budget détaillé.",
-            image: "https://solkant.com/images/og/blog.png",
+            image: "https://www.solkant.com/images/og/blog.png",
             datePublished: "2025-01-28T09:00:00Z",
             dateModified: "2025-01-28T09:00:00Z",
             author: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
               logo: {
                 "@type": "ImageObject",
-                url: "https://solkant.com/images/og/home.png",
+                url: "https://www.solkant.com/images/og/home.png",
               },
             },
             mainEntityOfPage: {
               "@type": "WebPage",
               "@id":
-                "https://solkant.com/blog/materiel-informatique-institut-beaute",
+                "https://www.solkant.com/blog/materiel-informatique-institut-beaute",
             },
           }),
         }}

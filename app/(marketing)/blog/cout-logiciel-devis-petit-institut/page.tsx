@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "Coût réel d'un logiciel de devis pour petit institut",
     description:
       "Prix, ROI et comparatif des solutions pour instituts de beauté.",
-    url: "https://solkant.com/blog/cout-logiciel-devis-petit-institut",
+    url: "https://www.solkant.com/blog/cout-logiciel-devis-petit-institut",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/blog.png",
+        url: "https://www.solkant.com/images/og/blog.png",
         width: 1200,
         height: 630,
         alt: "Coût logiciel devis institut beauté",
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     ],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/cout-logiciel-devis-petit-institut",
+    canonical: "https://www.solkant.com/blog/cout-logiciel-devis-petit-institut",
   },
 };
 

@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { blogArticles } from "@/lib/blog-articles";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://solkant.com";
+  const baseUrl = "https://www.solkant.com";
   const currentDate = new Date().toISOString();
 
   // Pages statiques principales (marketing)

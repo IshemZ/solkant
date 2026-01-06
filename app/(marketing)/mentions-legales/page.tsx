@@ -9,13 +9,13 @@ export const metadata: Metadata = {
     title: "Mentions légales – Solkant",
     description:
       "Informations légales sur Solkant, éditeur et hébergement du service.",
-    url: "https://solkant.com/mentions-legales",
+    url: "https://www.solkant.com/mentions-legales",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "website",
   },
   alternates: {
-    canonical: "https://solkant.com/mentions-legales",
+    canonical: "https://www.solkant.com/mentions-legales",
   },
   robots: {
     index: true,
@@ -36,11 +36,11 @@ export default function MentionsLegalesPage() {
             name: "Mentions légales – Solkant",
             description:
               "Mentions légales de Solkant, logiciel de devis pour instituts de beauté.",
-            url: "https://solkant.com/mentions-legales",
+            url: "https://www.solkant.com/mentions-legales",
             publisher: {
               "@type": "Organization",
               name: "Solkant",
-              url: "https://solkant.com",
+              url: "https://www.solkant.com",
             },
           }),
         }}

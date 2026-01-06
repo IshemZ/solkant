@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     title: "Envoyer un devis par email : guide 2025",
     description:
       "Toutes les étapes pour envoyer un devis par email à vos clientes, avec conseils et mentions obligatoires.",
-    url: "https://solkant.com/blog/envoyer-devis-email-guide-2025",
+    url: "https://www.solkant.com/blog/envoyer-devis-email-guide-2025",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/article-email.png",
+        url: "https://www.solkant.com/images/og/article-email.png",
         width: 1200,
         height: 630,
         alt: "Envoyer un devis par email institut de beauté",
@@ -30,10 +30,10 @@ export const metadata: Metadata = {
     title: "Envoyer un devis par email : guide 2025",
     description:
       "Toutes les étapes pour envoyer un devis par email à vos clientes, avec conseils et mentions obligatoires.",
-    images: ["https://solkant.com/images/og/article-email.png"],
+    images: ["https://www.solkant.com/images/og/article-email.png"],
   },
   alternates: {
-    canonical: "https://solkant.com/blog/envoyer-devis-email-guide-2025",
+    canonical: "https://www.solkant.com/blog/envoyer-devis-email-guide-2025",
   },
 };
 
@@ -106,27 +106,27 @@ export default function ArticleEmailPage() {
                 "Comment envoyer un devis par email : le guide complet 2025",
               description:
                 "Guide complet pour envoyer vos devis par email en toute sécurité et professionnalisme en 2025. Conseils, étapes, mentions légales et astuces pour instituts de beauté.",
-              image: "https://solkant.com/images/og/article-email.png",
+              image: "https://www.solkant.com/images/og/article-email.png",
               datePublished: "2025-12-10T09:00:00Z",
               dateModified: "2025-12-23T10:00:00Z",
               author: {
                 "@type": "Organization",
                 name: "Solkant",
-                url: "https://solkant.com",
+                url: "https://www.solkant.com",
               },
               publisher: {
                 "@type": "Organization",
                 name: "Solkant",
-                url: "https://solkant.com",
+                url: "https://www.solkant.com",
                 logo: {
                   "@type": "ImageObject",
-                  url: "https://solkant.com/images/og/home.png",
+                  url: "https://www.solkant.com/images/og/home.png",
                 },
               },
               mainEntityOfPage: {
                 "@type": "WebPage",
                 "@id":
-                  "https://solkant.com/blog/envoyer-devis-email-guide-2025",
+                  "https://www.solkant.com/blog/envoyer-devis-email-guide-2025",
               },
             }),
           }}
@@ -144,19 +144,19 @@ export default function ArticleEmailPage() {
                   "@type": "ListItem",
                   position: 1,
                   name: "Accueil",
-                  item: "https://solkant.com",
+                  item: "https://www.solkant.com",
                 },
                 {
                   "@type": "ListItem",
                   position: 2,
                   name: "Blog",
-                  item: "https://solkant.com/blog",
+                  item: "https://www.solkant.com/blog",
                 },
                 {
                   "@type": "ListItem",
                   position: 3,
                   name: "Envoyer un devis par email",
-                  item: "https://solkant.com/blog/envoyer-devis-email-guide-2025",
+                  item: "https://www.solkant.com/blog/envoyer-devis-email-guide-2025",
                 },
               ],
             }),

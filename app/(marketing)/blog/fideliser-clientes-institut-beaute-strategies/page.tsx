@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     title: "7 stratégies pour fidéliser vos clientes institut beauté",
     description:
       "Techniques concrètes pour augmenter la rétention et le CA récurrent.",
-    url: "https://solkant.com/blog/fideliser-clientes-institut-beaute-strategies",
+    url: "https://www.solkant.com/blog/fideliser-clientes-institut-beaute-strategies",
     siteName: "Solkant",
     locale: "fr_FR",
     type: "article",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     authors: ["Solkant"],
     images: [
       {
-        url: "https://solkant.com/images/og/blog.png",
+        url: "https://www.solkant.com/images/og/blog.png",
         width: 1200,
         height: 630,
         alt: "Fidéliser clientes institut beauté",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical:
-      "https://solkant.com/blog/fideliser-clientes-institut-beaute-strategies",
+      "https://www.solkant.com/blog/fideliser-clientes-institut-beaute-strategies",
   },
 };
 

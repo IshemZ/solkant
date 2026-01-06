@@ -33,7 +33,7 @@ export function generateHreflangLinks(pathname: string): Array<{
   hreflang: string;
   href: string;
 }> {
-  const baseUrl = "https://solkant.com";
+  const baseUrl = "https://www.solkant.com";
 
   const links: Array<{ hreflang: string; href: string }> = [
     {
@@ -54,7 +54,7 @@ export function generateHreflangLinks(pathname: string): Array<{
  * Inclut canonical et langues alternatives
  */
 export function generateAlternates(pathname: string) {
-  const baseUrl = "https://solkant.com";
+  const baseUrl = "https://www.solkant.com";
 
   return {
     canonical: `${baseUrl}${pathname}`,
