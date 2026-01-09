@@ -22,8 +22,10 @@ export const createClientSchema = z.object({
     .toLowerCase()
     .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'email invalide")
-    .optional()
-    .nullable(),
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   phone: z
     .string({ message: "Le numéro de téléphone est requis" })
     .trim()
@@ -37,39 +39,45 @@ export const createClientSchema = z.object({
     .string()
     .trim()
     .max(255, "L'adresse ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   // NEW - structured address fields
   rue: z
     .string()
     .trim()
     .max(255, "La rue ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   complement: z
     .string()
     .trim()
     .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   codePostal: z
     .string()
     .trim()
     .max(20, "Le code postal ne peut pas dépasser 20 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   ville: z
     .string()
     .trim()
     .max(100, "La ville ne peut pas dépasser 100 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   notes: z
     .string()
     .trim()
     .max(5000, "Les notes ne peuvent pas dépasser 5000 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
 });
 
 /**
@@ -95,8 +103,10 @@ export const updateClientSchema = z.object({
     .toLowerCase()
     .max(254, "L'email ne peut pas dépasser 254 caractères")
     .email("Format d'email invalide")
-    .optional()
-    .nullable(),
+    .or(z.literal(""))
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   phone: z
     .string()
     .trim()
@@ -111,39 +121,45 @@ export const updateClientSchema = z.object({
     .string()
     .trim()
     .max(255, "L'adresse ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   // NEW - structured address fields
   rue: z
     .string()
     .trim()
     .max(255, "La rue ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   complement: z
     .string()
     .trim()
     .max(255, "Le complément d'adresse ne peut pas dépasser 255 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   codePostal: z
     .string()
     .trim()
     .max(20, "Le code postal ne peut pas dépasser 20 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   ville: z
     .string()
     .trim()
     .max(100, "La ville ne peut pas dépasser 100 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
   notes: z
     .string()
     .trim()
     .max(5000, "Les notes ne peuvent pas dépasser 5000 caractères")
-    .optional()
-    .nullable(),
+    .transform((val) => (val === "" ? null : val))
+    .nullable()
+    .optional(),
 });
 
 /**

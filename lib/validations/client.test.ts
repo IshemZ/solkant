@@ -412,7 +412,7 @@ describe("Client Validation Schema", () => {
       }
     });
 
-    it("should accept empty strings for optional address fields", () => {
+    it("should transform empty strings to null for optional address fields", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
@@ -426,9 +426,9 @@ describe("Client Validation Schema", () => {
 
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.rue).toBe("");
-        expect(result.data.codePostal).toBe("");
-        expect(result.data.ville).toBe("");
+        expect(result.data.rue).toBeNull();
+        expect(result.data.codePostal).toBeNull();
+        expect(result.data.ville).toBeNull();
       }
     });
 

@@ -225,6 +225,44 @@ describe("Client Actions", () => {
         })
       );
     });
+
+    it("should create client with only required fields (nom, prénom, téléphone)", async () => {
+      // ARRANGE
+      const minimalInput = {
+        firstName: "Sophie",
+        lastName: "Martin",
+        phone: "0687654321",
+      };
+
+      const createdClient = createMockClient({
+        ...minimalInput,
+        businessId: "business-test-123",
+        email: null,
+        rue: null,
+        codePostal: null,
+        ville: null,
+        complement: null,
+        notes: null,
+      });
+
+      vi.mocked(prisma.client.count).mockResolvedValue(0);
+      vi.mocked(prisma.client.create).mockResolvedValue(createdClient);
+
+      // ACT
+      const result = await createClient(minimalInput);
+
+      // ASSERT
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data?.firstName).toBe("Sophie");
+        expect(result.data?.lastName).toBe("Martin");
+        expect(result.data?.phone).toBe("0687654321");
+        expect(result.data?.isFirstClient).toBe(true);
+      }
+
+      expect(prisma.client.create).toHaveBeenCalled();
+      expect(revalidatePath).toHaveBeenCalledWith("/dashboard/clients");
+    });
   });
 
   describe("updateClient", () => {
