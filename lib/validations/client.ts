@@ -25,15 +25,14 @@ export const createClientSchema = z.object({
     .optional()
     .nullable(),
   phone: z
-    .string()
+    .string({ message: "Le numéro de téléphone est requis" })
     .trim()
+    .min(1, "Le numéro de téléphone est requis")
     .max(20, "Le numéro de téléphone ne peut pas dépasser 20 caractères")
     .regex(
       /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       "Numéro de téléphone invalide (format français attendu)"
-    )
-    .optional()
-    .nullable(),
+    ),
   address: z
     .string()
     .trim()
@@ -44,7 +43,6 @@ export const createClientSchema = z.object({
   rue: z
     .string()
     .trim()
-    .min(1, "La rue est requise")
     .max(255, "La rue ne peut pas dépasser 255 caractères")
     .optional()
     .nullable(),
@@ -57,13 +55,12 @@ export const createClientSchema = z.object({
   codePostal: z
     .string()
     .trim()
-    .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+    .max(20, "Le code postal ne peut pas dépasser 20 caractères")
     .optional()
     .nullable(),
   ville: z
     .string()
     .trim()
-    .min(1, "La ville est requise")
     .max(100, "La ville ne peut pas dépasser 100 caractères")
     .optional()
     .nullable(),
@@ -103,13 +100,13 @@ export const updateClientSchema = z.object({
   phone: z
     .string()
     .trim()
+    .min(1, "Le numéro de téléphone ne peut pas être vide")
     .max(20, "Le numéro de téléphone ne peut pas dépasser 20 caractères")
     .regex(
       /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/,
       "Numéro de téléphone invalide (format français attendu)"
     )
-    .optional()
-    .nullable(),
+    .optional(),
   address: z
     .string()
     .trim()
@@ -120,7 +117,6 @@ export const updateClientSchema = z.object({
   rue: z
     .string()
     .trim()
-    .min(1, "La rue est requise")
     .max(255, "La rue ne peut pas dépasser 255 caractères")
     .optional()
     .nullable(),
@@ -133,13 +129,12 @@ export const updateClientSchema = z.object({
   codePostal: z
     .string()
     .trim()
-    .regex(/^\d{5}$/, "Le code postal doit contenir exactement 5 chiffres")
+    .max(20, "Le code postal ne peut pas dépasser 20 caractères")
     .optional()
     .nullable(),
   ville: z
     .string()
     .trim()
-    .min(1, "La ville est requise")
     .max(100, "La ville ne peut pas dépasser 100 caractères")
     .optional()
     .nullable(),
@@ -169,7 +164,7 @@ export interface CreateClientResult {
   firstName: string;
   lastName: string;
   email: string | null;
-  phone: string | null;
+  phone: string;
   address: string | null;
   rue: string | null;
   complement: string | null;

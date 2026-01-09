@@ -27,6 +27,7 @@ describe("Client Validation Schema", () => {
         firstName: "  Jean  ",
         lastName: "  Dupont  ",
         email: "  JEAN@EXAMPLE.COM  ",
+        phone: "  0123456789  ",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -36,12 +37,15 @@ describe("Client Validation Schema", () => {
         expect(result.data.firstName).toBe("Jean");
         expect(result.data.lastName).toBe("Dupont");
         expect(result.data.email).toBe("jean@example.com");
+        expect(result.data.phone).toBe("0123456789");
       }
     });
 
     it("should require firstName", () => {
       const data = {
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -62,6 +66,8 @@ describe("Client Validation Schema", () => {
     it("should require lastName", () => {
       const data = {
         firstName: "Jean",
+        email: "jean@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -79,11 +85,30 @@ describe("Client Validation Schema", () => {
       }
     });
 
+    it("should require phone", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const phoneError = result.error.issues.find(
+          (issue) => issue.path[0] === "phone"
+        );
+        expect(phoneError).toBeDefined();
+        expect(phoneError?.message).toMatch(/requis|required|expected string/);
+      }
+    });
+
     it("should reject invalid email format", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
         email: "invalid-email",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -110,6 +135,7 @@ describe("Client Validation Schema", () => {
         const data = {
           firstName: "Jean",
           lastName: "Dupont",
+          email: "jean@example.com",
           phone,
         };
 
@@ -122,6 +148,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "A".repeat(51), // Plus de 50 caractères
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -135,10 +163,11 @@ describe("Client Validation Schema", () => {
       }
     });
 
-    it("should accept optional fields as undefined", () => {
+    it("should accept optional email, address and notes fields", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -146,8 +175,10 @@ describe("Client Validation Schema", () => {
       expect(result.success).toBe(true);
       if (result.success) {
         expect(result.data.email).toBeUndefined();
-        expect(result.data.phone).toBeUndefined();
         expect(result.data.address).toBeUndefined();
+        expect(result.data.rue).toBeUndefined();
+        expect(result.data.codePostal).toBeUndefined();
+        expect(result.data.ville).toBeUndefined();
         expect(result.data.notes).toBeUndefined();
       }
     });
@@ -156,6 +187,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
         notes: "A".repeat(5001), // Plus de 5000 caractères
       };
 
@@ -174,6 +207,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "François",
         lastName: "Lefèvre",
+        email: "francois@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -189,6 +224,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "Jean-Claude",
         lastName: "O'Brien",
+        email: "jc@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -245,12 +282,32 @@ describe("Client Validation Schema", () => {
   });
 
   describe("Edge Cases & Security", () => {
-    it("should handle null values correctly", () => {
+    it("should reject null values for required phone field", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
         email: null,
         phone: null,
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(false);
+      if (!result.success) {
+        const errors = result.error.issues.map((i) => i.path[0]);
+        expect(errors).toContain("phone");
+      }
+    });
+
+    it("should accept null values for optional fields (email, address)", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        email: null,
+        phone: "0123456789",
+        rue: null,
+        ville: null,
+        codePostal: null,
       };
 
       const result = createClientSchema.safeParse(data);
@@ -285,6 +342,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "   ",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(data);
@@ -298,6 +357,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
         rue: "123 Rue de Rivoli",
         complement: "Appartement 4B",
         codePostal: "75001",
@@ -319,6 +380,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
         rue: "123 Rue de Rivoli",
         codePostal: "75001",
         ville: "Paris",
@@ -332,35 +395,53 @@ describe("Client Validation Schema", () => {
       }
     });
 
-    it.each(["1234", "123456", "ABCDE", "7500a"])(
-      "should reject invalid postal code format: %s",
-      (code) => {
-        const data = {
-          firstName: "Jean",
-          lastName: "Dupont",
-          rue: "123 Rue de Rivoli",
-          codePostal: code,
-          ville: "Paris",
-        };
+    it("should accept client without any address fields", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        phone: "0123456789",
+      };
 
-        const result = createClientSchema.safeParse(data);
-        expect(result.success).toBe(false);
-        if (!result.success) {
-          const error = result.error.issues.find(
-            (issue) => issue.path[0] === "codePostal"
-          );
-          expect(error?.message).toMatch(/5 chiffres/);
-        }
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.rue).toBeUndefined();
+        expect(result.data.codePostal).toBeUndefined();
+        expect(result.data.ville).toBeUndefined();
       }
-    );
+    });
 
-    it("should accept valid French postal codes", () => {
-      const validCodes = ["75001", "13001", "69001", "33000"];
+    it("should accept empty strings for optional address fields", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        phone: "0123456789",
+        rue: "",
+        codePostal: "",
+        ville: "",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.rue).toBe("");
+        expect(result.data.codePostal).toBe("");
+        expect(result.data.ville).toBe("");
+      }
+    });
+
+    it("should accept any postal code format as it is optional", () => {
+      // Since postal code is optional and has no format validation, accept any string
+      const validCodes = ["75001", "1234", "123456", "ABCDE", "13001"];
 
       validCodes.forEach((code) => {
         const data = {
           firstName: "Jean",
           lastName: "Dupont",
+          email: "jean@example.com",
+          phone: "0123456789",
           rue: "123 Rue Example",
           codePostal: code,
           ville: "Paris",
@@ -375,6 +456,8 @@ describe("Client Validation Schema", () => {
       const data = {
         firstName: "Jean",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
         rue: "  123 Rue de Rivoli  ",
         complement: "  Appartement 4B  ",
         codePostal: "  75001  ",
@@ -393,20 +476,40 @@ describe("Client Validation Schema", () => {
     });
 
     it("should enforce maximum length on address fields", () => {
-      const data = {
+      const dataRueTooLong = {
         firstName: "Jean",
         lastName: "Dupont",
+        email: "jean@example.com",
+        phone: "0123456789",
         rue: "A".repeat(256), // Plus de 255 caractères
       };
 
-      const result = createClientSchema.safeParse(data);
+      const resultRue = createClientSchema.safeParse(dataRueTooLong);
 
-      expect(result.success).toBe(false);
-      if (!result.success) {
-        const error = result.error.issues.find(
+      expect(resultRue.success).toBe(false);
+      if (!resultRue.success) {
+        const error = resultRue.error.issues.find(
           (issue) => issue.path[0] === "rue"
         );
         expect(error?.message).toContain("255 caractères");
+      }
+
+      // Test code postal max length
+      const dataCodePostalTooLong = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        phone: "0123456789",
+        codePostal: "A".repeat(21), // Plus de 20 caractères
+      };
+
+      const resultCodePostal = createClientSchema.safeParse(dataCodePostalTooLong);
+
+      expect(resultCodePostal.success).toBe(false);
+      if (!resultCodePostal.success) {
+        const error = resultCodePostal.error.issues.find(
+          (issue) => issue.path[0] === "codePostal"
+        );
+        expect(error?.message).toContain("20 caractères");
       }
     });
   });
@@ -418,6 +521,8 @@ describe("Client Validation Schema", () => {
       const dataWithHTML = {
         firstName: '<script>alert("XSS")</script>',
         lastName: "Dupont",
+        email: "test@example.com",
+        phone: "0123456789",
       };
 
       const result = createClientSchema.safeParse(dataWithHTML);
@@ -441,8 +546,22 @@ describe("Client Validation Schema", () => {
       if (!result.success) {
         const errorPaths = result.error.issues.map((i) => i.path[0]);
         expect(errorPaths).toContain("firstName");
-        expect(errorPaths).toContain("email");
+        expect(errorPaths).toContain("lastName");
+        expect(errorPaths).toContain("email"); // Invalid format
+        expect(errorPaths).toContain("phone"); // Invalid format
       }
+    });
+
+    it("should accept missing optional email field", () => {
+      const data = {
+        firstName: "Jean",
+        lastName: "Dupont",
+        phone: "0123456789",
+      };
+
+      const result = createClientSchema.safeParse(data);
+
+      expect(result.success).toBe(true);
     });
   });
 });

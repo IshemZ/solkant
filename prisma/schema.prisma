@@ -113,7 +113,7 @@ model Client {
   firstName  String
   lastName   String
   email      String?
-  phone      String?
+  phone      String
   address    String?
   notes      String?
   createdAt  DateTime @default(now())

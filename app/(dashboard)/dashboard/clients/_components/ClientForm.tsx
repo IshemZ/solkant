@@ -56,7 +56,7 @@ export default function ClientForm({
       firstName: client?.firstName || "",
       lastName: client?.lastName || "",
       email: client?.email || null,
-      phone: client?.phone || null,
+      phone: client?.phone || "",
       address: client?.address || null, // Legacy field
       rue: client?.rue || null,
       complement: client?.complement || null,
@@ -221,7 +221,7 @@ export default function ClientForm({
               label="Email"
               id="email"
               error={errors.email?.message}
-              hint="Format : exemple@email.com"
+              hint="Format : exemple@email.com (optionnel)"
             >
               <Input
                 id="email"
@@ -237,6 +237,7 @@ export default function ClientForm({
             <FormField
               label="Téléphone"
               id="phone"
+              required
               error={errors.phone?.message}
               hint="Format français : 06 12 34 56 78"
             >
@@ -257,8 +258,8 @@ export default function ClientForm({
             <FormField
               label="Rue"
               id="rue"
-              required
               error={errors.rue?.message}
+              hint="Optionnel"
             >
               <Input
                 id="rue"
@@ -266,7 +267,7 @@ export default function ClientForm({
                 autoComplete="street-address"
                 placeholder="123 Rue de Rivoli"
                 aria-invalid={!!errors.rue}
-                aria-describedby={errors.rue ? "rue-error" : undefined}
+                aria-describedby={errors.rue ? "rue-error" : "rue-hint"}
               />
             </FormField>
 
@@ -292,9 +293,8 @@ export default function ClientForm({
               <FormField
                 label="Code postal"
                 id="codePostal"
-                required
                 error={errors.codePostal?.message}
-                hint="5 chiffres"
+                hint="5 chiffres (optionnel)"
               >
                 <Input
                   id="codePostal"
@@ -313,8 +313,8 @@ export default function ClientForm({
               <FormField
                 label="Ville"
                 id="ville"
-                required
                 error={errors.ville?.message}
+                hint="Optionnel"
               >
                 <Input
                   id="ville"
@@ -322,7 +322,7 @@ export default function ClientForm({
                   autoComplete="address-level2"
                   placeholder="Paris"
                   aria-invalid={!!errors.ville}
-                  aria-describedby={errors.ville ? "ville-error" : undefined}
+                  aria-describedby={errors.ville ? "ville-error" : "ville-hint"}
                 />
               </FormField>
             </div>
