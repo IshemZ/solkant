@@ -150,27 +150,6 @@ export function withAuthAndValidation<TInput, TOutput>(
 }
 
 /**
- * Higher-order function for authenticated actions (alias de withAuth)
- *
- * @deprecated Email verification has been removed - this is now identical to withAuth. Use withAuth instead.
- * @param handler - The server action handler function
- * @param actionName - Name of the action for error logging
- * @param errorMessage - Optional custom error message
- * @returns Wrapped function with auth and error handling
- */
-export function withAuthUnverified<TInput, TOutput>(
-  handler: (
-    input: TInput,
-    session: ValidatedSession
-  ) => Promise<ActionResult<TOutput>>,
-  actionName: string,
-  errorMessage?: string
-) {
-  // Delegate to withAuth - no longer any difference since email verification was removed
-  return withAuth(handler, actionName, errorMessage);
-}
-
-/**
  * Higher-order function that wraps public (unauthenticated) server action handlers
  * with validation and error handling.
  *

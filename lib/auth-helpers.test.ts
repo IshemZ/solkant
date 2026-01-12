@@ -6,7 +6,7 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { validateSessionWithEmail, validateSession } from "@/lib/auth-helpers";
+import { validateSessionWithEmail } from "@/lib/auth-helpers";
 import * as NextAuth from "next-auth";
 import prisma from "@/lib/prisma";
 
@@ -182,82 +182,6 @@ describe("validateSessionWithEmail", () => {
     );
 
     const result = await validateSessionWithEmail();
-
-    expect(result).toEqual({
-      error: "Erreur lors de la validation de la session",
-      code: "UNAUTHORIZED",
-    });
-  });
-});
-
-describe("validateSession", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  afterEach(() => {
-    vi.restoreAllMocks();
-  });
-
-  it("devrait retourner une erreur si aucune session", async () => {
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(null);
-
-    const result = await validateSession();
-
-    expect(result).toEqual({
-      error: "Non autorisé",
-      code: "UNAUTHORIZED",
-    });
-  });
-
-  it("devrait retourner une erreur si pas de businessId", async () => {
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue({
-      user: {
-        id: "user123",
-        email: "test@example.com",
-        // businessId manquant
-      },
-      expires: new Date().toISOString(),
-    } as never);
-
-    const result = await validateSession();
-
-    expect(result).toEqual({
-      error: "Non autorisé",
-      code: "UNAUTHORIZED",
-    });
-  });
-
-  it("devrait retourner ValidatedSession directement depuis la session", async () => {
-    const mockSession = {
-      user: {
-        id: "user123",
-        email: "test@example.com",
-        businessId: "biz123",
-      },
-      expires: new Date().toISOString(),
-    };
-
-    vi.mocked(NextAuth.getServerSession).mockResolvedValue(mockSession as never);
-
-    const result = await validateSession();
-
-    // Ne devrait PAS appeler prisma si businessId est présent dans la session
-    expect(prisma.user.findUnique).not.toHaveBeenCalled();
-
-    expect(result).toEqual({
-      userId: "user123",
-      userEmail: "test@example.com",
-      businessId: "biz123",
-    });
-  });
-
-  it("devrait gérer les erreurs gracieusement", async () => {
-    vi.mocked(NextAuth.getServerSession).mockRejectedValue(
-      new Error("NextAuth error")
-    );
-
-    const result = await validateSession();
 
     expect(result).toEqual({
       error: "Erreur lors de la validation de la session",

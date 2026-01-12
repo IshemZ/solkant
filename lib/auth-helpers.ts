@@ -135,54 +135,6 @@ export async function validateSessionWithEmail(): Promise<
 }
 
 /**
- * Valide la session utilisateur (alias de validateSessionWithEmail pour compatibilité)
- *
- * @deprecated Utilisez validateSessionWithEmail à la place
- * @returns ValidatedSession si succès, AuthError si échec
- */
-export async function validateSession(): Promise<ValidatedSession | AuthError> {
-  try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id || !session.user.businessId) {
-      return {
-        error: "Non autorisé",
-        code: "UNAUTHORIZED",
-      };
-    }
-
-    // Lazy import Sentry to avoid bundling in client components
-    const Sentry = await import("@sentry/nextjs");
-    Sentry.setContext("user", {
-      userId: session.user.id,
-      businessId: session.user.businessId,
-      email: session.user.email,
-    });
-
-    return {
-      userId: session.user.id,
-      userEmail: session.user.email,
-      businessId: session.user.businessId,
-    };
-  } catch (error) {
-    // Lazy import Sentry to avoid bundling in client components
-    const Sentry = await import("@sentry/nextjs");
-    Sentry.captureException(error, {
-      tags: { action: "validateSession" },
-    });
-
-    if (process.env.NODE_ENV === "development") {
-      console.error("Error in validateSession:", error);
-    }
-
-    return {
-      error: "Erreur lors de la validation de la session",
-      code: "UNAUTHORIZED",
-    };
-  }
-}
-
-/**
  * Valide que l'utilisateur connecté est un super admin
  *
  * IMPORTANT: businessId peut être vide pour les super admins (opérations système)

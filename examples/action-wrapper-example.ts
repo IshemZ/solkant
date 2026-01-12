@@ -224,7 +224,7 @@ export const getClientById = withAuthAndValidation(
 
 /**
  * Récupère les préférences utilisateur
- * Pattern: withAuth (ou withAuthUnverified - identique maintenant)
+ * Pattern: withAuth
  */
 export const getUserPreferences = withAuth(
   async (_input: void, session) => {
@@ -460,11 +460,7 @@ export const searchClients = withAuthAndValidation(
    ✅ PUT/PATCH (mises à jour)
    ✅ Actions avec inputs complexes
 
-3. withAuthUnverified() - DEPRECATED: Identique à withAuth maintenant
-   ⚠️  Email verification has been removed
-   ✅ Use withAuth() instead for all authenticated actions
-
-4. Best Practices:
+3. Best Practices:
    - Toujours filtrer par businessId pour multi-tenancy
    - Utiliser revalidatePath() après mutations
    - Logger les actions critiques avec auditLog()
